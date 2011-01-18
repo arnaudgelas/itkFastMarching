@@ -77,7 +77,26 @@ class MeshFastMarchingTraits :
   {};
 
 
-
+/**
+ * \class FastMarchingBase
+ * \brief Solve an Eikonal equation (see equation below) using Fast Marching
+ *
+ * Fast marching solves an Eikonal equation where the speed is always
+ * non-negative and depends on the position only. Starting from an
+ * initial position on the front, fast marching systematically moves the
+ * front forward one grid point at a time.
+ *
+ * Updates are preformed using an entropy satisfy scheme where only
+ * "upwind" neighborhoods are used.
+ *
+ * Fast Marching sweeps through N grid points in (N log N) steps to obtain
+ * the arrival time value as the front propagates through the grid.
+ *
+ * Implementation of this class is based on Chapter 8 of
+ * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
+ * Cambridge Press, Second edition, 1999.
+ *
+*/
 template< class TTraits >
 class FastMarchingBase : public TTraits::SuperclassType
   {
@@ -122,7 +141,7 @@ public:
                    Alive,
                    Trial,
                    InitialTrial,
-                   Outside };
+                   Forbidden };
 
   enum TopologyCheckType { None = 0,
                            NoHandles,
@@ -132,14 +151,24 @@ public:
   itkSetMacro( TopologyCheck, TopologyCheckType );
   itkGetConstReferenceMacro( TopologyCheck, TopologyCheckType );
 
+  typedef std::pair< NodeType, OutputPixelType > NodePairType;
   typedef std::vector< std::pair< NodeType, OutputPixelType > > NodeContainerType;
   typedef typename NodeContainerType::iterator NodeContainerIterator;
 
   virtual void SetAliveNodes( NodeContainerType iNodes ) = 0;
   virtual void AddAliveNode( NodeType iNode, OutputPixelType iValue ) = 0;
 
-  virtual void SetTrialNodes( NodeContainerType iNodes ) = 0;
-  virtual void AddTrialNode( NodeType iNode, OutputPixelType iValue ) = 0;
+  virtual void SetTrialNodes( NodeContainerType iNodes )
+    {
+    m_TrialNodes = iNodes;
+    this->Modified();
+    }
+
+  virtual void AddTrialNode( NodeType iNode, OutputPixelType iValue )
+    {
+    m_TrialNodes.push_back( NodePairType( iNode, iValue ) );
+    this->Modified();
+    }
 
   virtual void SetForbiddenNodes( NodeType iNodes ) = 0;
   virtual void AddForbiddenNode( NodeType iNode ) = 0;
@@ -162,6 +191,8 @@ protected:
   double m_InverseSpeed;
   double m_NormalizationFactor;
   OutputPixelType m_StoppingValue;
+
+  NodeContainerType m_TrialNodes;
 
   PriorityQueuePointer m_Heap;
 
@@ -207,7 +238,7 @@ protected:
           // Send events every certain number of points.
           newProgress = static_cast< double >( current_value ) /
             static_cast< double >( m_StoppingValue );
-          if ( current_value - oldProgress > 0.01 )
+          if ( newProgress - oldProgress > 0.01 )
             {
             this->UpdateProgress(newProgress);
             oldProgress = newProgress;
@@ -241,4 +272,4 @@ private:
 
 }
 
-#endif // ITKFASTMARCHING_H
+#endif

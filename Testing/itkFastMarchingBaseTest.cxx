@@ -29,11 +29,6 @@ public:
   virtual void AddAliveNode( NodeType iNode, OutputPixelType iValue )
     { (void) iNode; (void) iValue; }
 
-  void SetTrialNodes( NodeContainerType iNodes )
-    { (void) iNodes; }
-  void AddTrialNode( NodeType iNode, OutputPixelType iValue )
-    { (void) iNode; (void) iValue; }
-
   virtual void SetForbiddenNodes( NodeType iNodes )
     { (void) iNodes; }
   virtual void AddForbiddenNode( NodeType iNode )
