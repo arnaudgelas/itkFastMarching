@@ -10,6 +10,6 @@ endif()
 
 include_directories( Code )
 
+include( CTest )
 add_subdirectory( Testing )
 
-include( CTest )

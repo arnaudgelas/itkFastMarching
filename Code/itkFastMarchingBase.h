@@ -147,10 +147,18 @@ public:
 
 protected:
 
-  FastMarchingBase() {}
+  FastMarchingBase()
+    {
+    m_Heap = PriorityQueueType::New();
+    m_SpeedConstant = 1.;
+    m_InverseSpeed = 1.;
+    m_NormalizationFactor = 1.;
+    m_StoppingValue = 0.;
+    m_TopologyCheck = None;
+    }
   virtual ~FastMarchingBase() {}
 
-  double m_SpeedConstand;
+  double m_SpeedConstant;
   double m_InverseSpeed;
   double m_NormalizationFactor;
   OutputPixelType m_StoppingValue;
