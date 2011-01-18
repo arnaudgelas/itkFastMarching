@@ -9,3 +9,6 @@ if( ${ITK_FOUND} )
 endif()
 
 include_directories( Code )
+
+add_subdirectory( Testing )
+

@@ -16,8 +16,8 @@
  *
  *=========================================================================*/
 
-#ifndef __itkFastMarching_h
-#define __itkFastMarching_h
+#ifndef __itkFastMarchingBase_h
+#define __itkFastMarchingBase_h
 
 namespace itk
 {
@@ -65,10 +65,10 @@ class MeshFastMarchingTraits :
 
 
 template< class TTraits >
-class FastMarching : public TTraits::SuperclassType
+class FastMarchingBase : public TTraits::SuperclassType
   {
 public:
-  typedef FastMarching                Self;
+  typedef FastMarchingBase                Self;
   typedef TSuperclass                 Superclass;
   typedef SmartPointer< Self >        Pointer;
   typedef SmartPointer< const Self >  ConstPointer;
@@ -122,8 +122,8 @@ public:
 
 protected:
 
-  FastMarching();
-  virtual ~FastMarching();
+  FastMarchingBase();
+  virtual ~FastMarchingBase();
 
   double m_SpeedConstand;
   double m_InverseSpeed;
@@ -196,7 +196,7 @@ protected:
 
 
 private:
-  FastMarching( const Self& );
+  FastMarchingBase( const Self& );
   void operator = ( const Self& );
   };
 
