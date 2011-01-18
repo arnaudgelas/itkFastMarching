@@ -1,4 +1,8 @@
 add_executable( itkFastMarchingBaseTest itkFastMarchingBaseTest.cxx )
 target_link_libraries( itkFastMarchingBaseTest ITKCommon )
 
-add_test( itkFastMarchingBaseTest itkFastMarchingBaseTest )
+add_test( itkImageFastMarchingBaseTest
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingBaseTest 0 )
+
+add_test( itkMeshFastMarchingBaseTest
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingBaseTest 1 )

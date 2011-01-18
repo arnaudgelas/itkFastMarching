@@ -1,4 +1,5 @@
 #include "itkFastMarchingBase.h"
+#include "itkDefaultStaticMeshTraits.h"
 
 namespace itk
 {
@@ -64,18 +65,52 @@ private:
 
 int main( int argc, char* argv[] )
 {
-  (void) argc;
-  (void) argv;
+  if( argc != 2 )
+    {
+    return EXIT_FAILURE;
+    }
 
-  typedef itk::ImageFastMarchingTraits< 2, float, float >
-    ImageTraits;
-  typedef ImageTraits::InputDomainType InputImageType;
-  InputImageType::Pointer input = InputImageType::New();
+  if( atoi( argv[1] ) == 0 )
+    {
+    typedef itk::ImageFastMarchingTraits< 2, float, float >
+      ImageTraits;
+    typedef ImageTraits::InputDomainType InputImageType;
+    InputImageType::Pointer input = InputImageType::New();
 
-  typedef itk::FastMarchingBaseTestHelper< ImageTraits > ImageFastMarching;
-  ImageFastMarching::Pointer fmm = ImageFastMarching::New();
-  fmm->SetInput( input );
-  fmm->Update();
+    typedef itk::FastMarchingBaseTestHelper< ImageTraits > ImageFastMarching;
+    ImageFastMarching::Pointer fmm = ImageFastMarching::New();
+    fmm->SetInput( input );
+    fmm->Update();
+
+    typedef ImageFastMarching::OutputDomainType OutputImageType;
+    OutputImageType::Pointer output = fmm->GetOutput();
+
+    (void) output;
+    }
+  else
+    {
+    if( atoi( argv[1] ) == 1 )
+      {
+      typedef itk::MeshFastMarchingTraits< 3,
+          float,
+          itk::DefaultStaticMeshTraits< float, 3, 3 >,
+          float,
+          itk::DefaultStaticMeshTraits< float, 3, 3 > >
+        MeshTraits;
+      typedef MeshTraits::InputDomainType InputMeshType;
+      InputMeshType::Pointer input = InputMeshType::New();
+
+      typedef itk::FastMarchingBaseTestHelper< MeshTraits > MeshFastMarching;
+      MeshFastMarching::Pointer fmm = MeshFastMarching::New();
+      fmm->SetInput( input );
+      fmm->Update();
+
+      typedef MeshFastMarching::OutputDomainType OutputMeshType;
+      OutputMeshType::Pointer output = fmm->GetOutput();
+
+      (void) output;
+      }
+    }
 
   return EXIT_SUCCESS;
 }
