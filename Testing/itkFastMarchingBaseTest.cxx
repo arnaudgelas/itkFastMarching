@@ -64,10 +64,18 @@ private:
 
 int main( int argc, char* argv[] )
 {
+  (void) argc;
+  (void) argv;
+
   typedef itk::ImageFastMarchingTraits< 2, float, float >
     ImageTraits;
+  typedef ImageTraits::InputDomainType InputImageType;
+  InputImageType::Pointer input = InputImageType::New();
+
   typedef itk::FastMarchingBaseTestHelper< ImageTraits > ImageFastMarching;
   ImageFastMarching::Pointer fmm = ImageFastMarching::New();
+  fmm->SetInput( input );
+  fmm->Update();
 
   return EXIT_SUCCESS;
 }

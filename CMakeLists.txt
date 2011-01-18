@@ -12,3 +12,4 @@ include_directories( Code )
 
 add_subdirectory( Testing )
 
+include( CTest )
