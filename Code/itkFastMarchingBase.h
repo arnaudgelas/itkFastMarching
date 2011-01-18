@@ -155,8 +155,17 @@ public:
   typedef std::vector< std::pair< NodeType, OutputPixelType > > NodeContainerType;
   typedef typename NodeContainerType::iterator NodeContainerIterator;
 
-  virtual void SetAliveNodes( NodeContainerType iNodes ) = 0;
-  virtual void AddAliveNode( NodeType iNode, OutputPixelType iValue ) = 0;
+  virtual void SetAliveNodes( NodeContainerType iNodes )
+    {
+    m_AliveNodes = iNodes;
+    this->Modified();
+    }
+
+  virtual void AddAliveNode( NodeType iNode, OutputPixelType iValue )
+    {
+    m_AliveNodes.push_back( NodePairType( iNode, iValue ) );
+    this->Modified();
+    }
 
   virtual void SetTrialNodes( NodeContainerType iNodes )
     {
@@ -170,8 +179,17 @@ public:
     this->Modified();
     }
 
-  virtual void SetForbiddenNodes( NodeType iNodes ) = 0;
-  virtual void AddForbiddenNode( NodeType iNode ) = 0;
+  virtual void SetForbiddenNodes( std::vector< NodeType > iNodes )
+    {
+    m_ForbiddenNodes = iNodes;
+    this->Modified();
+    }
+
+  virtual void AddForbiddenNode( NodeType iNode )
+    {
+    m_ForbiddenNodes.push_back( iNode );
+    this->Modified();
+    }
 
 
 protected:
@@ -193,6 +211,8 @@ protected:
   OutputPixelType m_StoppingValue;
 
   NodeContainerType m_TrialNodes;
+  NodeContainerType m_AliveNodes;
+  std::vector< NodeType > m_ForbiddenNodes;
 
   PriorityQueuePointer m_Heap;
 

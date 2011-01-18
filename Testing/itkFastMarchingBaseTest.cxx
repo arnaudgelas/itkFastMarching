@@ -24,16 +24,6 @@ public:
   typedef typename Superclass::OutputPixelType  OutputPixelType;
   typedef typename Superclass::LabelType        LabelType;
 
-  void SetAliveNodes( NodeContainerType iNodes )
-    { (void) iNodes; }
-  virtual void AddAliveNode( NodeType iNode, OutputPixelType iValue )
-    { (void) iNode; (void) iValue; }
-
-  virtual void SetForbiddenNodes( NodeType iNodes )
-    { (void) iNodes; }
-  virtual void AddForbiddenNode( NodeType iNode )
-    { (void) iNode; }
-
 protected:
   FastMarchingBaseTestHelper() {}
   ~FastMarchingBaseTestHelper() {}
