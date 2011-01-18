@@ -29,7 +29,7 @@ class FastMarchingTraits
   {
 public:
   typedef TInputDomain InputDomainType;
-  typedef DomainType::Pointer InputDomainPointer;
+  typedef InputDomainType::Pointer InputDomainPointer;
 
   typedef TNode NodeType;
   typedef TOutputDomain OutputDomainType;
