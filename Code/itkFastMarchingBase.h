@@ -225,7 +225,7 @@ protected:
     m_TargetReachedValue = NumericTraits< OutputPixelType >::Zero;
     m_TopologyCheck = None;
     m_TargetCondition = NoTargets;
-    m_NumberOfTargetsToBeReached = 1;
+    m_NumberOfTargetsToBeReached = 0;
     }
   virtual ~FastMarchingBase() {}
 
@@ -282,18 +282,27 @@ protected:
       {
       itkExceptionMacro( <<"Stopping Value is null or negative" );
       }
-    if( m_TargetCondition == OneTarget )
+    if( m_TargetCondition != NoTargets )
       {
-      m_NumberOfTargetsToBeReached = 1;
-      }
-    if( m_TargetCondition == AllTargets )
-      {
-      m_NumberOfTargetsToBeReached = m_TargetNodes.size();
-      }
-    if( m_NumberOfTargetsToBeReached > m_TargetNodes.size() )
-      {
-      itkExceptionMacro(
-        <<"Number of target nodes to be reached is above the provided number of target nodes" );
+      if( m_TargetCondition == OneTarget )
+        {
+        m_NumberOfTargetsToBeReached = 1;
+        }
+      if( m_TargetCondition == AllTargets )
+        {
+        m_NumberOfTargetsToBeReached = m_TargetNodes.size();
+        }
+      if( m_NumberOfTargetsToBeReached < 1 )
+        {
+        itkExceptionMacro(
+          <<"Number of target nodes to be reached is null" );
+        }
+      if( m_NumberOfTargetsToBeReached > m_TargetNodes.size() )
+        {
+        itkExceptionMacro(
+          <<"Number of target nodes to be reached is above the provided number of target nodes" );
+        }
+      m_ReachedTargetNodes.clear();
       }
     if( m_NormalizationFactor < vnl_math::eps )
       {
