@@ -164,12 +164,7 @@ public:
   typedef std::vector< std::pair< NodeType, OutputPixelType > > NodeContainerType;
   typedef typename NodeContainerType::iterator NodeContainerIterator;
 
-  virtual void SetAliveNodes( NodeContainerType iNodes )
-    {
-    m_AliveNodes = iNodes;
-    this->Modified();
-    }
-
+  virtual void SetAliveNodes( NodeContainerType iNodes );
   virtual void AddAliveNode( NodeType iNode, OutputPixelType iValue )
     {
     m_AliveNodes.push_back( NodePairType( iNode, iValue ) );
@@ -215,19 +210,8 @@ public:
 
 protected:
 
-  FastMarchingBase()
-    {
-    m_Heap = PriorityQueueType::New();
-    m_SpeedConstant = 1.;
-    m_InverseSpeed = 1.;
-    m_NormalizationFactor = 1.;
-    m_StoppingValue = NumericTraits< OutputPixelType >::Zero;
-    m_TargetReachedValue = NumericTraits< OutputPixelType >::Zero;
-    m_TopologyCheck = None;
-    m_TargetCondition = NoTargets;
-    m_NumberOfTargetsToBeReached = 0;
-    }
-  virtual ~FastMarchingBase() {}
+  FastMarchingBase();
+  virtual ~FastMarchingBase();
 
   double m_SpeedConstant;
   double m_InverseSpeed;
@@ -415,4 +399,5 @@ private:
 
 }
 
+#include "itkFastMarchingBase.txx"
 #endif
