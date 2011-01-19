@@ -389,10 +389,11 @@ InitializeOutput()
       //if ( m_BufferedRegion.IsInside( idx ) )
         {
         // make this an initial trial point
-        m_LabelImage->SetPixel(idx, Superclass::InitialTrialPoint);
+        m_LabelImage->SetPixel( idx, Superclass::InitialTrialPoint );
 
         output->SetPixel(idx, pointsIter->second);
 
+        this->m_Heap->Push( PriorityQueueElementType( idx, pointsIter->second ) );
         //m_TrialHeap.push(node);
         }
       ++pointsIter;

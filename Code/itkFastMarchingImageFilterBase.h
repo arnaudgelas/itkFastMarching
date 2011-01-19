@@ -20,6 +20,7 @@
 #define __itkFastMarchingImageFilterBase_h
 
 #include "itkFastMarchingBase.h"
+#include "itkImageRegionConstIteratorWithIndex.h"
 
 namespace itk
 {
@@ -47,6 +48,7 @@ public:
   typedef typename Superclass::OutputDomainPointer  OutputImagePointer;
   typedef typename Superclass::OutputPixelType      OutputPixelType;
   typedef typename OutputImageType::SpacingType     OutputSpacingType;
+  typedef typename OutputImageType::SizeType        OutputSizeType;
 
   typedef typename Superclass::NodeType NodeType;
   typedef typename Superclass::ElementIdentifier ElementIdentifier;
@@ -66,6 +68,46 @@ public:
   typedef typename Superclass::NodeContainerType NodeContainerType;
   typedef typename Superclass::NodeContainerConstIterator NodeContainerConstIterator;
 
+  template< typename TPixel >
+  void SetBinaryMask( Image< TPixel, ImageDimension >* iImage )
+    {
+    OutputSizeType nullsize;
+    nullsize.Fill( 0 );
+
+    /*
+    if( m_BufferedRegion.GetSize() == nullsize )
+      {
+      itkGenericExceptionMacro( << "m_BufferedRegion has not been set yet" );
+      }
+    else */
+      {
+      typedef Image< TPixel, ImageDimension > InternalImageType;
+      typedef ImageRegionConstIteratorWithIndex< InternalImageType >
+        InternalRegionIterator;
+      InternalRegionIterator b_it( iImage, iImage->GetLargestPossibleRegion() );
+      b_it.GoToBegin();
+
+      OutputImageType* output = this->GetOutput();
+
+      TPixel zero_value = NumericTraits< TPixel >::Zero;
+      NodeType idx;
+
+      while( !b_it.IsAtEnd() )
+        {
+        if( b_it.Get() == zero_value )
+          {
+          idx = b_it.GetIndex();
+          //if ( m_BufferedRegion.IsInside( idx ) )
+            {
+            m_LabelImage->SetPixel(idx, Superclass::Forbidden );
+            output->SetPixel (idx, zero_value );
+            }
+          }
+        ++b_it;
+        }
+      this->Modified();
+      }
+    }
 
 protected:
   FastMarchingImageFilterBase();
