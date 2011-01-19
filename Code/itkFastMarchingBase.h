@@ -165,48 +165,17 @@ public:
   typedef typename NodeContainerType::iterator NodeContainerIterator;
 
   virtual void SetAliveNodes( NodeContainerType iNodes );
-  virtual void AddAliveNode( NodeType iNode, OutputPixelType iValue )
-    {
-    m_AliveNodes.push_back( NodePairType( iNode, iValue ) );
-    this->Modified();
-    }
+  virtual void AddAliveNode( NodeType iNode, OutputPixelType iValue );
 
-  virtual void SetTrialNodes( NodeContainerType iNodes )
-    {
-    m_TrialNodes = iNodes;
-    this->Modified();
-    }
 
-  virtual void AddTrialNode( NodeType iNode, OutputPixelType iValue )
-    {
-    m_TrialNodes.push_back( NodePairType( iNode, iValue ) );
-    this->Modified();
-    }
+  virtual void SetTrialNodes( NodeContainerType iNodes );
+  virtual void AddTrialNode( NodeType iNode, OutputPixelType iValue );
 
-  virtual void SetForbiddenNodes( std::vector< NodeType > iNodes )
-    {
-    m_ForbiddenNodes = iNodes;
-    this->Modified();
-    }
+  virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
+  virtual void AddForbiddenNode( NodeType iNode );
 
-  virtual void AddForbiddenNode( NodeType iNode )
-    {
-    m_ForbiddenNodes.push_back( iNode );
-    this->Modified();
-    }
-
-  virtual void SetTargetNodes( std::vector< NodeType > iNodes )
-    {
-    m_TargetNodes = iNodes;
-    this->Modified();
-    }
-
-  virtual void AddTargetNode( NodeType iNode )
-    {
-    m_TargetNodes.push_back( iNode );
-    this->Modified();
-    }
-
+  virtual void SetTargetNodes( std::vector< NodeType > iNodes );
+  virtual void AddTargetNode( NodeType iNode );
 
 protected:
 
@@ -236,159 +205,15 @@ protected:
   virtual void UpdateNeighbors( NodeType iNode ) = 0;
   virtual void CheckTopology( NodeType iNode ) = 0;
 
-  bool CheckTargetCondition( NodeType iNode )
-    {
-    // Only check for reached targets if the mode is not NoTargets and
-    // there is at least one TargetPoint.
-    if ( m_TargetCondition != NoTargets &&  !m_TargetNodes.empty() )
-      {
-      typename std::vector< NodeType >::const_iterator
-          pointsIter = m_TargetNodes.begin();
-      typename std::vector< NodeType >::const_iterator
-          pointsEnd = m_TargetNodes.end();
+  bool CheckTargetCondition( NodeType iNode );
 
-      while( pointsIter != pointsEnd )
-        {
-        if ( *pointsIter == iNode )
-          {
-          this->m_ReachedTargetNodes.push_back( iNode );
-          return ( m_ReachedTargetNodes.size() == m_NumberOfTargetsToBeReached );
-          }
-        ++pointsIter;
-        }
-      }
-    return false;
-    }
-
-  virtual void Initialize()
-    {
-    if( m_StoppingValue < 0. )
-      {
-      itkExceptionMacro( <<"Stopping Value is null or negative" );
-      }
-    if( m_TargetCondition != NoTargets )
-      {
-      if( m_TargetCondition == OneTarget )
-        {
-        m_NumberOfTargetsToBeReached = 1;
-        }
-      if( m_TargetCondition == AllTargets )
-        {
-        m_NumberOfTargetsToBeReached = m_TargetNodes.size();
-        }
-      if( m_NumberOfTargetsToBeReached < 1 )
-        {
-        itkExceptionMacro(
-          <<"Number of target nodes to be reached is null" );
-        }
-      if( m_NumberOfTargetsToBeReached > m_TargetNodes.size() )
-        {
-        itkExceptionMacro(
-          <<"Number of target nodes to be reached is above the provided number of target nodes" );
-        }
-      m_ReachedTargetNodes.clear();
-      }
-    if( m_NormalizationFactor < vnl_math::eps )
-      {
-      itkExceptionMacro( <<"Normalization Factor is null or negative" );
-      }
-
-    // make sure the heap is empty
-    while ( !m_Heap->Empty() )
-      {
-      m_Heap->Pop();
-      }
-
-    InitializeOutput();
-    }
+  void Initialize();
 
   virtual void InitializeOutput() = 0;
 
-  virtual void GenerateData()
-    {
-    Initialize();
+  void GenerateData();
 
-    try
-      {
-      double newProgress = 0.;
-      double oldProgress = 0.;
-
-      while( !m_Heap->Empty() )
-        {
-        PriorityQueueElementType element = m_Heap->Peek();
-        m_Heap->Pop();
-
-        NodeType current_node = element.m_Element;
-        OutputPixelType current_value = element.m_Priority;
-
-        // is this node already alive ?
-        if( this->GetLabelValueForGivenNode( current_node ) != Alive )
-          {
-          this->CheckTopology( current_node );
-
-          if( current_value > m_StoppingValue )
-            {
-            m_TargetReachedValue = m_StoppingValue;
-            this->UpdateProgress(1.0);
-            break;
-            }
-
-          // set this node as alive
-          this->SetLabelValueForGivenNode( current_node, Alive );
-
-          // update its neighbors
-          this->UpdateNeighbors( current_node );
-
-          if( !CheckTargetCondition( current_node ) )
-            {
-            // Send events every certain number of points.
-            newProgress = static_cast< double >( current_value ) /
-              static_cast< double >( m_StoppingValue );
-
-            if ( newProgress - oldProgress > 0.01 )
-              {
-              this->UpdateProgress(newProgress);
-              oldProgress = newProgress;
-              }
-            }
-          else
-            {
-            m_TargetReachedValue = current_value;
-            this->UpdateProgress(1.0);
-            break;
-            }
-          }
-
-        }
-      }
-    catch ( ProcessAborted & )
-      {
-      // User aborted filter excecution Here we catch an exception thrown by the
-      // progress reporter and rethrow it with the correct line number and file
-      // name. We also invoke AbortEvent in case some observer was interested on
-      // it.
-      //
-      // RELEASE MEMORY!!!
-      while( !m_Heap->Empty() )
-        {
-        m_Heap->Pop();
-        }
-
-      throw ProcessAborted(__FILE__, __LINE__);
-      }
-
-    // let's release some useless memory...
-    while( !m_Heap->Empty() )
-      {
-      m_Heap->Pop();
-      }
-    }
-
-  void PrintSelf(std::ostream & os, Indent indent) const
-    {
-    Superclass::PrintSelf( os, indent );
-    }
-
+  void PrintSelf(std::ostream & os, Indent indent) const;
 
 
 private:
