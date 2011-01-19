@@ -43,6 +43,7 @@ FastMarchingBase()
   m_TopologyCheck = None;
   m_TargetCondition = NoTargets;
   m_NumberOfTargetsToBeReached = 0;
+  m_LargeValue = NumericTraits< OutputPixelType >::max();
   }
 // -----------------------------------------------------------------------------
 

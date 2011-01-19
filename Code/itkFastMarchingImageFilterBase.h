@@ -46,6 +46,7 @@ public:
   typedef typename Superclass::OutputDomainType     OutputImageType;
   typedef typename Superclass::OutputDomainPointer  OutputImagePointer;
   typedef typename Superclass::OutputPixelType      OutputPixelType;
+  typedef typename OutputImageType::SpacingType     OutputSpacingType;
 
   typedef typename Superclass::NodeType NodeType;
   typedef typename Superclass::ElementIdentifier ElementIdentifier;
@@ -66,6 +67,8 @@ protected:
   FastMarchingImageFilterBase();
   ~FastMarchingImageFilterBase();
 
+  struct InternalNodeStructure;
+
   NodeType m_StartIndex;
   NodeType m_LastIndex;
 
@@ -77,6 +80,7 @@ protected:
   void UpdateValue( NodeType iValue );
   void CheckTopology( NodeType iNode );
   void InitializeOutput();
+  OutputPixelType Solve( std::vector< InternalNodeStructure > iNeighbors );
 
 private:
   FastMarchingImageFilterBase( const Self& );

@@ -23,6 +23,26 @@ namespace itk
 {
 // -----------------------------------------------------------------------------
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+class
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+    InternalNodeStructure
+  {
+public:
+    InternalNodeStructure( ) : m_Value( this->m_LargeValue ) {}
+
+    NodeType        m_Node;
+    OutputPixelType m_Value;
+    unsigned int    m_Axis;
+
+    bool operator< ( InternalNodeStructure& iRight )
+      {
+      return m_Value < iRight.m_Value;
+      }
+  };
+
+
+// -----------------------------------------------------------------------------
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 FastMarchingImageFilterBase()
   {
@@ -99,7 +119,131 @@ void
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 UpdateValue( NodeType iNode )
   {
+  NodeType neighbor_node = iNode;
 
+  OutputPixelType neighValue;
+
+  std::vector< InternalNodeStructure > NodesUsed( ImageDimension );
+
+  // just to make sure the index is initialized (really cautious)
+  InternalNodeStructure temp_node;
+  temp_node.m_Node = iNode;
+
+  for ( unsigned int j = 0; j < ImageDimension; j++ )
+    {
+    temp_node.m_Value = this->m_LargeValue;
+
+    // find smallest valued neighbor in this dimension
+    for ( int s = -1; s < 2; s = s + 2 )
+      {
+      neighbor_node[j] = iNode[j] + s;
+
+      // make sure neighIndex is not outside from the image
+      if ( ( neighbor_node[j] > m_LastIndex[j] ) ||
+           ( neighbor_node[j] < m_StartIndex[j] ) )
+        {
+        continue;
+        }
+
+      if ( m_LabelImage->GetPixel( neighbor_node ) == Superclass::Alive )
+        {
+        neighValue =
+            static_cast< OutputPixelType >( this->GetOutput()->GetPixel( neighbor_node ) );
+
+        // let's find the minimum value given a direction j
+        if ( temp_node.m_Value > neighValue )
+          {
+          temp_node.m_Value = neighValue;
+          temp_node.m_Node = neighbor_node;
+          }
+        }
+      } // end for ( int s = -1; s < 2; s = s + 2 )
+
+    // put the minimum neighbor onto the heap
+    temp_node.m_Axis = j;
+    NodesUsed[j] = temp_node;
+
+    // reset neighIndex
+    neighbor_node[j] = iNode[j];
+
+    } // end for ( unsigned int j = 0; j < SetDimension; j++ )
+  }
+
+// -----------------------------------------------------------------------------
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+typename
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::OutputPixelType
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+Solve( std::vector< InternalNodeStructure > iNeighbors )
+{
+  // sort the local list
+  std::sort( iNeighbors.begin(), iNeighbors.end() );
+
+  double solution = NumericTraits< double >::max();
+
+  double aa( 0.0 );
+  double bb( 0.0 );
+  double cc( this->m_InverseSpeed );
+
+  if ( this->GetInput() )
+    {
+    cc =
+      static_cast< double >( this->GetInput()->GetPixel(index) ) /
+        this->m_NormalizationFactor;
+    cc = -1.0 * vnl_math_sqr(1.0 / cc);
+    }
+
+  OutputSpacingType spacing = this->GetOutput()->GetSpacing();
+
+  double discrim = 0.;
+  double value = 0.;
+
+  InternalNodeStructure temp_node;
+
+  for ( unsigned int j = 0; j < ImageDimension; j++ )
+    {
+    temp_node = iNeighbors[j];
+    value = static_cast< double >( temp_node.m_Value );
+
+    if ( solution >= value )
+      {
+      const int    axis = temp_node.GetAxis();
+      // spaceFactor = \frac{1}{spacing[axis]^2}
+      const double spaceFactor = vnl_math_sqr(1.0 / spacing[axis]);
+      aa += spaceFactor;
+      bb += value * spaceFactor;
+      cc += vnl_math_sqr(value) * spaceFactor;
+
+      discrim = vnl_math_sqr(bb) - aa * cc;
+      if ( discrim < vnl_math::eps )
+        {
+        // Discriminant of quadratic eqn. is negative
+        itkExceptionMacro(
+          <<"Discriminant of quadratic equation is negative" );
+        }
+
+      solution = ( vcl_sqrt(discrim) + bb ) / aa;
+      }
+    else
+      {
+      break;
+      }
+    }
+
+    if ( solution < this->m_LargeValue )
+      {
+      // write solution to m_OutputLevelSet
+      OutputPixelType outputPixel = static_cast< OutputPixelType >( solution );
+      this->GetOutput()->SetPixel(index, outputPixel);
+
+      // insert point into trial heap
+      m_LabelImage->SetPixel( index, Superclass::Trial );
+      //node.SetValue( outputPixel );
+      //node.SetIndex( index );
+      //m_TrialHeap.push(node);
+      }
+
+    return solution;
   }
 // -----------------------------------------------------------------------------
 
