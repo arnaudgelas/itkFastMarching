@@ -80,7 +80,7 @@ protected:
   void UpdateValue( NodeType iValue );
   void CheckTopology( NodeType iNode );
   void InitializeOutput();
-  OutputPixelType Solve( std::vector< InternalNodeStructure > iNeighbors );
+  double Solve( std::vector< InternalNodeStructure > iNeighbors );
 
 private:
   FastMarchingImageFilterBase( const Self& );

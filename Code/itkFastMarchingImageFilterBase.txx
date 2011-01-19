@@ -167,19 +167,33 @@ UpdateValue( NodeType iNode )
     neighbor_node[j] = iNode[j];
 
     } // end for ( unsigned int j = 0; j < SetDimension; j++ )
+
+  double solution = Solve( NodesUsed );
+
+  if ( solution < this->m_LargeValue )
+    {
+    // write solution to m_OutputLevelSet
+    OutputPixelType outputPixel = static_cast< OutputPixelType >( solution );
+    this->GetOutput()->SetPixel(index, outputPixel);
+
+    // insert point into trial heap
+    m_LabelImage->SetPixel( index, Superclass::Trial );
+    //node.SetValue( outputPixel );
+    //node.SetIndex( index );
+    //m_TrialHeap.push(node);
+    }
   }
 
 // -----------------------------------------------------------------------------
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
-typename
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::OutputPixelType
+double
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 Solve( std::vector< InternalNodeStructure > iNeighbors )
 {
   // sort the local list
   std::sort( iNeighbors.begin(), iNeighbors.end() );
 
-  double solution = NumericTraits< double >::max();
+  double oSolution = NumericTraits< double >::max();
 
   double aa( 0.0 );
   double bb( 0.0 );
@@ -197,19 +211,23 @@ Solve( std::vector< InternalNodeStructure > iNeighbors )
 
   double discrim = 0.;
   double value = 0.;
+  double spaceFactor = 0.;
+  unsigned int axis = 0;
 
-  InternalNodeStructure temp_node;
+  typename std::vector< InternalNodeStructure >::iterator
+      n_it = iNeighbors.begin();
 
-  for ( unsigned int j = 0; j < ImageDimension; j++ )
+  while( n_it != iNeighbors.end() )
     {
-    temp_node = iNeighbors[j];
-    value = static_cast< double >( temp_node.m_Value );
+    value = static_cast< double >( n_it->m_Value );
 
-    if ( solution >= value )
+    if ( oSolution >= value )
       {
-      const int    axis = temp_node.GetAxis();
+      axis = n_it->m_Axis;
+
       // spaceFactor = \frac{1}{spacing[axis]^2}
-      const double spaceFactor = vnl_math_sqr(1.0 / spacing[axis]);
+      spaceFactor = vnl_math_sqr(1.0 / spacing[axis]);
+
       aa += spaceFactor;
       bb += value * spaceFactor;
       cc += vnl_math_sqr(value) * spaceFactor;
@@ -222,28 +240,16 @@ Solve( std::vector< InternalNodeStructure > iNeighbors )
           <<"Discriminant of quadratic equation is negative" );
         }
 
-      solution = ( vcl_sqrt(discrim) + bb ) / aa;
+      oSolution = ( vcl_sqrt(discrim) + bb ) / aa;
       }
     else
       {
       break;
       }
+    ++n_it;
     }
 
-    if ( solution < this->m_LargeValue )
-      {
-      // write solution to m_OutputLevelSet
-      OutputPixelType outputPixel = static_cast< OutputPixelType >( solution );
-      this->GetOutput()->SetPixel(index, outputPixel);
-
-      // insert point into trial heap
-      m_LabelImage->SetPixel( index, Superclass::Trial );
-      //node.SetValue( outputPixel );
-      //node.SetIndex( index );
-      //m_TrialHeap.push(node);
-      }
-
-    return solution;
+  return oSolution;
   }
 // -----------------------------------------------------------------------------
 
