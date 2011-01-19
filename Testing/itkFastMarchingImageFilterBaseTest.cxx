@@ -20,5 +20,11 @@
 
 int main( int argc, char** argv )
   {
+  typedef itk::FastMarchingImageFilterBase< 2, float, float > FMM2DType;
+  FMM2DType::Pointer fmm2d = FMM2DType::New();
+
+  typedef itk::FastMarchingImageFilterBase< 3, float, float > FMM3DType;
+  FMM3DType::Pointer fmm3d = FMM3DType::New();
+
   return EXIT_SUCCESS;
   }

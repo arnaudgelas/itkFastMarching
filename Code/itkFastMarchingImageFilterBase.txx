@@ -30,13 +30,14 @@ FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
     InternalNodeStructure
   {
 public:
-    InternalNodeStructure( ) : m_Value( this->m_LargeValue ) {}
+    InternalNodeStructure( ) :
+      m_Value( NumericTraits< TOutputPixel >::max() ) {}
 
     NodeType        m_Node;
     OutputPixelType m_Value;
     unsigned int    m_Axis;
 
-    bool operator< ( InternalNodeStructure& iRight )
+    bool operator< ( const InternalNodeStructure& iRight ) const
       {
       return m_Value < iRight.m_Value;
       }
@@ -61,9 +62,7 @@ FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 
 // -----------------------------------------------------------------------------
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
-typename
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
-LabelType
+char
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 GetLabelValueForGivenNode( NodeType iNode )
   {
@@ -170,16 +169,16 @@ UpdateValue( NodeType iNode )
 
     } // end for ( unsigned int j = 0; j < SetDimension; j++ )
 
-  double solution = Solve( NodesUsed );
+  double solution = Solve( iNode, NodesUsed );
 
   if ( solution < this->m_LargeValue )
     {
     // write solution to m_OutputLevelSet
     OutputPixelType outputPixel = static_cast< OutputPixelType >( solution );
-    this->GetOutput()->SetPixel(index, outputPixel);
+    this->GetOutput()->SetPixel(iNode, outputPixel);
 
     // insert point into trial heap
-    m_LabelImage->SetPixel( index, Superclass::Trial );
+    m_LabelImage->SetPixel( iNode, Superclass::Trial );
     //node.SetValue( outputPixel );
     //node.SetIndex( index );
     //m_TrialHeap.push(node);
@@ -191,7 +190,7 @@ UpdateValue( NodeType iNode )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
 double
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
-Solve( std::vector< InternalNodeStructure > iNeighbors )
+Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors )
 {
   // sort the local list
   std::sort( iNeighbors.begin(), iNeighbors.end() );
@@ -205,7 +204,7 @@ Solve( std::vector< InternalNodeStructure > iNeighbors )
   if ( this->GetInput() )
     {
     cc =
-      static_cast< double >( this->GetInput()->GetPixel(index) ) /
+      static_cast< double >( this->GetInput()->GetPixel(iNode) ) /
         this->m_NormalizationFactor;
     cc = -1.0 * vnl_math_sqr(1.0 / cc);
     }
@@ -389,7 +388,7 @@ InitializeOutput()
       //if ( m_BufferedRegion.IsInside( idx ) )
         {
         // make this an initial trial point
-        m_LabelImage->SetPixel( idx, Superclass::InitialTrialPoint );
+        m_LabelImage->SetPixel( idx, Superclass::InitialTrial );
 
         output->SetPixel(idx, pointsIter->second);
 

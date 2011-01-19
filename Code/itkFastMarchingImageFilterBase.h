@@ -39,6 +39,12 @@ public:
   typedef SmartPointer< Self >        Pointer;
   typedef SmartPointer< const Self >  ConstPointer;
 
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self);
+
+  /** Run-time type information (and related methods). */
+  itkTypeMacro(FastMarchingImageFilterBase, FastMarchingBase);
+
 
   typedef typename Superclass::InputDomainType     InputImageType;
   typedef typename Superclass::InputDomainPointer  InputImagePointer;
@@ -129,13 +135,13 @@ protected:
 
   LabelImagePointer m_LabelImage;
 
-  LabelType GetLabelValueForGivenNode( NodeType iNode );
+  char GetLabelValueForGivenNode( NodeType iNode );
   void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel );
   void UpdateNeighbors( NodeType iNode );
   void UpdateValue( NodeType iValue );
   void CheckTopology( NodeType iNode );
   void InitializeOutput();
-  double Solve( std::vector< InternalNodeStructure > iNeighbors );
+  double Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors );
 
 private:
   FastMarchingImageFilterBase( const Self& );

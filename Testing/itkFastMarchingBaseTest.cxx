@@ -46,7 +46,7 @@ protected:
   FastMarchingBaseTestHelper() {}
   ~FastMarchingBaseTestHelper() {}
 
-  LabelType GetLabelValueForGivenNode( NodeType iNode )
+  char GetLabelValueForGivenNode( NodeType iNode )
     {
     return Superclass::Far;
     }

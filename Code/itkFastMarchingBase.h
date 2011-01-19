@@ -224,7 +224,7 @@ protected:
   /** \brief Get the Label Value for a given node
     \param[in] iNode
     \return its label value  */
-  virtual LabelType GetLabelValueForGivenNode( NodeType iNode ) = 0;
+  virtual char GetLabelValueForGivenNode( NodeType iNode ) = 0;
 
   /** \brief Set the Label Value for a given node
     \param[in] iNode
