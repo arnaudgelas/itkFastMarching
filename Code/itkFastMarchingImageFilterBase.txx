@@ -183,6 +183,7 @@ UpdateValue( NodeType iNode )
     //m_TrialHeap.push(node);
     }
   }
+// -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
@@ -258,7 +259,15 @@ template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
 void
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 CheckTopology( NodeType iNode )
-  {}
+  {
+  (void) iNode;
+
+  if( this->m_TopologyCheck != Superclass::None )
+    {
+    itkWarningMacro( << "CheckTopology has not be implemented for Dimension != 2 and != 3."
+                    << "m_TopologyCheck should be set to None." );
+    }
+  }
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
