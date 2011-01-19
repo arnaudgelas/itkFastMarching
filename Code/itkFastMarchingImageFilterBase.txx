@@ -71,34 +71,20 @@ UpdateNeighbors( NodeType iNode )
 
   for ( unsigned int j = 0; j < ImageDimension; j++ )
     {
-    // update left neighbor
-    if ( iNode[j] > m_StartIndex[j] )
+    for( int s = -1; s < 2; s+= 2 )
       {
-      neighIndex[j] = iNode[j] - 1;
-      }
+      if ( ( iNode[j] > m_StartIndex[j] ) && ( iNode[j] < m_LastIndex[j] ) )
+        {
+        neighIndex[j] += s;
+        }
+     label = m_LabelImage->GetPixel(neighIndex);
 
-    label = m_LabelImage->GetPixel(neighIndex);
-
-    if ( ( label != Superclass::Alive ) &&
-         ( label != Superclass::InitialTrial ) &&
-         ( label != Superclass::Forbidden ) )
-      {
-      this->UpdateValue( neighIndex );
-      }
-
-    // update right neighbor
-    if ( iNode[j] < m_LastIndex[j] )
-      {
-      neighIndex[j] = iNode[j] + 1;
-      }
-
-    label = m_LabelImage->GetPixel(neighIndex);
-
-    if ( ( label != Superclass::Alive ) &&
-         ( label != Superclass::InitialTrial ) &&
-         ( label != Superclass::Outside ) )
-      {
-      this->UpdateValue( neighIndex );
+      if ( ( label != Superclass::Alive ) &&
+           ( label != Superclass::InitialTrial ) &&
+           ( label != Superclass::Forbidden ) )
+        {
+        this->UpdateValue( neighIndex );
+        }
       }
 
     //reset neighIndex
