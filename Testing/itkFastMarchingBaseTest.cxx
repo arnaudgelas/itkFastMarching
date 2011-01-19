@@ -54,8 +54,8 @@ protected:
   void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel )
     { (void) iNode; (void) iLabel; }
 
-  void UpdateNeighbors( NodeType iNode )
-    { (void) iNode; }
+  bool UpdateNeighbors( NodeType iNode )
+    { (void) iNode; return true; }
 
   void CheckTopology( NodeType iNode )
     { (void) iNode; }

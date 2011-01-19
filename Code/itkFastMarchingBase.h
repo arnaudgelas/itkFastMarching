@@ -147,9 +147,18 @@ public:
                            NoHandles,
                            Strict };
 
+  enum TargetConditionType { NoTargets = 0,
+                             OneTarget,
+                             SomeTargets,
+                             AllTargets };
+
   /** Set/Get boolean macro indicating whether the user wants to check topology. */
   itkSetMacro( TopologyCheck, TopologyCheckType );
   itkGetConstReferenceMacro( TopologyCheck, TopologyCheckType );
+
+  /** Set/Get boolean macro indicating whether the user wants to check topology. */
+  itkSetMacro( TargetCondition, TargetConditionType );
+  itkGetConstReferenceMacro( TargetCondition, TargetConditionType );
 
   typedef std::pair< NodeType, OutputPixelType > NodePairType;
   typedef std::vector< std::pair< NodeType, OutputPixelType > > NodeContainerType;
@@ -191,6 +200,18 @@ public:
     this->Modified();
     }
 
+  virtual void SetTargetNodes( std::vector< NodeType > iNodes )
+    {
+    m_TargetNodes = iNodes;
+    this->Modified();
+    }
+
+  virtual void AddTargetNode( NodeType iNode )
+    {
+    m_TargetNodes.push_back( iNode );
+    this->Modified();
+    }
+
 
 protected:
 
@@ -202,6 +223,7 @@ protected:
     m_NormalizationFactor = 1.;
     m_StoppingValue = 0.;
     m_TopologyCheck = None;
+    m_TargetCondition = NoTargets;
     }
   virtual ~FastMarchingBase() {}
 
@@ -213,14 +235,16 @@ protected:
   NodeContainerType m_TrialNodes;
   NodeContainerType m_AliveNodes;
   std::vector< NodeType > m_ForbiddenNodes;
+  std::vector< NodeType > m_TargetNodes;
 
   PriorityQueuePointer m_Heap;
 
   TopologyCheckType m_TopologyCheck;
+  TargetConditionType m_TargetCondition;
 
   virtual LabelType GetLabelValueForGivenNode( NodeType iNode ) = 0;
   virtual void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel ) = 0;
-  virtual void UpdateNeighbors( NodeType iNode ) = 0;
+  virtual bool UpdateNeighbors( NodeType iNode ) = 0;
   virtual void CheckTopology( NodeType iNode ) = 0;
 
   virtual void GenerateData()
@@ -253,15 +277,16 @@ protected:
           this->SetLabelValueForGivenNode( current_node, Alive );
 
           // update its neighbors
-          this->UpdateNeighbors( current_node );
-
-          // Send events every certain number of points.
-          newProgress = static_cast< double >( current_value ) /
-            static_cast< double >( m_StoppingValue );
-          if ( newProgress - oldProgress > 0.01 )
+          if( this->UpdateNeighbors( current_node ) )
             {
-            this->UpdateProgress(newProgress);
-            oldProgress = newProgress;
+            // Send events every certain number of points.
+            newProgress = static_cast< double >( current_value ) /
+              static_cast< double >( m_StoppingValue );
+            if ( newProgress - oldProgress > 0.01 )
+              {
+              this->UpdateProgress(newProgress);
+              oldProgress = newProgress;
+              }
             }
           }
 
