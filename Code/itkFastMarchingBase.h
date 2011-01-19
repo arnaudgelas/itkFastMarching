@@ -29,6 +29,9 @@
 
 namespace itk
 {
+/**  \class FastMarchingTraits
+  \brief
+  */
 template< class TInputDomain,
           class TNode,
           class TOutputDomain,
@@ -49,6 +52,9 @@ public:
   // Here concept checking: make sure TValue is scalar!
   };
 
+/**  \class ImageFastMarchingTraits
+  \brief
+*/
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
 class ImageFastMarchingTraits :
     public FastMarchingTraits<
@@ -62,6 +68,9 @@ class ImageFastMarchingTraits :
 
   };
 
+/**  \class MeshFastMarchingTraits
+  \brief
+*/
 template< unsigned int VDimension,
           typename TInputPixel,
           class TInputMeshTraits,
@@ -165,22 +174,32 @@ public:
   typedef typename NodeContainerType::const_iterator NodeContainerConstIterator;
   typedef typename NodeContainerType::iterator NodeContainerIterator;
 
+  /** \brief Set Alive nodes representing the initial front. */
   virtual void SetAliveNodes( NodeContainerType iNodes );
+
+  /** \brief Add one node as alive to the initial front.
+    \param[in] iNode
+    \param[in] ivalue */
   virtual void AddAliveNode( NodeType iNode, OutputPixelType iValue );
 
-
+  /** \brief Set Trial Nodes */
   virtual void SetTrialNodes( NodeContainerType iNodes );
   virtual void AddTrialNode( NodeType iNode, OutputPixelType iValue );
 
+  /** \brief Set Forbidden Nodes */
   virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
   virtual void AddForbiddenNode( NodeType iNode );
 
+  /** \brief Set Target Nodes*/
   virtual void SetTargetNodes( std::vector< NodeType > iNodes );
   virtual void AddTargetNode( NodeType iNode );
 
 protected:
 
+  /** \brief Constructor */
   FastMarchingBase();
+
+  /** \brief Destructor */
   virtual ~FastMarchingBase();
 
   double m_SpeedConstant;
@@ -202,20 +221,42 @@ protected:
   TopologyCheckType m_TopologyCheck;
   TargetConditionType m_TargetCondition;
 
+  /** \brief Get the Label Value for a given node
+    \param[in] iNode
+    \return its label value  */
   virtual LabelType GetLabelValueForGivenNode( NodeType iNode ) = 0;
+
+  /** \brief Set the Label Value for a given node
+    \param[in] iNode
+    \param[in] iLabel */
   virtual void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel ) = 0;
+
+  /** \brief Update neighbors to a given node
+    \param[in] iNode
+  */
   virtual void UpdateNeighbors( NodeType iNode ) = 0;
+
+  /** \brief Update value for a given node
+    \param[in] iNode
+    */
   virtual void UpdateValue( NodeType iNode ) = 0;
+
+  /**    */
   virtual void CheckTopology( NodeType iNode ) = 0;
 
+  /**    */
   bool CheckTargetCondition( NodeType iNode );
 
+  /**    */
   void Initialize();
 
+  /**    */
   virtual void InitializeOutput() = 0;
 
+  /**    */
   void GenerateData();
 
+  /**    */
   void PrintSelf(std::ostream & os, Indent indent) const;
 
 private:
