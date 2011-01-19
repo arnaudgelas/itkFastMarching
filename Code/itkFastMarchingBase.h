@@ -203,6 +203,7 @@ protected:
   virtual LabelType GetLabelValueForGivenNode( NodeType iNode ) = 0;
   virtual void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel ) = 0;
   virtual void UpdateNeighbors( NodeType iNode ) = 0;
+  virtual void UpdateValue( NodeType iNode ) = 0;
   virtual void CheckTopology( NodeType iNode ) = 0;
 
   bool CheckTargetCondition( NodeType iNode );
@@ -215,12 +216,10 @@ protected:
 
   void PrintSelf(std::ostream & os, Indent indent) const;
 
-
 private:
   FastMarchingBase( const Self& );
   void operator = ( const Self& );
   };
-
 
 }
 

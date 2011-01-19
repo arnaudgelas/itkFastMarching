@@ -57,6 +57,9 @@ protected:
   void UpdateNeighbors( NodeType iNode )
     { (void) iNode; }
 
+  void UpdateValue( NodeType iNode )
+    { (void) iNode; }
+
   void CheckTopology( NodeType iNode )
     { (void) iNode; }
 
