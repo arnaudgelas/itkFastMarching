@@ -221,9 +221,11 @@ protected:
     m_SpeedConstant = 1.;
     m_InverseSpeed = 1.;
     m_NormalizationFactor = 1.;
-    m_StoppingValue = 0.;
+    m_StoppingValue = NumericTraits< OutputPixelType >::Zero;
+    m_TargetReachedValue = NumericTraits< OutputPixelType >::Zero;
     m_TopologyCheck = None;
     m_TargetCondition = NoTargets;
+    m_NumberOfTargetsToBeReached = 1;
     }
   virtual ~FastMarchingBase() {}
 
@@ -231,11 +233,14 @@ protected:
   double m_InverseSpeed;
   double m_NormalizationFactor;
   OutputPixelType m_StoppingValue;
+  OutputPixelType m_TargetReachedValue;
 
   NodeContainerType m_TrialNodes;
   NodeContainerType m_AliveNodes;
   std::vector< NodeType > m_ForbiddenNodes;
   std::vector< NodeType > m_TargetNodes;
+  std::vector< NodeType > m_ReachedTargetNodes;
+  size_t m_NumberOfTargetsToBeReached;
 
   PriorityQueuePointer m_Heap;
 
@@ -244,8 +249,67 @@ protected:
 
   virtual LabelType GetLabelValueForGivenNode( NodeType iNode ) = 0;
   virtual void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel ) = 0;
-  virtual bool UpdateNeighbors( NodeType iNode ) = 0;
+  virtual void UpdateNeighbors( NodeType iNode ) = 0;
   virtual void CheckTopology( NodeType iNode ) = 0;
+
+  bool CheckTargetCondition( NodeType iNode )
+    {
+    // Only check for reached targets if the mode is not NoTargets and
+    // there is at least one TargetPoint.
+    if ( m_TargetCondition != NoTargets &&  !m_TargetNodes.empty() )
+      {
+      typename std::vector< NodeType >::const_iterator
+          pointsIter = m_TargetNodes.begin();
+      typename std::vector< NodeType >::const_iterator
+          pointsEnd = m_TargetNodes.end();
+
+      switch( m_TargetCondition )
+        {
+        default:
+        case OneTarget:
+          {
+          while( pointsIter != pointsEnd )
+            {
+            if ( *pointsIter == iNode )
+              {
+              return true;
+              }
+            ++pointsIter;
+            }
+          break;
+          }
+        case SomeTargets:
+          {
+          while( pointsIter != pointsEnd )
+            {
+            if ( *pointsIter == iNode )
+              {
+              this->m_ReachedTargetNodes.push_back( iNode );
+              return ( m_ReachedTargetNodes.size() == m_NumberOfTargetsToBeReached );
+              }
+            ++pointsIter;
+            }
+          break;
+          }
+        case AllTargets:
+          {
+          while( pointsIter != pointsEnd )
+            {
+            if ( *pointsIter == iNode )
+              {
+              this->m_ReachedTargetNodes.push_back( iNode );
+
+              return( m_ReachedTargetNodes.size() == m_TargetNodes.size() );
+              }
+            ++pointsIter;
+            }
+          break;
+          }
+        }
+      }
+    return false;
+    }
+
 
   virtual void GenerateData()
     {
@@ -269,6 +333,7 @@ protected:
 
           if( current_value > m_StoppingValue )
             {
+            m_TargetReachedValue = m_StoppingValue;
             this->UpdateProgress(1.0);
             break;
             }
@@ -277,16 +342,25 @@ protected:
           this->SetLabelValueForGivenNode( current_node, Alive );
 
           // update its neighbors
-          if( this->UpdateNeighbors( current_node ) )
+          this->UpdateNeighbors( current_node );
+
+          if( !CheckTargetCondition( current_node ) )
             {
             // Send events every certain number of points.
             newProgress = static_cast< double >( current_value ) /
               static_cast< double >( m_StoppingValue );
+
             if ( newProgress - oldProgress > 0.01 )
               {
               this->UpdateProgress(newProgress);
               oldProgress = newProgress;
               }
+            }
+          else
+            {
+            m_TargetReachedValue = current_value;
+            this->UpdateProgress(1.0);
+            break;
             }
           }
 
@@ -305,6 +379,11 @@ protected:
       e.SetLocation(ITK_LOCATION);
       throw e;
       }
+    }
+
+  void PrintSelf(std::ostream & os, Indent indent) const
+    {
+    Superclass::PrintSelf( os, indent );
     }
 
 
