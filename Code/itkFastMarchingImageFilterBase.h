@@ -63,6 +63,10 @@ public:
   typedef Image< unsigned char, ImageDimension >  LabelImageType;
   typedef typename LabelImageType::Pointer        LabelImagePointer;
 
+  typedef typename Superclass::NodeContainerType NodeContainerType;
+  typedef typename Superclass::NodeContainerConstIterator NodeContainerConstIterator;
+
+
 protected:
   FastMarchingImageFilterBase();
   ~FastMarchingImageFilterBase();

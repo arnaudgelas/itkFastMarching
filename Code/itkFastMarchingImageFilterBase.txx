@@ -19,6 +19,8 @@
 #ifndef __itkFastMarchingImageFilterBase_txx
 #define __itkFastMarchingImageFilterBase_txx
 
+#include "itkImageRegionIterator.h"
+
 namespace itk
 {
 // -----------------------------------------------------------------------------
@@ -274,7 +276,129 @@ CheckTopology( NodeType iNode )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
 void FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 InitializeOutput()
-  {}
+  {
+  OutputImageType* output = this->GetOutput();
+
+  // allocate memory for the output buffer
+  output->SetBufferedRegion( output->GetRequestedRegion() );
+  output->Allocate();
+
+  // cache some buffered region information
+  //m_BufferedRegion = output->GetBufferedRegion();
+  //m_StartIndex = m_BufferedRegion.GetIndex();
+  //m_LastIndex = m_StartIndex + m_BufferedRegion.GetSize();
+
+  typename OutputImageType::OffsetType offset;
+  offset.Fill(1);
+  m_LastIndex -= offset;
+
+  // allocate memory for the PointTypeImage
+  m_LabelImage->CopyInformation(output);
+  m_LabelImage->SetBufferedRegion( output->GetBufferedRegion() );
+  m_LabelImage->Allocate();
+
+  // set all output value to infinity
+  typedef ImageRegionIterator< OutputImageType > OutputIterator;
+
+  OutputIterator outIt ( output, output->GetBufferedRegion() );
+
+  // set all points type to FarPoint
+  typedef ImageRegionIterator< LabelImageType > LabelIterator;
+
+  LabelIterator typeIt( m_LabelImage,
+                        m_LabelImage->GetBufferedRegion() );
+
+
+  OutputPixelType outputPixel = this->m_LargeValue;
+
+  outIt.GoToBegin();
+  typeIt.GoToBegin();
+  while( !outIt.IsAtEnd() )
+    {
+    outIt.Set(outputPixel);
+    typeIt.Set( Superclass::Far );
+
+    ++outIt;
+    ++typeIt;
+    }
+
+
+  NodeType idx;
+
+  if ( !this->m_AliveNodes.empty() )
+    {
+    NodeContainerConstIterator pointsIter = this->m_AliveNodes.begin();
+    NodeContainerConstIterator pointsEnd = this->m_AliveNodes.end();
+
+    while( pointsIter != pointsEnd )
+      {
+      // get node from alive points container
+      idx = pointsIter->first;
+
+      // check if node index is within the output level set
+      //if ( m_BufferedRegion.IsInside( idx ) )
+        {
+        // make this an alive point
+        m_LabelImage->SetPixel(idx, Superclass::Alive );
+
+        outputPixel = pointsIter->second;
+        output->SetPixel(idx, outputPixel);
+        }
+
+      ++pointsIter;
+      }
+    }
+
+  if( this->m_ForbiddenNodes.empty() )
+    {
+    typename std::vector< NodeType >::const_iterator
+        p_it = this->m_ForbiddenNodes.begin();
+    typename std::vector< NodeType >::const_iterator
+        p_end = this->m_ForbiddenNodes.end();
+
+    OutputPixelType zero = NumericTraits< OutputPixelType >::Zero;
+
+    while( p_it != p_end )
+      {
+      idx = *p_it;
+
+      // check if node index is within the output level set
+      //if ( m_BufferedRegion.IsInside( idx ) )
+        {
+        // make this an alive point
+        m_LabelImage->SetPixel(idx, Superclass::Forbidden );
+        output->SetPixel (idx, zero );
+        }
+
+      ++p_it;
+      }
+    }
+
+  // process the input trial points
+  if ( this->m_TrialNodes.empty() )
+    {
+    NodeContainerConstIterator pointsIter = this->m_TrialNodes.begin();
+    NodeContainerConstIterator pointsEnd = this->m_TrialNodes.end();
+
+    while( pointsIter != pointsEnd )
+      {
+      // get node from trial points container
+      idx = pointsIter->first;
+
+      // check if node index is within the output level set
+      //if ( m_BufferedRegion.IsInside( idx ) )
+        {
+        // make this an initial trial point
+        m_LabelImage->SetPixel(idx, Superclass::InitialTrialPoint);
+
+        output->SetPixel(idx, pointsIter->second);
+
+        //m_TrialHeap.push(node);
+        }
+      ++pointsIter;
+      }
+    }
+  }
 // -----------------------------------------------------------------------------
 }
 #endif // __itkFastMarchingImageFilterBase_txx

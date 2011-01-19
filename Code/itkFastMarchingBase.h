@@ -162,6 +162,7 @@ public:
 
   typedef std::pair< NodeType, OutputPixelType > NodePairType;
   typedef std::vector< std::pair< NodeType, OutputPixelType > > NodeContainerType;
+  typedef typename NodeContainerType::const_iterator NodeContainerConstIterator;
   typedef typename NodeContainerType::iterator NodeContainerIterator;
 
   virtual void SetAliveNodes( NodeContainerType iNodes );
