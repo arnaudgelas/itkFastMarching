@@ -60,6 +60,8 @@ protected:
   void CheckTopology( NodeType iNode )
     { (void) iNode; }
 
+  virtual void InitializeOutput() {}
+
 private:
   FastMarchingBaseTestHelper( const Self& );
   void operator = ( const Self& );

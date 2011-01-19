@@ -263,56 +263,58 @@ protected:
       typename std::vector< NodeType >::const_iterator
           pointsEnd = m_TargetNodes.end();
 
-      switch( m_TargetCondition )
+      while( pointsIter != pointsEnd )
         {
-        default:
-        case OneTarget:
+        if ( *pointsIter == iNode )
           {
-          while( pointsIter != pointsEnd )
-            {
-            if ( *pointsIter == iNode )
-              {
-              return true;
-              }
-            ++pointsIter;
-            }
-          break;
+          this->m_ReachedTargetNodes.push_back( iNode );
+          return ( m_ReachedTargetNodes.size() == m_NumberOfTargetsToBeReached );
           }
-        case SomeTargets:
-          {
-          while( pointsIter != pointsEnd )
-            {
-            if ( *pointsIter == iNode )
-              {
-              this->m_ReachedTargetNodes.push_back( iNode );
-              return ( m_ReachedTargetNodes.size() == m_NumberOfTargetsToBeReached );
-              }
-            ++pointsIter;
-            }
-          break;
-          }
-        case AllTargets:
-          {
-          while( pointsIter != pointsEnd )
-            {
-            if ( *pointsIter == iNode )
-              {
-              this->m_ReachedTargetNodes.push_back( iNode );
-
-              return( m_ReachedTargetNodes.size() == m_TargetNodes.size() );
-              }
-            ++pointsIter;
-            }
-          break;
-          }
+        ++pointsIter;
         }
       }
     return false;
     }
 
+  virtual void Initialize()
+    {
+    if( m_StoppingValue < 0. )
+      {
+      itkExceptionMacro( <<"Stopping Value is null or negative" );
+      }
+    if( m_TargetCondition == OneTarget )
+      {
+      m_NumberOfTargetsToBeReached = 1;
+      }
+    if( m_TargetCondition == AllTargets )
+      {
+      m_NumberOfTargetsToBeReached = m_TargetNodes.size();
+      }
+    if( m_NumberOfTargetsToBeReached > m_TargetNodes.size() )
+      {
+      itkExceptionMacro(
+        <<"Number of target nodes to be reached is above the provided number of target nodes" );
+      }
+    if( m_NormalizationFactor < vnl_math::eps )
+      {
+      itkExceptionMacro( <<"Normalization Factor is null or negative" );
+      }
+
+    // make sure the heap is empty
+    while ( !m_Heap->Empty() )
+      {
+      m_Heap->Pop();
+      }
+
+    InitializeOutput();
+    }
+
+  virtual void InitializeOutput() = 0;
 
   virtual void GenerateData()
     {
+    Initialize();
+
     try
       {
       double newProgress = 0.;
@@ -374,10 +376,18 @@ protected:
       // it.
       //
       // RELEASE MEMORY!!!
-      ProcessAborted e(__FILE__, __LINE__);
-      e.SetDescription("Process aborted.");
-      e.SetLocation(ITK_LOCATION);
-      throw e;
+      while( !m_Heap->Empty() )
+        {
+        m_Heap->Pop();
+        }
+
+      throw ProcessAborted(__FILE__, __LINE__);
+      }
+
+    // let's release some useless memory...
+    while( !m_Heap->Empty() )
+      {
+      m_Heap->Pop();
       }
     }
 
