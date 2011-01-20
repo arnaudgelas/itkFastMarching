@@ -10,3 +10,7 @@ add_test( itkMeshFastMarchingBaseTest
 add_executable( itkFastMarchingImageFilterBaseTest
  itkFastMarchingImageFilterBaseTest.cxx )
 target_link_libraries( itkFastMarchingImageFilterBaseTest ITKCommon )
+
+add_test( itkFastMarchingImageFilterBaseTest
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterBaseTest )
+
