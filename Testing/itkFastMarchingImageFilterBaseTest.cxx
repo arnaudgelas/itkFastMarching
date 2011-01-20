@@ -17,14 +17,29 @@
  *=========================================================================*/
 
 #include "itkFastMarchingImageFilterBase.h"
+#include "itkImage.h"
 
 int main( int argc, char** argv )
   {
+  typedef itk::Image< float, 2 > Image2DType;
+  Image2DType::Pointer input2d = Image2DType::New();
+
   typedef itk::FastMarchingImageFilterBase< 2, float, float > FMM2DType;
   FMM2DType::Pointer fmm2d = FMM2DType::New();
+  fmm2d->SetInput( input2d );
+  fmm2d->Update();
+
+  Image2DType::Pointer output2d = fmm2d->GetOutput();
+
+  typedef itk::Image< float, 3 > Image3DType;
+  Image3DType::Pointer input3d = Image3DType::New();
 
   typedef itk::FastMarchingImageFilterBase< 3, float, float > FMM3DType;
   FMM3DType::Pointer fmm3d = FMM3DType::New();
+  fmm3d->SetInput( input3d );
+  fmm3d->Update();
+
+  Image3DType::Pointer output3d = fmm3d->GetOutput();
 
   return EXIT_SUCCESS;
   }
