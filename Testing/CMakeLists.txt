@@ -22,4 +22,4 @@ add_executable( itkFastMarchingStoppingCriterionBaseTest
   itkFastMarchingStoppingCriterionBaseTest.cxx
   ${BASE_SOURCE}
 )
-target_link_libraries( itkFastMarchingImageFilterBaseTest ITKCommon ITKNumerics )
+target_link_libraries( itkFastMarchingStoppingCriterionBaseTest ITKCommon )

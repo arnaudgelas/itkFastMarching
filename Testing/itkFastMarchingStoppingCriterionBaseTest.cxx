@@ -54,7 +54,10 @@ namespace itk
 
 int main( int argc, char* argv[] )
   {
-  typedef itk::ImageFastMarchingTraits< 2, float, float >
+  (void) argc;
+  (void) argv;
+
+   typedef itk::ImageFastMarchingTraits< 2, float, float >
     ImageTraits;
   typedef itk::FastMarchingStoppingCriterionBaseHelperTest< ImageTraits >
     ImageStoppingCriterionType;
