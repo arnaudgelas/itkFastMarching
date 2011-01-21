@@ -41,8 +41,6 @@ FastMarchingBase()
   m_StoppingValue = NumericTraits< OutputPixelType >::Zero;
   m_TargetReachedValue = NumericTraits< OutputPixelType >::Zero;
   m_TopologyCheck = None;
-  m_TargetCondition = NoTargets;
-  m_NumberOfTargetsToBeReached = 0;
   m_LargeValue = NumericTraits< OutputPixelType >::max();
   }
 // -----------------------------------------------------------------------------
@@ -140,84 +138,11 @@ AddForbiddenNode( NodeType iNode )
 template< class TTraits >
 void
 FastMarchingBase< TTraits >::
-SetTargetNodes( std::vector< NodeType > iNodes )
-  {
-  m_TargetNodes = iNodes;
-  this->Modified();
-  }
-// -----------------------------------------------------------------------------
-
-// -----------------------------------------------------------------------------
-template< class TTraits >
-void
-FastMarchingBase< TTraits >::
-AddTargetNode( NodeType iNode )
-  {
-  m_TargetNodes.push_back( iNode );
-  this->Modified();
-  }
-// -----------------------------------------------------------------------------
-
-// -----------------------------------------------------------------------------
-template< class TTraits >
-bool
-FastMarchingBase< TTraits >::
-CheckTargetCondition( NodeType iNode )
-  {
-  // Only check for reached targets if the mode is not NoTargets and
-  // there is at least one TargetPoint.
-  if ( m_TargetCondition != NoTargets &&  !m_TargetNodes.empty() )
-    {
-    typename std::vector< NodeType >::const_iterator
-        pointsIter = m_TargetNodes.begin();
-    typename std::vector< NodeType >::const_iterator
-        pointsEnd = m_TargetNodes.end();
-
-    while( pointsIter != pointsEnd )
-      {
-      if ( *pointsIter == iNode )
-        {
-        this->m_ReachedTargetNodes.push_back( iNode );
-        return ( m_ReachedTargetNodes.size() == m_NumberOfTargetsToBeReached );
-        }
-      ++pointsIter;
-      }
-    }
-  return false;
-  }
-// -----------------------------------------------------------------------------
-
-// -----------------------------------------------------------------------------
-template< class TTraits >
-void
-FastMarchingBase< TTraits >::
 Initialize()
   {
   if( m_StoppingCriterion.IsNull() )
     {
     itkExceptionMacro( <<"No Stopping Criterion Set" );
-    }
-  if( m_TargetCondition != NoTargets )
-    {
-    if( m_TargetCondition == OneTarget )
-      {
-      m_NumberOfTargetsToBeReached = 1;
-      }
-    if( m_TargetCondition == AllTargets )
-      {
-      m_NumberOfTargetsToBeReached = m_TargetNodes.size();
-      }
-    if( m_NumberOfTargetsToBeReached < 1 )
-      {
-      itkExceptionMacro(
-        <<"Number of target nodes to be reached is null" );
-      }
-    if( m_NumberOfTargetsToBeReached > m_TargetNodes.size() )
-      {
-      itkExceptionMacro(
-        <<"Number of target nodes to be reached is above the provided number of target nodes" );
-      }
-    m_ReachedTargetNodes.clear();
     }
   if( m_NormalizationFactor < vnl_math::eps )
     {
@@ -271,26 +196,22 @@ GenerateData()
         // update its neighbors
         this->UpdateNeighbors( current_node );
 
-        if( !CheckTargetCondition( current_node ) )
-          {
-          // Send events every certain number of points.
-          newProgress = static_cast< double >( current_value ) /
-            static_cast< double >( m_StoppingValue );
+        // Send events every certain number of points.
+        newProgress = static_cast< double >( current_value ) /
+          static_cast< double >( m_StoppingValue );
 
-          if ( newProgress - oldProgress > 0.01 )
-            {
-            this->UpdateProgress(newProgress);
-            oldProgress = newProgress;
-            }
-          }
-        else
+        if ( newProgress - oldProgress > 0.01 )
           {
-          m_TargetReachedValue = current_value;
-          this->UpdateProgress(1.0);
-          break;
+          this->UpdateProgress(newProgress);
+          oldProgress = newProgress;
           }
         }
-
+      else
+        {
+        m_TargetReachedValue = current_value;
+        this->UpdateProgress(1.0);
+        break;
+        }
       }
     }
   catch ( ProcessAborted & )

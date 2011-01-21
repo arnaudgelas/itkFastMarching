@@ -45,5 +45,6 @@ private:
   StoppingCriterionBase( const Self& );
   void operator = ( const Self& );
 };
+
 }
 #endif

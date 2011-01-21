@@ -161,18 +161,9 @@ public:
                            NoHandles,
                            Strict };
 
-  enum TargetConditionType { NoTargets = 0,
-                             OneTarget,
-                             SomeTargets,
-                             AllTargets };
-
   /** Set/Get boolean macro indicating whether the user wants to check topology. */
   itkSetMacro( TopologyCheck, TopologyCheckType );
   itkGetConstReferenceMacro( TopologyCheck, TopologyCheckType );
-
-  /** Set/Get boolean macro indicating whether the user wants to check topology. */
-  itkSetMacro( TargetCondition, TargetConditionType );
-  itkGetConstReferenceMacro( TargetCondition, TargetConditionType );
 
   typedef std::pair< NodeType, OutputPixelType > NodePairType;
   typedef std::vector< std::pair< NodeType, OutputPixelType > > NodeContainerType;
@@ -195,9 +186,6 @@ public:
   virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
   virtual void AddForbiddenNode( NodeType iNode );
 
-  /** \brief Set Target Nodes*/
-  virtual void SetTargetNodes( std::vector< NodeType > iNodes );
-  virtual void AddTargetNode( NodeType iNode );
 
 protected:
 
@@ -219,14 +207,10 @@ protected:
   NodeContainerType m_TrialNodes;
   NodeContainerType m_AliveNodes;
   std::vector< NodeType > m_ForbiddenNodes;
-  std::vector< NodeType > m_TargetNodes;
-  std::vector< NodeType > m_ReachedTargetNodes;
-  size_t m_NumberOfTargetsToBeReached;
 
   PriorityQueuePointer m_Heap;
 
   TopologyCheckType m_TopologyCheck;
-  TargetConditionType m_TargetCondition;
 
   /** \brief Get the Label Value for a given node
     \param[in] iNode
@@ -250,9 +234,6 @@ protected:
 
   /**    */
   virtual void CheckTopology( NodeType iNode ) = 0;
-
-  /**    */
-  bool CheckTargetCondition( NodeType iNode );
 
   /**    */
   void Initialize();
