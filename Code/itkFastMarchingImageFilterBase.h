@@ -152,34 +152,34 @@ protected:
   double Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors );
 
   /**
-     * Functions and variables to check for topology changes (2D/3D only).
-     */
+   * Functions and variables to check for topology changes (2D/3D only).
+   */
 
-    // Functions/data for the 2-D case
-    void InitializeIndices2D();
-    bool IsChangeWellComposed2D( NodeType );
-    bool IsCriticalC1Configuration2D( Array<short> );
-    bool IsCriticalC2Configuration2D( Array<short> );
-    bool IsCriticalC3Configuration2D( Array<short> );
-    bool IsCriticalC4Configuration2D( Array<short> );
-    bool IsSpecialCaseOfC4Configuration2D(
-      OutputPixelType, NodeType, NodeType, NodeType );
+  // Functions/data for the 2-D case
+  void InitializeIndices2D();
+  bool IsChangeWellComposed2D( NodeType );
+  bool IsCriticalC1Configuration2D( std::vector<bool> );
+  bool IsCriticalC2Configuration2D( std::vector<bool> );
+  bool IsCriticalC3Configuration2D( std::vector<bool> );
+  bool IsCriticalC4Configuration2D( std::vector<bool> );
+  bool IsSpecialCaseOfC4Configuration2D(
+    OutputPixelType, NodeType, NodeType, NodeType );
 
-    Array<unsigned int>                        m_RotationIndices[4];
-    Array<unsigned int>                        m_ReflectionIndices[2];
+  Array<unsigned char>                        m_RotationIndices[4];
+  Array<unsigned char>                        m_ReflectionIndices[2];
 
-    // Functions/data for the 3-D case
-    void InitializeIndices3D();
-    bool IsCriticalC1Configuration3D( Array<short> );
-    unsigned int IsCriticalC2Configuration3D( Array<short> );
-    bool IsChangeWellComposed3D( NodeType );
+  // Functions/data for the 3-D case
+  void InitializeIndices3D();
+  bool IsCriticalC1Configuration3D( std::vector<bool> );
+  unsigned int IsCriticalC2Configuration3D( std::vector<bool> );
+  bool IsChangeWellComposed3D( NodeType );
 
-    Array<unsigned int>                        m_C1Indices[12];
-    Array<unsigned int>                        m_C2Indices[8];
+  Array<unsigned char>                        m_C1Indices[12];
+  Array<unsigned char>                        m_C2Indices[8];
 
-    // Functions for both 2D/3D cases
-    bool DoesVoxelChangeViolateWellComposedness( NodeType );
-    bool DoesVoxelChangeViolateStrictTopology( NodeType );
+  // Functions for both 2D/3D cases
+  bool DoesVoxelChangeViolateWellComposedness( NodeType );
+  bool DoesVoxelChangeViolateStrictTopology( NodeType );
 
 private:
   FastMarchingImageFilterBase( const Self& );

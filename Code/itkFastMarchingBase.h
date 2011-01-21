@@ -205,6 +205,7 @@ protected:
   double m_NormalizationFactor;
   OutputPixelType m_TargetReachedValue;
   OutputPixelType m_LargeValue;
+  OutputPixelType m_TopologyValue;
 
   NodeContainerType m_TrialNodes;
   NodeContainerType m_AliveNodes;

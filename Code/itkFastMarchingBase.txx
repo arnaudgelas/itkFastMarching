@@ -41,6 +41,7 @@ FastMarchingBase()
   m_TargetReachedValue = NumericTraits< OutputPixelType >::Zero;
   m_TopologyCheck = None;
   m_LargeValue = NumericTraits< OutputPixelType >::max();
+  m_TopologyValue = -1. * std::numeric_limits< OutputPixelType >::epsilon();
   }
 // -----------------------------------------------------------------------------
 
