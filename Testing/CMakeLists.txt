@@ -23,3 +23,10 @@ add_executable( itkFastMarchingStoppingCriterionBaseTest
   ${BASE_SOURCE}
 )
 target_link_libraries( itkFastMarchingStoppingCriterionBaseTest ITKCommon )
+
+
+add_executable( itkFastMarchingThresholdStoppingCriterionTest
+  itkFastMarchingThresholdStoppingCriterionTest.cxx
+  ${BASE_SOURCE}
+)
+target_link_libraries( itkFastMarchingThresholdStoppingCriterionTest ITKCommon )

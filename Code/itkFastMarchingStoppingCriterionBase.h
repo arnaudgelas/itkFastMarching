@@ -46,9 +46,6 @@ namespace itk
   /** Run-time type information (and related methods). */
   itkTypeMacro(FastMarchingStoppingCriterionBase, StoppingCriterionBase);
 
-  itkSetMacro( Threshold, OutputPixelType );
-  itkGetMacro( Threshold, OutputPixelType );
-
   virtual void SetCurrentNode( const NodeType& iNode ) = 0;
 
   void SetCurrentValue( const OutputPixelType& iValue )
@@ -67,13 +64,12 @@ namespace itk
  protected:
   FastMarchingStoppingCriterionBase() : Superclass()
   {
-    m_Threshold = NumericTraits< OutputPixelType >::Zero;
+
     m_CurrentValue = NumericTraits< OutputPixelType >::Zero;
     m_PreviousValue = NumericTraits< OutputPixelType >::Zero;
   }
   virtual ~FastMarchingStoppingCriterionBase() {}
 
-  OutputPixelType m_Threshold;
   OutputPixelType m_PreviousValue;
   OutputPixelType m_CurrentValue;
 

@@ -14,8 +14,6 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY
 
 set( BASE_SOURCE ${FMM_SOURCE_DIR}/Code/itkStoppingCriterionBase.cxx )
 
-message( ${BASE_SOURCE} )
-
 include_directories( Code )
 
 include( CTest )
