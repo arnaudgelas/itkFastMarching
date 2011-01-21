@@ -25,6 +25,8 @@
 #include "itkMesh.h"
 #include "itkMeshToMeshFilter.h"
 
+#include "itkFastMarchingStoppingCriterionBase.h"
+
 #include "itkPriorityQueueContainer.h"
 
 namespace itk
@@ -140,6 +142,9 @@ public:
     ElementIdentifier > PriorityQueueType;
   typedef typename PriorityQueueType::Pointer PriorityQueuePointer;
 
+  typedef FastMarchingStoppingCriterionBase< Self > StoppingCriterionType;
+  typedef typename StoppingCriterionType::Pointer   StoppingCriterionPointer;
+
   /** Enum of Fast Marching algorithm point types.
    * Far represent far away points;
    * Trial represent points within a narrowband of the propagating front;
@@ -201,6 +206,8 @@ protected:
 
   /** \brief Destructor */
   virtual ~FastMarchingBase();
+
+  StoppingCriterionPointer m_StoppingCriterion;
 
   double m_SpeedConstant;
   double m_InverseSpeed;

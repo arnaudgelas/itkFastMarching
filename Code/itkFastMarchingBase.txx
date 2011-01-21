@@ -193,9 +193,9 @@ void
 FastMarchingBase< TTraits >::
 Initialize()
   {
-  if( m_StoppingValue < 0. )
+  if( m_StoppingCriterion.IsNull() )
     {
-    itkExceptionMacro( <<"Stopping Value is null or negative" );
+    itkExceptionMacro( <<"No Stopping Criterion Set" );
     }
   if( m_TargetCondition != NoTargets )
     {
@@ -257,14 +257,13 @@ GenerateData()
       // is this node already alive ?
       if( this->GetLabelValueForGivenNode( current_node ) != Alive )
         {
-        this->CheckTopology( current_node );
-
-        if( current_value > m_StoppingValue )
+        if( m_StoppingCriterion->IsSatisfied() )
           {
           m_TargetReachedValue = m_StoppingValue;
           this->UpdateProgress(1.0);
           break;
           }
+        this->CheckTopology( current_node );
 
         // set this node as alive
         this->SetLabelValueForGivenNode( current_node, Alive );

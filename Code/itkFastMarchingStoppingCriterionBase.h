@@ -15,38 +15,43 @@
  *  limitations under the License.
  *
  *=========================================================================*/
- 
- #ifndef __itkFastMarchingStoppingCriterionBase_h
- #define __itkFastMarchingStoppingCriterionBase_h
- 
- #include "itkStoppingCriterionBase.h"
- 
- namespace itk
- {
- 
- /** \class FastMarchingStoppingCriterionBase 
+
+#ifndef __itkFastMarchingStoppingCriterionBase_h
+#define __itkFastMarchingStoppingCriterionBase_h
+
+#include "itkStoppingCriterionBase.h"
+#include "itkNumericTraits.h"
+
+namespace itk
+{
+
+ /** \class FastMarchingStoppingCriterionBase
+
  */
- template< class TFastMarching >
+ template< class TTraits >
  class FastMarchingStoppingCriterionBase : public StoppingCriterionBase
  {
  public:
   typedef FastMarchingStoppingCriterionBase Self;
-  typedef StoppingCriterionBase Superclass;
-  typedef SmartPointer< Self > Pointer;
-  typedef SmartPointer< const Self > ConstPointer;
-  
-  /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  typedef StoppingCriterionBase             Superclass;
+  typedef SmartPointer< Self >              Pointer;
+  typedef SmartPointer< const Self >        ConstPointer;
+
+  typedef TTraits Traits;
+  typedef typename Traits::OutputPixelType  OutputPixelType;
+  typedef typename Traits::NodeType         NodeType;
+
+
 
   /** Run-time type information (and related methods). */
   itkTypeMacro(FastMarchingStoppingCriterionBase, StoppingCriterionBase);
-  
-  itkSetMacro( Threshold, ValueType );
-  itkGetMacro( Threshold, ValueType );
-  
+
+  itkSetMacro( Threshold, OutputPixelType );
+  itkGetMacro( Threshold, OutputPixelType );
+
   virtual void SetCurrentNode( const NodeType& iNode ) = 0;
-  
-  void SetCurrentValue( const ValueType& iValue )
+
+  void SetCurrentValue( const OutputPixelType& iValue )
   {
     if( iValue >= m_CurrentValue )
       {
@@ -55,27 +60,27 @@
       }
     else
       {
-      itkGenericException( << "Current value is decreasing!" );
+      itkExceptionMacro( << "Current value is decreasing!" );
       }
   }
-   
+
  protected:
   FastMarchingStoppingCriterionBase() : Superclass()
   {
-    m_Threshold = NumericTraits< ValueType >::Zero;
-    m_Currentvalue = NumericTraits< ValueType >::Zero;
-    m_Currentvalue = NumericTraits< ValueType >::Zero;
+    m_Threshold = NumericTraits< OutputPixelType >::Zero;
+    m_CurrentValue = NumericTraits< OutputPixelType >::Zero;
+    m_PreviousValue = NumericTraits< OutputPixelType >::Zero;
   }
-  ~FastMarchingStoppingCriterionBase() {}
-  
-  ValueType m_Threshold;
-  ValueType m_PreviousValue;
-  ValueType m_CurrentValue;
-  
+  virtual ~FastMarchingStoppingCriterionBase() {}
+
+  OutputPixelType m_Threshold;
+  OutputPixelType m_PreviousValue;
+  OutputPixelType m_CurrentValue;
+
  private:
   FastMarchingStoppingCriterionBase( const Self& );
   void operator = ( const Self& );
  };
  }
  #endif
- 
+

@@ -16,34 +16,17 @@
  *
  *=========================================================================*/
 
-#ifndef __itkStoppingCriterionBase_h
-#define __itkStoppingCriterionBase_h
-
-#include "itkObject.h"
-#include "itkObjectFactoryBase.h"
-#include "itkMacro.h"
+#include "itkStoppingCriterionBase.h"
 
 namespace itk
 {
-class StoppingCriterionBase : public Object
-{
-public:
-  typedef StoppingCriterionBase Self;
-  typedef Object Superclass;
-  typedef SmartPointer< Self > Pointer;
-  typedef SmartPointer< const Self > ConstPointer;
+StoppingCriterionBase::
+StoppingCriterionBase()
+{}
 
-  itkTypeMacro(StoppingCriterionBase, Object);
+StoppingCriterionBase::
+~StoppingCriterionBase()
+{}
 
-  virtual bool IsSatisfied() const = 0;
 
-protected:
-  StoppingCriterionBase();
-  virtual ~StoppingCriterionBase();
-
-private:
-  StoppingCriterionBase( const Self& );
-  void operator = ( const Self& );
-};
 }
-#endif
