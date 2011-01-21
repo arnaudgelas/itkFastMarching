@@ -148,6 +148,10 @@ Initialize()
     {
     itkExceptionMacro( <<"Normalization Factor is null or negative" );
     }
+  if( m_SpeedConstant < vnl_math::eps )
+    {
+    itkExceptionMacro( <<"SpeedConstant is null or negative" );
+    }
 
   // make sure the heap is empty
   while ( !m_Heap->Empty() )
