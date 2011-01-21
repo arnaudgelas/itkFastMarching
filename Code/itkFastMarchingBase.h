@@ -86,6 +86,22 @@ class MeshFastMarchingTraits :
   {};
 
 
+template< >
+class FastMarchingStoppingCriterion : public LightObject
+{
+  public:
+    typedef FastMarchingStoppingCriterion Self;
+    typedef SmartPointer< Self >          Pointer;
+    typedef SmartPointer< const Self >    ConstPointer;
+
+    bool IsSatisified
+
+  protected:
+  private:
+    FastMarchingStoppingCriterion( const Self& );
+    void operator = ( const Self& );
+};
+
 /**
  * \class FastMarchingBase
  * \brief Solve an Eikonal equation (see equation below) using Fast Marching
