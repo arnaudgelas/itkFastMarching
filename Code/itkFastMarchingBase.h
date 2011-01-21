@@ -149,13 +149,16 @@ public:
    * Far represent far away points;
    * Trial represent points within a narrowband of the propagating front;
    * Alive represent points which have already been processed.
-   * Forbidden represent points where the front can not propagate
+   * Forbidden represent points where the front can not propagate.
+   * Topology points were trial points but their inclusion
+   * would have violated topology checks.
    */
   enum LabelType { Far = 0,
                    Alive,
                    Trial,
                    InitialTrial,
-                   Forbidden };
+                   Forbidden,
+                   Topology };
 
   enum TopologyCheckType { None = 0,
                            NoHandles,
@@ -200,7 +203,6 @@ protected:
   double m_SpeedConstant;
   double m_InverseSpeed;
   double m_NormalizationFactor;
-  OutputPixelType m_StoppingValue;
   OutputPixelType m_TargetReachedValue;
   OutputPixelType m_LargeValue;
 
@@ -233,7 +235,7 @@ protected:
   virtual void UpdateValue( NodeType iNode ) = 0;
 
   /**    */
-  virtual void CheckTopology( NodeType iNode ) = 0;
+  virtual bool CheckTopology( NodeType iNode ) = 0;
 
   /**    */
   void Initialize();

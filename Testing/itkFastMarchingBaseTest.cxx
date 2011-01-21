@@ -60,8 +60,8 @@ protected:
   void UpdateValue( NodeType iNode )
     { (void) iNode; }
 
-  void CheckTopology( NodeType iNode )
-    { (void) iNode; }
+  bool CheckTopology( NodeType iNode )
+    { return true; }
 
   virtual void InitializeOutput() {}
 

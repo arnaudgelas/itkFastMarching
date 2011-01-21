@@ -21,6 +21,7 @@
 
 #include "itkFastMarchingBase.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
+#include "itkNeighborhoodIterator.h"
 
 namespace itk
 {
@@ -70,6 +71,12 @@ public:
 
   typedef Image< unsigned char, ImageDimension >  LabelImageType;
   typedef typename LabelImageType::Pointer        LabelImagePointer;
+
+  typedef Image< unsigned int, ImageDimension >
+    ConnectedComponentImageType;
+  typedef typename ConnectedComponentImageType::Pointer ConnectedComponentImagePointer;
+
+  typedef NeighborhoodIterator<LabelImageType> NeighborhoodIteratorType;
 
   typedef typename Superclass::NodeContainerType NodeContainerType;
   typedef typename Superclass::NodeContainerConstIterator NodeContainerConstIterator;
@@ -134,14 +141,45 @@ protected:
   NodeType m_LastIndex;
 
   LabelImagePointer m_LabelImage;
+  ConnectedComponentImagePointer                m_ConnectedComponentImage;
 
   char GetLabelValueForGivenNode( NodeType iNode );
   void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel );
   void UpdateNeighbors( NodeType iNode );
   void UpdateValue( NodeType iValue );
-  void CheckTopology( NodeType iNode );
+  bool CheckTopology( NodeType iNode );
   void InitializeOutput();
   double Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors );
+
+  /**
+     * Functions and variables to check for topology changes (2D/3D only).
+     */
+
+    // Functions/data for the 2-D case
+    void InitializeIndices2D();
+    bool IsChangeWellComposed2D( NodeType );
+    bool IsCriticalC1Configuration2D( Array<short> );
+    bool IsCriticalC2Configuration2D( Array<short> );
+    bool IsCriticalC3Configuration2D( Array<short> );
+    bool IsCriticalC4Configuration2D( Array<short> );
+    bool IsSpecialCaseOfC4Configuration2D(
+      OutputPixelType, NodeType, NodeType, NodeType );
+
+    Array<unsigned int>                        m_RotationIndices[4];
+    Array<unsigned int>                        m_ReflectionIndices[2];
+
+    // Functions/data for the 3-D case
+    void InitializeIndices3D();
+    bool IsCriticalC1Configuration3D( Array<short> );
+    unsigned int IsCriticalC2Configuration3D( Array<short> );
+    bool IsChangeWellComposed3D( NodeType );
+
+    Array<unsigned int>                        m_C1Indices[12];
+    Array<unsigned int>                        m_C2Indices[8];
+
+    // Functions for both 2D/3D cases
+    bool DoesVoxelChangeViolateWellComposedness( NodeType );
+    bool DoesVoxelChangeViolateStrictTopology( NodeType );
 
 private:
   FastMarchingImageFilterBase( const Self& );

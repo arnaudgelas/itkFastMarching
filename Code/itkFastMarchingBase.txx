@@ -38,7 +38,6 @@ FastMarchingBase()
   m_SpeedConstant = 1.;
   m_InverseSpeed = 1.;
   m_NormalizationFactor = 1.;
-  m_StoppingValue = NumericTraits< OutputPixelType >::Zero;
   m_TargetReachedValue = NumericTraits< OutputPixelType >::Zero;
   m_TopologyCheck = None;
   m_LargeValue = NumericTraits< OutputPixelType >::max();
@@ -62,7 +61,6 @@ PrintSelf( std::ostream & os, Indent indent ) const
   Superclass::PrintSelf( os, indent );
 
   os << indent << "Speed constant: " << m_SpeedConstant << std::endl;
-  os << indent << "Stopping value: " << m_StoppingValue << std::endl;
   os << indent << "Normalization Factor: " << m_NormalizationFactor << std::endl;
   }
 
@@ -172,8 +170,8 @@ GenerateData()
   Initialize();
   try
     {
-    double newProgress = 0.;
-    double oldProgress = 0.;
+    //double newProgress = 0.;
+    //double oldProgress = 0.;
 
     while( !m_Heap->Empty() )
       {
@@ -188,26 +186,30 @@ GenerateData()
         {
         if( m_StoppingCriterion->IsSatisfied() )
           {
-          m_TargetReachedValue = m_StoppingValue;
+          m_TargetReachedValue = current_value;
           this->UpdateProgress(1.0);
           break;
           }
-        this->CheckTopology( current_node );
 
-        // set this node as alive
-        this->SetLabelValueForGivenNode( current_node, Alive );
-
-        // update its neighbors
-        this->UpdateNeighbors( current_node );
-
-        // Send events every certain number of points.
-        newProgress = static_cast< double >( current_value ) /
-          static_cast< double >( m_StoppingValue );
-
-        if ( newProgress - oldProgress > 0.01 )
+        if( this->CheckTopology( current_node ) )
           {
-          this->UpdateProgress(newProgress);
-          oldProgress = newProgress;
+          // set this node as alive
+          this->SetLabelValueForGivenNode( current_node, Alive );
+
+          // update its neighbors
+          this->UpdateNeighbors( current_node );
+
+
+          // Send events every certain number of points.
+          /*
+          newProgress = static_cast< double >( current_value ) /
+            static_cast< double >( m_StoppingValue );
+
+          if ( newProgress - oldProgress > 0.01 )
+            {
+            this->UpdateProgress(newProgress);
+            oldProgress = newProgress;
+            }*/
           }
         }
       else
