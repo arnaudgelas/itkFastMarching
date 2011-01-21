@@ -23,13 +23,13 @@
  
  namespace itk
  {
- class StoppingCriterionBase : public LightObject
+ class StoppingCriterionBase : public Object
  {
    public:
      typedef StoppingCriterionBase Self;
      typedef SmartPointer< Self > Pointer;
      typedef SmartPointer< const Self > ConstPointer;
-     typedef LightObject Superclass;
+     typedef Object Superclass;
      
      itkTypeMacro(FastMarchingImageFilterBase, FastMarchingBase);
      
