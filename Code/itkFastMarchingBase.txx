@@ -30,15 +30,15 @@
 namespace itk
 {
 // -----------------------------------------------------------------------------
-template< class TTraits >
-FastMarchingBase< TTraits >::
+template< class TTraits, class TCriterion >
+FastMarchingBase< TTraits, TCriterion >::
 FastMarchingBase()
   {
   this->ProcessObject::SetNumberOfRequiredInputs(0);
 
   //m_Heap = PriorityQueueType::New();
   m_SpeedConstant = 1.;
-  m_InverseSpeed = 1.;
+  m_InverseSpeed = -1.;
   m_NormalizationFactor = 1.;
   m_TargetReachedValue = NumericTraits< OutputPixelType >::Zero;
   m_TopologyCheck = None;
@@ -48,17 +48,17 @@ FastMarchingBase()
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
-FastMarchingBase< TTraits >::
+template< class TTraits, class TCriterion >
+FastMarchingBase< TTraits, TCriterion >::
 ~FastMarchingBase()
   {
   }
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 PrintSelf( std::ostream & os, Indent indent ) const
   {
   Superclass::PrintSelf( os, indent );
@@ -70,9 +70,9 @@ PrintSelf( std::ostream & os, Indent indent ) const
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 SetAliveNodes( NodeContainerType iNodes )
   {
   m_AliveNodes = iNodes;
@@ -81,9 +81,9 @@ SetAliveNodes( NodeContainerType iNodes )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue )
   {
   m_AliveNodes.push_back( NodePairType( iNode, iValue ) );
@@ -92,9 +92,9 @@ AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 AddAliveNode( const NodePairType& iPair )
   {
   m_AliveNodes.push_back( iPair );
@@ -103,9 +103,9 @@ AddAliveNode( const NodePairType& iPair )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 SetTrialNodes( NodeContainerType iNodes )
   {
   m_TrialNodes = iNodes;
@@ -114,9 +114,9 @@ SetTrialNodes( NodeContainerType iNodes )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue )
   {
   m_TrialNodes.push_back( NodePairType( iNode, iValue ) );
@@ -125,9 +125,9 @@ AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 AddTrialNode( const NodePairType& iPair )
   {
   m_TrialNodes.push_back( iPair );
@@ -136,9 +136,9 @@ AddTrialNode( const NodePairType& iPair )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 SetForbiddenNodes( std::vector< NodeType > iNodes )
   {
   m_ForbiddenNodes = iNodes;
@@ -147,10 +147,10 @@ SetForbiddenNodes( std::vector< NodeType > iNodes )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
-AddForbiddenNode( NodeType iNode )
+FastMarchingBase< TTraits, TCriterion >::
+AddForbiddenNode( const NodeType& iNode )
   {
   m_ForbiddenNodes.push_back( iNode );
   this->Modified();
@@ -158,10 +158,10 @@ AddForbiddenNode( NodeType iNode )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
-Initialize()
+FastMarchingBase< TTraits, TCriterion >::
+Initialize( OutputDomainType* oDomain )
   {
   if( m_StoppingCriterion.IsNull() )
     {
@@ -188,17 +188,24 @@ Initialize()
     }
   */
 
-  InitializeOutput();
+  InitializeOutput( oDomain );
   }
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 GenerateData()
   {
-  Initialize();
+  OutputDomainType* output = this->GetOutput();
+
+  Initialize( output );
+
+  OutputPixelType current_value = 0.;
+
+  this->UpdateProgress(0.0);   // Send first progress event
+
   try
     {
     //double newProgress = 0.;
@@ -218,45 +225,42 @@ GenerateData()
       m_Heap.pop();
 
       NodeType current_node = current_node_pair.first;
-      OutputPixelType current_value = current_node_pair.second;
+      current_value = this->GetOutputValue( output, current_node );
 
-
-      // is this node already alive ?
-      if( this->GetLabelValueForGivenNode( current_node ) != Alive )
+      if( current_value == current_node_pair.second )
         {
-        if( m_StoppingCriterion->IsSatisfied() )
+        // is this node already alive ?
+        if( this->GetLabelValueForGivenNode( current_node ) != Alive )
           {
-          m_TargetReachedValue = current_value;
-          this->UpdateProgress(1.0);
-          break;
-          }
+          m_StoppingCriterion->SetCurrentNode( current_node );
+          m_StoppingCriterion->SetCurrentValue( current_value );
 
-        if( this->CheckTopology( current_node ) )
-          {
-          // set this node as alive
-          this->SetLabelValueForGivenNode( current_node, Alive );
-
-          // update its neighbors
-          this->UpdateNeighbors( current_node );
-
-
-          // Send events every certain number of points.
-          /*
-          newProgress = static_cast< double >( current_value ) /
-            static_cast< double >( m_StoppingValue );
-
-          if ( newProgress - oldProgress > 0.01 )
+          if( m_StoppingCriterion->IsSatisfied() )
             {
-            this->UpdateProgress(newProgress);
-            oldProgress = newProgress;
-            }*/
+            break;
+            }
+
+          if( this->CheckTopology( output, current_node ) )
+            {
+            // set this node as alive
+            this->SetLabelValueForGivenNode( current_node, Alive );
+
+            // update its neighbors
+            this->UpdateNeighbors( output, current_node );
+
+
+            // Send events every certain number of points.
+            /*
+            newProgress = static_cast< double >( current_value ) /
+              static_cast< double >( m_StoppingValue );
+
+            if ( newProgress - oldProgress > 0.01 )
+              {
+              this->UpdateProgress(newProgress);
+              oldProgress = newProgress;
+              }*/
+            }
           }
-        }
-      else
-        {
-        m_TargetReachedValue = current_value;
-        this->UpdateProgress(1.0);
-        break;
         }
       }
     }
@@ -279,6 +283,9 @@ GenerateData()
 
     throw ProcessAborted(__FILE__, __LINE__);
     }
+
+  m_TargetReachedValue = current_value;
+  this->UpdateProgress(1.0);
 
   // let's release some useless memory...
   while( !m_Heap.empty() )

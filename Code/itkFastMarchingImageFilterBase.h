@@ -26,17 +26,21 @@
 namespace itk
 {
 
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension,
+         typename TInputPixel,
+         typename TOutputPixel,
+         class TCriterion >
 class FastMarchingImageFilterBase :
     public FastMarchingBase<
-      ImageFastMarchingTraits< VDimension, TInputPixel, TOutputPixel >
+      ImageFastMarchingTraits< VDimension, TInputPixel, TOutputPixel >,
+      TCriterion
     >
   {
 public:
   typedef ImageFastMarchingTraits< VDimension, TInputPixel, TOutputPixel > Traits;
 
   typedef FastMarchingImageFilterBase            Self;
-  typedef FastMarchingBase< Traits >             Superclass;
+  typedef FastMarchingBase< Traits, TCriterion >             Superclass;
   typedef SmartPointer< Self >        Pointer;
   typedef SmartPointer< const Self >  ConstPointer;
 
@@ -62,12 +66,14 @@ public:
 
   typedef typename Superclass::NodeType NodeType;
   typedef typename Superclass::NodePairType NodePairType;
+  /*
   typedef typename Superclass::ElementIdentifier ElementIdentifier;
 
   typedef typename Superclass::PriorityQueueElementType PriorityQueueElementType;
 
   typedef typename Superclass::PriorityQueueType PriorityQueueType;
   typedef typename Superclass::PriorityQueuePointer PriorityQueuePointer;
+  */
 
   typedef typename Superclass::LabelType LabelType;
 
@@ -81,6 +87,7 @@ public:
   typedef typename ConnectedComponentImageType::Pointer ConnectedComponentImagePointer;
 
   typedef NeighborhoodIterator<LabelImageType> NeighborhoodIteratorType;
+  typedef typename NeighborhoodIteratorType::RadiusType NeighborhoodRadiusType;
 
   typedef typename Superclass::NodeContainerType NodeContainerType;
   typedef typename Superclass::NodeContainerConstIterator NodeContainerConstIterator;
@@ -100,12 +107,12 @@ public:
     OutputSizeType nullsize;
     nullsize.Fill( 0 );
 
-    /*
+
     if( m_BufferedRegion.GetSize() == nullsize )
       {
       itkGenericExceptionMacro( << "m_BufferedRegion has not been set yet" );
       }
-    else */
+    else
       {
       typedef Image< TPixel, ImageDimension > InternalImageType;
       typedef ImageRegionConstIteratorWithIndex< InternalImageType >
@@ -173,16 +180,26 @@ protected:
   OutputDirectionType m_OutputDirection;
   bool                m_OverrideOutputInformation;
 
+  /** Generate the output image meta information. */
+  virtual void GenerateOutputInformation();
+
+  virtual void EnlargeOutputRequestedRegion(DataObject *output);
+
   LabelImagePointer m_LabelImage;
   ConnectedComponentImagePointer                m_ConnectedComponentImage;
 
-  char GetLabelValueForGivenNode( NodeType iNode );
-  void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel );
-  void UpdateNeighbors( NodeType iNode );
-  void UpdateValue( NodeType iValue );
-  bool CheckTopology( NodeType iNode );
-  void InitializeOutput();
-  double Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors );
+  OutputPixelType GetOutputValue( OutputImageType* oImage,
+                                  const NodeType& iNode ) const;
+  char GetLabelValueForGivenNode( const NodeType& iNode ) const;
+  void SetLabelValueForGivenNode( const NodeType& iNode,
+                                 const LabelType& iLabel );
+  void UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode );
+  void UpdateValue( OutputImageType* oImage, const NodeType& iValue );
+  bool CheckTopology( OutputImageType* oImage, const NodeType& iNode );
+  void InitializeOutput( OutputImageType* oImage );
+  double Solve( OutputImageType* oImage,
+               const NodeType& iNode,
+               std::vector< InternalNodeStructure > iNeighbors );
 
   /**
    * Functions and variables to check for topology changes (2D/3D only).
@@ -190,29 +207,27 @@ protected:
 
   // Functions/data for the 2-D case
   void InitializeIndices2D();
-  bool IsChangeWellComposed2D( NodeType );
-  bool IsCriticalC1Configuration2D( std::vector<bool> );
-  bool IsCriticalC2Configuration2D( std::vector<bool> );
-  bool IsCriticalC3Configuration2D( std::vector<bool> );
-  bool IsCriticalC4Configuration2D( std::vector<bool> );
-  bool IsSpecialCaseOfC4Configuration2D(
-    OutputPixelType, NodeType, NodeType, NodeType );
+  bool IsChangeWellComposed2D( const NodeType& ) const;
+  bool IsCriticalC1Configuration2D( const std::vector<bool>& ) const;
+  bool IsCriticalC2Configuration2D( const std::vector<bool>& ) const;
+  bool IsCriticalC3Configuration2D( const std::vector<bool>& ) const;
+  bool IsCriticalC4Configuration2D( const std::vector<bool>& ) const;
 
   Array<unsigned char>                        m_RotationIndices[4];
   Array<unsigned char>                        m_ReflectionIndices[2];
 
   // Functions/data for the 3-D case
   void InitializeIndices3D();
-  bool IsCriticalC1Configuration3D( std::vector<bool> );
-  unsigned int IsCriticalC2Configuration3D( std::vector<bool> );
-  bool IsChangeWellComposed3D( NodeType );
+  bool IsCriticalC1Configuration3D( const std::vector<bool>& ) const;
+  unsigned int IsCriticalC2Configuration3D( const std::vector<bool>& ) const;
+  bool IsChangeWellComposed3D( const NodeType& ) const;
 
   Array<unsigned char>                        m_C1Indices[12];
   Array<unsigned char>                        m_C2Indices[8];
 
   // Functions for both 2D/3D cases
-  bool DoesVoxelChangeViolateWellComposedness( NodeType );
-  bool DoesVoxelChangeViolateStrictTopology( NodeType );
+  bool DoesVoxelChangeViolateWellComposedness( const NodeType& ) const;
+  bool DoesVoxelChangeViolateStrictTopology( const NodeType& ) const;
 
 private:
   FastMarchingImageFilterBase( const Self& );

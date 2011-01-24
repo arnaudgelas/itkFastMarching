@@ -46,9 +46,11 @@ public:
   typedef typename InputDomainType::PixelType InputPixelType;
 
   typedef TNode NodeType;
+
   typedef TOutputDomain OutputDomainType;
   typedef typename OutputDomainType::Pointer OutputDomainPointer;
   typedef typename OutputDomainType::PixelType OutputPixelType;
+
   typedef TSuperclass SuperclassType;
 
   // Here concept checking: make sure TValue is scalar!
@@ -57,7 +59,9 @@ public:
 /**  \class ImageFastMarchingTraits
   \brief
 */
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template<unsigned int VDimension,
+         typename TInputPixel,
+         typename TOutputPixel >
 class ImageFastMarchingTraits :
     public FastMarchingTraits<
       Image< TInputPixel, VDimension >,
@@ -66,9 +70,7 @@ class ImageFastMarchingTraits :
       ImageToImageFilter< Image< TInputPixel, VDimension >,
                           Image< TOutputPixel, VDimension > >
     >
-  {
-
-  };
+  {};
 
 /**  \class MeshFastMarchingTraits
   \brief
@@ -84,7 +86,8 @@ class MeshFastMarchingTraits :
       typename TInputMeshTraits::PointIdentifier,
       Mesh< TOutputPixel, VDimension, TOutputMeshTraits >,
       MeshToMeshFilter< Mesh< TInputPixel, VDimension, TInputMeshTraits >,
-                        Mesh< TOutputPixel, VDimension, TOutputMeshTraits > > >
+                        Mesh< TOutputPixel, VDimension, TOutputMeshTraits > >
+    >
   {};
 
 
@@ -108,7 +111,7 @@ class MeshFastMarchingTraits :
  * Cambridge Press, Second edition, 1999.
  *
 */
-template< class TTraits >
+template< class TTraits, class TStoppingCriterion >
 class FastMarchingBase : public TTraits::SuperclassType
   {
 public:
@@ -130,6 +133,11 @@ public:
   typedef typename Traits::OutputPixelType      OutputPixelType;
 
   typedef typename Traits::NodeType NodeType;
+
+  typedef TStoppingCriterion StoppingCriterionType;
+  typedef typename StoppingCriterionType::Pointer StoppingCriterionPointer;
+
+  /*
   typedef long ElementIdentifier;
 
   typedef MinPriorityQueueElementWrapper< NodeType,
@@ -141,9 +149,8 @@ public:
     OutputPixelType,
     ElementIdentifier > PriorityQueueType;
   typedef typename PriorityQueueType::Pointer PriorityQueuePointer;
+  */
 
-  typedef FastMarchingStoppingCriterionBase< Self > StoppingCriterionType;
-  typedef typename StoppingCriterionType::Pointer   StoppingCriterionPointer;
 
   /** Enum of Fast Marching algorithm point types.
    * Far represent far away points;
@@ -189,7 +196,7 @@ public:
 
     bool operator < ( const Self& iRight ) const
       {
-      return this->second < iRight.second;
+      return this->second > iRight.second;
       }
     };
 
@@ -215,7 +222,7 @@ public:
 
   /** \brief Set Forbidden Nodes */
   virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
-  virtual void AddForbiddenNode( NodeType iNode );
+  virtual void AddForbiddenNode( const NodeType& iNode );
 
   itkGetObjectMacro( StoppingCriterion, StoppingCriterionType );
   itkSetObjectMacro( StoppingCriterion, StoppingCriterionType );
@@ -247,34 +254,41 @@ protected:
 
   TopologyCheckType m_TopologyCheck;
 
+  virtual OutputPixelType GetOutputValue( OutputDomainType* oDomain,
+                                         const NodeType& iNode ) const = 0;
+
   /** \brief Get the Label Value for a given node
     \param[in] iNode
     \return its label value  */
-  virtual char GetLabelValueForGivenNode( NodeType iNode ) = 0;
+  virtual char GetLabelValueForGivenNode( const NodeType& iNode ) const = 0;
 
   /** \brief Set the Label Value for a given node
     \param[in] iNode
     \param[in] iLabel */
-  virtual void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel ) = 0;
+  virtual void SetLabelValueForGivenNode( const NodeType& iNode,
+                                         const LabelType& iLabel ) = 0;
 
   /** \brief Update neighbors to a given node
     \param[in] iNode
   */
-  virtual void UpdateNeighbors( NodeType iNode ) = 0;
+  virtual void UpdateNeighbors( OutputDomainType* oDomain,
+                               const NodeType& iNode ) = 0;
 
   /** \brief Update value for a given node
     \param[in] iNode
     */
-  virtual void UpdateValue( NodeType iNode ) = 0;
+  virtual void UpdateValue( OutputDomainType* oDomain,
+                           const NodeType& iNode ) = 0;
 
   /**    */
-  virtual bool CheckTopology( NodeType iNode ) = 0;
+  virtual bool CheckTopology( OutputDomainType* oDomain,
+                             const NodeType& iNode ) = 0;
 
   /**    */
-  void Initialize();
+  void Initialize( OutputDomainType* oDomain );
 
   /**    */
-  virtual void InitializeOutput() = 0;
+  virtual void InitializeOutput( OutputDomainType* oDomain ) = 0;
 
   /**    */
   void GenerateData();

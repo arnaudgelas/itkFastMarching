@@ -41,8 +41,11 @@ public:
 };
 }
 
-int main(int, char* [] )
+int main(int argc, char* argv[] )
 {
+  (void) argc;
+  (void) argv;
+
   itk::OutputWindow::SetInstance(itk::TextOutput::New().GetPointer());
 
   // create a fastmarching object
@@ -50,17 +53,17 @@ int main(int, char* [] )
   const unsigned Dimension = 2;
 
   typedef itk::Image< PixelType, Dimension > FloatImageType;
+  typedef itk::FastMarchingImageThresholdStoppingCriterion< FloatImageType >
+      CriterionType;
 
-  typedef itk::FastMarchingImageFilterBase< Dimension, PixelType, PixelType >
+  typedef itk::FastMarchingImageFilterBase< Dimension, PixelType, PixelType, CriterionType >
     FastMarchingType;
-  typedef itk::FastMarchingThresholdStoppingCriterion< FastMarchingType::Traits >
-      StoppingCriterionType;
 
-  StoppingCriterionType::Pointer criterion = StoppingCriterionType::New();
+  CriterionType::Pointer criterion = CriterionType::New();
   criterion->SetThreshold( 100. );
 
   FastMarchingType::Pointer marcher = FastMarchingType::New();
-  marcher->SetStoppingCriterion( criterion.GetPointer() );
+  marcher->SetStoppingCriterion( criterion );
 
   ShowProgressObject progressWatch(marcher);
   itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
@@ -144,7 +147,6 @@ int main(int, char* [] )
 
   speedImage->Print( std::cout );
   marcher->SetInput( speedImage );
-  //marcher->SetStoppingValue( 100.0 );
 
   // turn on debugging
   marcher->DebugOn();
@@ -154,12 +156,13 @@ int main(int, char* [] )
 
   // check the results
   FloatImageType::Pointer output = marcher->GetOutput();
+
   itk::ImageRegionIterator<FloatImageType>
     iterator( output, output->GetBufferedRegion() );
 
   bool passed = true;
 
-  for ( ; !iterator.IsAtEnd(); ++iterator )
+  while ( !iterator.IsAtEnd() )
     {
 
     FloatImageType::IndexType tempIndex;
@@ -171,24 +174,24 @@ int main(int, char* [] )
     distance = 0.0;
     for ( int j = 0; j < 2; j++ )
       {
-        distance += tempIndex[j] * tempIndex[j];
+      distance += tempIndex[j] * tempIndex[j];
       }
     distance = vcl_sqrt( distance );
 
-    outputValue = (float) iterator.Get();
+    outputValue = iterator.Get();
 
-    if (distance == 0)
+    //std::cout << iterator.GetIndex() <<" ** " <<outputValue <<std::endl;
+    if (distance != 0)
       {
-      continue;
+      if ( vnl_math_abs( outputValue ) / distance > 1.42 )
+        {
+        std::cout << iterator.GetIndex() << " ";
+        std::cout << vnl_math_abs( outputValue ) / distance << " ";
+        std::cout << vnl_math_abs( outputValue ) << " " << distance << std::endl;
+        passed = false;
+        }
       }
-    if ( vnl_math_abs( outputValue ) / distance > 1.42 )
-      {
-      std::cout << iterator.GetIndex() << " ";
-      std::cout << vnl_math_abs( outputValue ) / distance << " ";
-      std::cout << vnl_math_abs( outputValue ) << " " << distance << std::endl;
-      passed = false;
-      }
-
+    ++iterator;
     }
 
   // Exercise other member functions
