@@ -196,7 +196,7 @@ public:
 
     bool operator < ( const Self& iRight ) const
       {
-      return this->second < iRight.second;
+      return this->second > iRight.second;
       }
     };
 
@@ -254,6 +254,9 @@ protected:
 
   TopologyCheckType m_TopologyCheck;
 
+  virtual OutputPixelType GetOutputValue( OutputDomainType* oDomain,
+                                         NodeType iNode ) const = 0;
+
   /** \brief Get the Label Value for a given node
     \param[in] iNode
     \return its label value  */
@@ -267,21 +270,21 @@ protected:
   /** \brief Update neighbors to a given node
     \param[in] iNode
   */
-  virtual void UpdateNeighbors( NodeType iNode ) = 0;
+  virtual void UpdateNeighbors( OutputDomainType* oDomain, NodeType iNode ) = 0;
 
   /** \brief Update value for a given node
     \param[in] iNode
     */
-  virtual void UpdateValue( NodeType iNode ) = 0;
+  virtual void UpdateValue( OutputDomainType* oDomain, NodeType iNode ) = 0;
 
   /**    */
   virtual bool CheckTopology( NodeType iNode ) = 0;
 
   /**    */
-  void Initialize();
+  void Initialize( OutputDomainType* oDomain );
 
   /**    */
-  virtual void InitializeOutput() = 0;
+  virtual void InitializeOutput( OutputDomainType* oDomain ) = 0;
 
   /**    */
   void GenerateData();

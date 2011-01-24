@@ -37,6 +37,8 @@ public:
   /** Run-time type information (and related methods). */
   itkTypeMacro(FastMarchingBaseTestHelper, FastMarchingBase);
 
+  typedef typename Superclass::OutputDomainType OutputDomainType;
+
   typedef typename Superclass::NodeContainerType  NodeContainerType;
   typedef typename Superclass::NodeType           NodeType;
 
@@ -47,6 +49,14 @@ protected:
   FastMarchingBaseTestHelper() {}
   ~FastMarchingBaseTestHelper() {}
 
+  OutputPixelType GetOutputValue( OutputDomainType* oDomain,
+                                  NodeType iNode ) const
+    {
+    (void) oDomain;
+    (void) iNode;
+    return NumericTraits< OutputPixelType >::Zero;
+    }
+
   char GetLabelValueForGivenNode( NodeType iNode )
     {
     return Superclass::Far;
@@ -55,16 +65,16 @@ protected:
   void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel )
     { (void) iNode; (void) iLabel; }
 
-  void UpdateNeighbors( NodeType iNode )
+  void UpdateNeighbors( OutputDomainType* oDomain, NodeType iNode )
     { (void) iNode; }
 
-  void UpdateValue( NodeType iNode )
+  void UpdateValue( OutputDomainType* oDomain, NodeType iNode )
     { (void) iNode; }
 
   bool CheckTopology( NodeType iNode )
     { return true; }
 
-  virtual void InitializeOutput() {}
+  virtual void InitializeOutput( OutputDomainType* oDomain ) {}
 
 private:
   FastMarchingBaseTestHelper( const Self& );

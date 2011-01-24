@@ -150,13 +150,14 @@ int main(int argc, char* argv[] )
   //marcher->SetStoppingValue( 100.0 );
 
   // turn on debugging
-  marcher->DebugOn();
+  //marcher->DebugOn();
 
   // update the marcher
   marcher->Update();
 
   // check the results
   FloatImageType::Pointer output = marcher->GetOutput();
+
   itk::ImageRegionIterator<FloatImageType>
     iterator( output, output->GetBufferedRegion() );
 
@@ -178,8 +179,9 @@ int main(int argc, char* argv[] )
       }
     distance = vcl_sqrt( distance );
 
-    outputValue = (float) iterator.Get();
+    outputValue = iterator.Get();
 
+    //std::cout << iterator.GetIndex() <<" ** " <<outputValue <<std::endl;
     if (distance == 0)
       {
       continue;

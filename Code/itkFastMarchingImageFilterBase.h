@@ -179,15 +179,22 @@ protected:
   OutputDirectionType m_OutputDirection;
   bool                m_OverrideOutputInformation;
 
+  /** Generate the output image meta information. */
+  virtual void GenerateOutputInformation();
+
+  virtual void EnlargeOutputRequestedRegion(DataObject *output);
+
   LabelImagePointer m_LabelImage;
   ConnectedComponentImagePointer                m_ConnectedComponentImage;
 
+  OutputPixelType GetOutputValue( OutputImageType* oImage,
+                                  NodeType iNode ) const;
   char GetLabelValueForGivenNode( NodeType iNode );
   void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel );
-  void UpdateNeighbors( NodeType iNode );
-  void UpdateValue( NodeType iValue );
+  void UpdateNeighbors( OutputImageType* oImage, NodeType iNode );
+  void UpdateValue( OutputImageType* oImage, NodeType iValue );
   bool CheckTopology( NodeType iNode );
-  void InitializeOutput();
+  void InitializeOutput( OutputImageType* oImage );
   double Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors );
 
   /**
