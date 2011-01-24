@@ -49,29 +49,28 @@ protected:
   FastMarchingBaseTestHelper() {}
   ~FastMarchingBaseTestHelper() {}
 
-  OutputPixelType GetOutputValue( OutputDomainType* oDomain,
-                                  NodeType iNode ) const
+  OutputPixelType GetOutputValue( OutputDomainType* ,
+                                  const NodeType& ) const
     {
-    (void) oDomain;
-    (void) iNode;
     return NumericTraits< OutputPixelType >::Zero;
     }
 
-  char GetLabelValueForGivenNode( NodeType iNode )
+  char GetLabelValueForGivenNode( const NodeType& ) const
     {
     return Superclass::Far;
     }
 
-  void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel )
-    { (void) iNode; (void) iLabel; }
+  void SetLabelValueForGivenNode( const NodeType& ,
+                                 const LabelType& )
+    {}
 
-  void UpdateNeighbors( OutputDomainType* oDomain, NodeType iNode )
-    { (void) iNode; }
+  void UpdateNeighbors( OutputDomainType* , const NodeType& )
+    {}
 
-  void UpdateValue( OutputDomainType* oDomain, NodeType iNode )
-    { (void) iNode; }
+  void UpdateValue( OutputDomainType* , const NodeType& )
+    {}
 
-  bool CheckTopology( OutputDomainType* oDomain, NodeType iNode )
+  bool CheckTopology( OutputDomainType* , const NodeType&  )
     { return true; }
 
   virtual void InitializeOutput( OutputDomainType* oDomain ) {}

@@ -222,7 +222,7 @@ public:
 
   /** \brief Set Forbidden Nodes */
   virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
-  virtual void AddForbiddenNode( NodeType iNode );
+  virtual void AddForbiddenNode( const NodeType& iNode );
 
   itkGetObjectMacro( StoppingCriterion, StoppingCriterionType );
   itkSetObjectMacro( StoppingCriterion, StoppingCriterionType );
@@ -255,30 +255,34 @@ protected:
   TopologyCheckType m_TopologyCheck;
 
   virtual OutputPixelType GetOutputValue( OutputDomainType* oDomain,
-                                         NodeType iNode ) const = 0;
+                                         const NodeType& iNode ) const = 0;
 
   /** \brief Get the Label Value for a given node
     \param[in] iNode
     \return its label value  */
-  virtual char GetLabelValueForGivenNode( NodeType iNode ) = 0;
+  virtual char GetLabelValueForGivenNode( const NodeType& iNode ) const = 0;
 
   /** \brief Set the Label Value for a given node
     \param[in] iNode
     \param[in] iLabel */
-  virtual void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel ) = 0;
+  virtual void SetLabelValueForGivenNode( const NodeType& iNode,
+                                         const LabelType& iLabel ) = 0;
 
   /** \brief Update neighbors to a given node
     \param[in] iNode
   */
-  virtual void UpdateNeighbors( OutputDomainType* oDomain, NodeType iNode ) = 0;
+  virtual void UpdateNeighbors( OutputDomainType* oDomain,
+                               const NodeType& iNode ) = 0;
 
   /** \brief Update value for a given node
     \param[in] iNode
     */
-  virtual void UpdateValue( OutputDomainType* oDomain, NodeType iNode ) = 0;
+  virtual void UpdateValue( OutputDomainType* oDomain,
+                           const NodeType& iNode ) = 0;
 
   /**    */
-  virtual bool CheckTopology( OutputDomainType* oDomain, NodeType iNode ) = 0;
+  virtual bool CheckTopology( OutputDomainType* oDomain,
+                             const NodeType& iNode ) = 0;
 
   /**    */
   void Initialize( OutputDomainType* oDomain );

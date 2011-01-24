@@ -132,7 +132,7 @@ typename
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 OutputPixelType
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-GetOutputValue( OutputImageType* oImage, NodeType iNode ) const
+GetOutputValue( OutputImageType* oImage, const NodeType& iNode ) const
   {
   return oImage->GetPixel( iNode );
   }
@@ -142,7 +142,7 @@ GetOutputValue( OutputImageType* oImage, NodeType iNode ) const
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 char
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-GetLabelValueForGivenNode( NodeType iNode )
+GetLabelValueForGivenNode( const NodeType& iNode ) const
   {
   return m_LabelImage->GetPixel( iNode );
   }
@@ -153,7 +153,7 @@ GetLabelValueForGivenNode( NodeType iNode )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 void
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel )
+SetLabelValueForGivenNode( const NodeType& iNode, const LabelType& iLabel )
   {
   m_LabelImage->SetPixel( iNode, iLabel );
   }
@@ -163,7 +163,7 @@ SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 void
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-UpdateNeighbors( OutputImageType* oImage, NodeType iNode )
+UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode )
   {
   NodeType neighIndex = iNode;
   unsigned char label;
@@ -196,7 +196,7 @@ UpdateNeighbors( OutputImageType* oImage, NodeType iNode )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 void
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-UpdateValue( OutputImageType* oImage, NodeType iNode )
+UpdateValue( OutputImageType* oImage, const NodeType& iNode )
   {
   NodeType neighbor_node = iNode;
 
@@ -270,7 +270,7 @@ template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, 
 double
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 Solve( OutputImageType* oImage,
-      NodeType iNode,
+      const NodeType& iNode,
       std::vector< InternalNodeStructure > iNeighbors )
 {
   // sort the local list
@@ -343,7 +343,7 @@ Solve( OutputImageType* oImage,
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-CheckTopology( OutputImageType* oImage, NodeType iNode )
+CheckTopology( OutputImageType* oImage, const NodeType& iNode )
   {
   if( this->m_TopologyCheck != Superclass::None )
     {
@@ -604,7 +604,7 @@ InitializeOutput( OutputImageType* oImage )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-DoesVoxelChangeViolateWellComposedness( NodeType idx )
+DoesVoxelChangeViolateWellComposedness( const NodeType& idx ) const
 {
   bool isChangeWellComposed = false;
   if( ImageDimension == 2 )
@@ -624,7 +624,7 @@ DoesVoxelChangeViolateWellComposedness( NodeType idx )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-DoesVoxelChangeViolateStrictTopology( NodeType idx )
+DoesVoxelChangeViolateStrictTopology( const NodeType& idx ) const
 {
   typename NeighborhoodIteratorType::RadiusType radius;
   radius.Fill( 1 );
@@ -667,9 +667,9 @@ DoesVoxelChangeViolateStrictTopology( NodeType idx )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-IsChangeWellComposed2D( NodeType idx )
+IsChangeWellComposed2D( const NodeType& idx ) const
 {
-  typename NeighborhoodIteratorType::RadiusType radius;
+  NeighborhoodRadiusType radius;
   radius.Fill( 1 );
 
   NeighborhoodIteratorType It( radius, this->m_LabelImage,
@@ -737,7 +737,7 @@ IsChangeWellComposed2D( NodeType idx )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-IsCriticalC1Configuration2D( std::vector<bool> neighborhood )
+IsCriticalC1Configuration2D( const std::vector<bool>& neighborhood ) const
 {
   return ( !neighborhood[0] &&  neighborhood[1] &&
             neighborhood[3] && !neighborhood[4] &&
@@ -749,7 +749,7 @@ IsCriticalC1Configuration2D( std::vector<bool> neighborhood )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-IsCriticalC2Configuration2D( std::vector<bool> neighborhood )
+IsCriticalC2Configuration2D( const std::vector<bool>& neighborhood ) const
 {
   return ( !neighborhood[0] &&  neighborhood[1] &&
             neighborhood[3] && !neighborhood[4] &&
@@ -762,7 +762,7 @@ IsCriticalC2Configuration2D( std::vector<bool> neighborhood )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-IsCriticalC3Configuration2D( std::vector<bool> neighborhood )
+IsCriticalC3Configuration2D( const std::vector<bool>& neighborhood ) const
 {
   return ( !neighborhood[0] &&  neighborhood[1] &&
             neighborhood[3] && !neighborhood[4] &&
@@ -775,7 +775,7 @@ IsCriticalC3Configuration2D( std::vector<bool> neighborhood )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-IsCriticalC4Configuration2D( std::vector<bool> neighborhood )
+IsCriticalC4Configuration2D( const std::vector<bool>& neighborhood ) const
 {
   return ( !neighborhood[0] &&  neighborhood[1] &&
             neighborhood[3] && !neighborhood[4] &&
@@ -864,14 +864,17 @@ InitializeIndices2D()
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-IsChangeWellComposed3D( NodeType idx )
+IsChangeWellComposed3D( const NodeType& idx ) const
 {
   std::vector<bool> neighborhoodPixels( 8 );
 
-  typename NeighborhoodIteratorType::RadiusType radius;
+  NeighborhoodRadiusType radius;
   radius.Fill( 1 );
-  NeighborhoodIteratorType It( radius, this->m_LabelImage,
-    this->m_LabelImage->GetRequestedRegion() );
+
+  NeighborhoodIteratorType It( radius,
+                              this->m_LabelImage,
+                              this->m_LabelImage->GetRequestedRegion() );
+
   It.SetLocation( idx );
 
   // Check for C1 critical configurations
@@ -904,7 +907,7 @@ IsChangeWellComposed3D( NodeType idx )
         neighborhoodPixels[j] = !neighborhoodPixels[j];
         }
       }
-    if( IsCriticalC2Configuration3D( neighborhoodPixels ) )
+    if( IsCriticalC2Configuration3D( neighborhoodPixels ) != 0 )
       {
       return false;
       }
@@ -918,7 +921,7 @@ IsChangeWellComposed3D( NodeType idx )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-IsCriticalC1Configuration3D( std::vector<bool> neighborhood )
+IsCriticalC1Configuration3D( const std::vector<bool>& neighborhood ) const
 {
   return ( (  neighborhood[0] &&  neighborhood[1] &&
              !neighborhood[2] && !neighborhood[3] ) ||
@@ -931,7 +934,7 @@ IsCriticalC1Configuration3D( std::vector<bool> neighborhood )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 unsigned int
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-IsCriticalC2Configuration3D( std::vector<bool> neighborhood )
+IsCriticalC2Configuration3D( const std::vector<bool>& neighborhood ) const
 {
   // Check if Type 1 or Type 2
   for ( unsigned int i = 0; i < 4; i++ )

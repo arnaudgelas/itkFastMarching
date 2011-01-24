@@ -150,7 +150,7 @@ SetForbiddenNodes( std::vector< NodeType > iNodes )
 template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
-AddForbiddenNode( NodeType iNode )
+AddForbiddenNode( const NodeType& iNode )
   {
   m_ForbiddenNodes.push_back( iNode );
   this->Modified();
