@@ -36,3 +36,7 @@ add_executable( itkFastMarchingImageFilterRealTest1
   ${BASE_SOURCE}
 )
 target_link_libraries( itkFastMarchingImageFilterRealTest1 ITKCommon )
+
+
+add_test( itkFastMarchingImageFilterRealTest1
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterRealTest1 )

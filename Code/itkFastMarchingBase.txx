@@ -34,6 +34,8 @@ template< class TTraits >
 FastMarchingBase< TTraits >::
 FastMarchingBase()
   {
+  this->ProcessObject::SetNumberOfRequiredInputs(0);
+
   //m_Heap = PriorityQueueType::New();
   m_SpeedConstant = 1.;
   m_InverseSpeed = 1.;

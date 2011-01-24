@@ -51,6 +51,21 @@ template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 FastMarchingImageFilterBase()
   {
+  OutputSizeType outputSize;
+  outputSize.Fill(16);
+
+  NodeType outputIndex;
+  outputIndex.Fill(0);
+
+  m_OutputRegion.SetSize(outputSize);
+  m_OutputRegion.SetIndex(outputIndex);
+
+  m_OutputOrigin.Fill(0.0);
+  m_OutputSpacing.Fill(1.0);
+  m_OutputDirection.SetIdentity();
+  m_OverrideOutputInformation = false;
+
+  m_LabelImage = LabelImageType::New();
   }
 // -----------------------------------------------------------------------------
 

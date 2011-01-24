@@ -67,8 +67,6 @@ int main(int, char* [] )
   typedef FastMarchingType::NodeContainerType NodeContainerType;
 
   // setup alive points
-  NodeContainerType AliveNodes;
-
   NodePairType node_pair;
 
   FloatImageType::OffsetType offset0 = {{28,35}};
@@ -88,8 +86,6 @@ int main(int, char* [] )
 
 
   // setup trial points
-  NodeContainerType TrialNodes;
-
   node_pair.SetValue( 1.0 );
 
   index.Fill(0);

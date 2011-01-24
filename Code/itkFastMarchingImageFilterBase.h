@@ -57,6 +57,8 @@ public:
   typedef typename OutputImageType::SpacingType     OutputSpacingType;
   typedef typename OutputImageType::SizeType        OutputSizeType;
   typedef typename OutputImageType::RegionType      OutputRegionType;
+  typedef typename OutputImageType::PointType       OutputPointType;
+  typedef typename OutputImageType::DirectionType   OutputDirectionType;
 
   typedef typename Superclass::NodeType NodeType;
   typedef typename Superclass::NodePairType NodePairType;
@@ -142,6 +144,12 @@ protected:
   OutputRegionType m_BufferedRegion;
   NodeType m_StartIndex;
   NodeType m_LastIndex;
+
+  OutputRegionType    m_OutputRegion;
+  OutputPointType     m_OutputOrigin;
+  OutputSpacingType   m_OutputSpacing;
+  OutputDirectionType m_OutputDirection;
+  bool                m_OverrideOutputInformation;
 
   LabelImagePointer m_LabelImage;
   ConnectedComponentImagePointer                m_ConnectedComponentImage;
