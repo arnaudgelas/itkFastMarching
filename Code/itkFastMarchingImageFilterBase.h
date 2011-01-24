@@ -56,6 +56,7 @@ public:
   typedef typename Superclass::OutputPixelType      OutputPixelType;
   typedef typename OutputImageType::SpacingType     OutputSpacingType;
   typedef typename OutputImageType::SizeType        OutputSizeType;
+  typedef typename OutputImageType::RegionType      OutputRegionType;
 
   typedef typename Superclass::NodeType NodeType;
   typedef typename Superclass::NodePairType NodePairType;
@@ -138,6 +139,7 @@ protected:
 
   struct InternalNodeStructure;
 
+  OutputRegionType m_BufferedRegion;
   NodeType m_StartIndex;
   NodeType m_LastIndex;
 

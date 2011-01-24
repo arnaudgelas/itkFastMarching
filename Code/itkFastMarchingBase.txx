@@ -82,9 +82,20 @@ SetAliveNodes( NodeContainerType iNodes )
 template< class TTraits >
 void
 FastMarchingBase< TTraits >::
-AddAliveNode( NodeType iNode, OutputPixelType iValue )
+AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue )
   {
   m_AliveNodes.push_back( NodePairType( iNode, iValue ) );
+  this->Modified();
+  }
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+template< class TTraits >
+void
+FastMarchingBase< TTraits >::
+AddAliveNode( const NodePairType& iPair )
+  {
+  m_AliveNodes.push_back( iPair );
   this->Modified();
   }
 // -----------------------------------------------------------------------------
@@ -104,9 +115,20 @@ SetTrialNodes( NodeContainerType iNodes )
 template< class TTraits >
 void
 FastMarchingBase< TTraits >::
-AddTrialNode( NodeType iNode, OutputPixelType iValue )
+AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue )
   {
   m_TrialNodes.push_back( NodePairType( iNode, iValue ) );
+  this->Modified();
+  }
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+template< class TTraits >
+void
+FastMarchingBase< TTraits >::
+AddTrialNode( const NodePairType& iPair )
+  {
+  m_TrialNodes.push_back( iPair );
   this->Modified();
   }
 // -----------------------------------------------------------------------------

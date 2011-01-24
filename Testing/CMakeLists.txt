@@ -30,3 +30,9 @@ add_executable( itkFastMarchingThresholdStoppingCriterionTest
   ${BASE_SOURCE}
 )
 target_link_libraries( itkFastMarchingThresholdStoppingCriterionTest ITKCommon )
+
+add_executable( itkFastMarchingImageFilterRealTest1
+  itkFastMarchingImageFilterRealTest1.cxx
+  ${BASE_SOURCE}
+)
+target_link_libraries( itkFastMarchingImageFilterRealTest1 ITKCommon )

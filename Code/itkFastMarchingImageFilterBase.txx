@@ -100,7 +100,7 @@ UpdateNeighbors( NodeType iNode )
         {
         neighIndex[j] += s;
         }
-     label = m_LabelImage->GetPixel(neighIndex);
+      label = m_LabelImage->GetPixel(neighIndex);
 
       if ( ( label != Superclass::Alive ) &&
            ( label != Superclass::InitialTrial ) &&
@@ -367,9 +367,9 @@ InitializeOutput()
   output->Allocate();
 
   // cache some buffered region information
-  //m_BufferedRegion = output->GetBufferedRegion();
-  //m_StartIndex = m_BufferedRegion.GetIndex();
-  //m_LastIndex = m_StartIndex + m_BufferedRegion.GetSize();
+  m_BufferedRegion = output->GetBufferedRegion();
+  m_StartIndex = m_BufferedRegion.GetIndex();
+  m_LastIndex = m_StartIndex + m_BufferedRegion.GetSize();
 
   typename OutputImageType::OffsetType offset;
   offset.Fill(1);
@@ -432,7 +432,7 @@ InitializeOutput()
       idx = pointsIter->first;
 
       // check if node index is within the output level set
-      //if ( m_BufferedRegion.IsInside( idx ) )
+      if ( m_BufferedRegion.IsInside( idx ) )
         {
         // make this an alive point
         m_LabelImage->SetPixel(idx, Superclass::Alive );
@@ -465,7 +465,7 @@ InitializeOutput()
       idx = *p_it;
 
       // check if node index is within the output level set
-      //if ( m_BufferedRegion.IsInside( idx ) )
+      if ( m_BufferedRegion.IsInside( idx ) )
         {
         // make this an alive point
         m_LabelImage->SetPixel(idx, Superclass::Forbidden );
@@ -507,7 +507,7 @@ InitializeOutput()
       idx = pointsIter->first;
 
       // check if node index is within the output level set
-      //if ( m_BufferedRegion.IsInside( idx ) )
+      if ( m_BufferedRegion.IsInside( idx ) )
         {
         // make this an initial trial point
         m_LabelImage->SetPixel( idx, Superclass::InitialTrial );

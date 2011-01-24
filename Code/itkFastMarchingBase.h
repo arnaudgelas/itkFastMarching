@@ -173,8 +173,19 @@ public:
   public:
     typedef NodePair Self;
     typedef std::pair< NodeType, OutputPixelType > Superclass;
+
+    NodePair() : Superclass() {}
     NodePair( const NodeType& iNode, const OutputPixelType& iValue ) :
       Superclass( iNode, iValue ) {}
+
+    void SetValue( const OutputPixelType& iValue )
+      {
+      this->second = iValue;
+      }
+    void SetNode( const NodeType& iNode )
+      {
+      this->first = iNode;
+      }
 
     bool operator < ( const Self& iRight ) const
       {
@@ -194,11 +205,13 @@ public:
   /** \brief Add one node as alive to the initial front.
     \param[in] iNode
     \param[in] ivalue */
-  virtual void AddAliveNode( NodeType iNode, OutputPixelType iValue );
+  virtual void AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue );
+  virtual void AddAliveNode( const NodePairType& iPair );
 
   /** \brief Set Trial Nodes */
   virtual void SetTrialNodes( NodeContainerType iNodes );
-  virtual void AddTrialNode( NodeType iNode, OutputPixelType iValue );
+  virtual void AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue );
+  virtual void AddTrialNode( const NodePairType& iPair );
 
   /** \brief Set Forbidden Nodes */
   virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
