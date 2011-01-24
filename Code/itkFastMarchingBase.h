@@ -168,8 +168,23 @@ public:
   itkSetMacro( TopologyCheck, TopologyCheckType );
   itkGetConstReferenceMacro( TopologyCheck, TopologyCheckType );
 
-  typedef std::pair< NodeType, OutputPixelType > NodePairType;
-  typedef std::vector< std::pair< NodeType, OutputPixelType > > NodeContainerType;
+  class NodePair : public std::pair< NodeType, OutputPixelType >
+    {
+  public:
+    typedef NodePair Self;
+    typedef std::pair< NodeType, OutputPixelType > Superclass;
+    NodePair( const NodeType& iNode, const OutputPixelType& iValue ) :
+      Superclass( iNode, iValue ) {}
+
+    bool operator < ( const Self& iRight ) const
+      {
+      return this->second < iRight.second;
+      }
+    };
+
+  //typedef std::pair< NodeType, OutputPixelType > NodePairType;
+  typedef typename Self::NodePair NodePairType;
+  typedef std::vector< NodePairType > NodeContainerType;
   typedef typename NodeContainerType::const_iterator NodeContainerConstIterator;
   typedef typename NodeContainerType::iterator NodeContainerIterator;
 
@@ -211,7 +226,8 @@ protected:
   NodeContainerType m_AliveNodes;
   std::vector< NodeType > m_ForbiddenNodes;
 
-  PriorityQueuePointer m_Heap;
+  //PriorityQueuePointer m_Heap;
+  std::priority_queue< NodeType, NodeContainerType > m_Heap;
 
   TopologyCheckType m_TopologyCheck;
 

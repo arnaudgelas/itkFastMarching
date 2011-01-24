@@ -514,8 +514,8 @@ InitializeOutput()
 
         output->SetPixel(idx, pointsIter->second);
 
-        this->m_Heap->Push( PriorityQueueElementType( idx, pointsIter->second ) );
-        //m_TrialHeap.push(node);
+        //this->m_Heap->Push( PriorityQueueElementType( idx, pointsIter->second ) );
+        this->m_Heap.push( NodePairType( idx, pointsIter->second ) );
         }
       ++pointsIter;
       }

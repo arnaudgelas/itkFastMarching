@@ -58,6 +58,7 @@ public:
   typedef typename OutputImageType::SizeType        OutputSizeType;
 
   typedef typename Superclass::NodeType NodeType;
+  typedef typename Superclass::NodePairType NodePairType;
   typedef typename Superclass::ElementIdentifier ElementIdentifier;
 
   typedef typename Superclass::PriorityQueueElementType PriorityQueueElementType;

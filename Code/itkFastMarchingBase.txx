@@ -34,7 +34,7 @@ template< class TTraits >
 FastMarchingBase< TTraits >::
 FastMarchingBase()
   {
-  m_Heap = PriorityQueueType::New();
+  //m_Heap = PriorityQueueType::New();
   m_SpeedConstant = 1.;
   m_InverseSpeed = 1.;
   m_NormalizationFactor = 1.;
@@ -153,10 +153,16 @@ Initialize()
     }
 
   // make sure the heap is empty
+  while ( !m_Heap.empty() )
+    {
+    m_Heap.pop();
+    }
+  /*
   while ( !m_Heap->Empty() )
     {
     m_Heap->Pop();
     }
+  */
 
   InitializeOutput();
   }
@@ -174,13 +180,22 @@ GenerateData()
     //double newProgress = 0.;
     //double oldProgress = 0.;
 
-    while( !m_Heap->Empty() )
+    //while( !m_Heap->Empty() )
+    while( !m_Heap.empty() )
       {
-      PriorityQueueElementType element = m_Heap->Peek();
-      m_Heap->Pop();
+      //PriorityQueueElementType element = m_Heap->Peek();
+      //m_Heap->Pop();
+      //
+      //NodeType current_node = element.m_Element;
+      //OutputPixelType current_value = element.m_Priority;
 
-      NodeType current_node = element.m_Element;
-      OutputPixelType current_value = element.m_Priority;
+
+      NodePairType current_node_pair = m_Heap.top();
+      m_Heap.pop();
+
+      NodeType current_node = current_node_pair.first;
+      OutputPixelType current_value = current_node_pair.second;
+
 
       // is this node already alive ?
       if( this->GetLabelValueForGivenNode( current_node ) != Alive )
@@ -229,19 +244,27 @@ GenerateData()
     // it.
     //
     // RELEASE MEMORY!!!
-    while( !m_Heap->Empty() )
+    while( !m_Heap.empty() )
+      {
+      m_Heap.pop();
+      }
+    /*while( !m_Heap->Empty() )
       {
       m_Heap->Pop();
-      }
+      }*/
 
     throw ProcessAborted(__FILE__, __LINE__);
     }
 
   // let's release some useless memory...
-  while( !m_Heap->Empty() )
+  while( !m_Heap.empty() )
+    {
+    m_Heap.pop();
+    }
+  /*while( !m_Heap->Empty() )
     {
     m_Heap->Pop();
-    }
+    }*/
   }
 // -----------------------------------------------------------------------------
 
