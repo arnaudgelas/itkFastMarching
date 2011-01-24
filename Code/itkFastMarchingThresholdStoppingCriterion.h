@@ -24,13 +24,14 @@
 
 namespace itk
 {
-  template< class TTraits >
+  template< class TNode,
+           typename TValue >
   class FastMarchingThresholdStoppingCriterion :
-      public FastMarchingStoppingCriterionBase< TTraits >
+      public FastMarchingStoppingCriterionBase< TNode, TValue>
     {
   public:
     typedef FastMarchingThresholdStoppingCriterion Self;
-    typedef FastMarchingStoppingCriterionBase< TTraits > Superclass;
+    typedef FastMarchingStoppingCriterionBase< TNode, TValue > Superclass;
     typedef SmartPointer< Self >              Pointer;
     typedef SmartPointer< const Self >        ConstPointer;
 
@@ -41,11 +42,11 @@ namespace itk
     itkTypeMacro(FastMarchingThresholdStoppingCriterion,
                  FastMarchingStoppingCriterionBase );
 
-    typedef typename Superclass::OutputPixelType  OutputPixelType;
-    typedef typename Superclass::NodeType         NodeType;
+    typedef typename Superclass::ValueType  ValueType;
+    typedef typename Superclass::NodeType   NodeType;
 
-    itkSetMacro( Threshold, OutputPixelType );
-    itkGetMacro( Threshold, OutputPixelType );
+    itkSetMacro( Threshold, ValueType );
+    itkGetMacro( Threshold, ValueType );
 
     void SetCurrentNode( const NodeType& iNode ) { (void) iNode; }
     bool IsSatisfied() const
@@ -56,15 +57,48 @@ namespace itk
   protected:
     FastMarchingThresholdStoppingCriterion() : Superclass()
     {
-      m_Threshold = NumericTraits< OutputPixelType >::Zero;
+      m_Threshold = NumericTraits< ValueType >::Zero;
     }
     ~FastMarchingThresholdStoppingCriterion() {}
 
-    OutputPixelType m_Threshold;
+    ValueType m_Threshold;
 
   private:
     FastMarchingThresholdStoppingCriterion( const Self& );
     void operator = ( const Self& );
     };
+
+  template< class TImage >
+  class FastMarchingImageThresholdStoppingCriterion :
+    public FastMarchingThresholdStoppingCriterion<
+      typename TImage::IndexType,
+      typename TImage::PixelType >
+    {
+  public:
+    typedef TImage ImageType;
+    typedef typename ImageType::IndexType NodeType;
+    typedef typename ImageType::PixelType ValueType;
+
+    typedef FastMarchingImageThresholdStoppingCriterion Self;
+    typedef FastMarchingThresholdStoppingCriterion< NodeType,
+      ValueType > Superclass;
+    typedef SmartPointer< Self >              Pointer;
+    typedef SmartPointer< const Self >        ConstPointer;
+
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self);
+
+    /** Run-time type information (and related methods). */
+    itkTypeMacro(FastMarchingImageThresholdStoppingCriterion,
+                 FastMarchingThresholdStoppingCriterion );
+
+  protected:
+    FastMarchingImageThresholdStoppingCriterion() : Superclass() {}
+    ~FastMarchingImageThresholdStoppingCriterion() {}
+
+
+
+    };
+
 }
 #endif // __itkFastMarchingThresholdStoppingCriterion_h

@@ -24,13 +24,14 @@
 
 namespace itk
 {
-  template< class TTraits >
+  template< class TNode,
+           typename TValue >
   class FastMarchingReachedTargetNodesStoppingCriterion :
-      public FastMarchingStoppingCriterionBase< TTraits >
+      public FastMarchingStoppingCriterionBase< TNode, TValue >
     {
   public:
     typedef FastMarchingReachedTargetNodesStoppingCriterion Self;
-    typedef FastMarchingStoppingCriterionBase< TTraits > Superclass;
+    typedef FastMarchingStoppingCriterionBase< TNode, TValue > Superclass;
     typedef SmartPointer< Self >              Pointer;
     typedef SmartPointer< const Self >        ConstPointer;
 
@@ -41,8 +42,8 @@ namespace itk
     itkTypeMacro(FastMarchingReachedTargetNodesStoppingCriterion,
                  FastMarchingStoppingCriterionBase );
 
-    typedef typename Superclass::OutputPixelType  OutputPixelType;
-    typedef typename Superclass::NodeType         NodeType;
+    typedef typename Superclass::ValueType  ValueType;
+    typedef typename Superclass::NodeType   NodeType;
 
     enum TargetConditionType { NoTargets = 0,
                                OneTarget,

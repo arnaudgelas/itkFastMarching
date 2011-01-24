@@ -24,23 +24,20 @@ int main( int argc, char* argv[] )
   (void) argc;
   (void) argv;
 
-   typedef itk::ImageFastMarchingTraits< 2, float, float >
-    ImageTraits;
-  typedef itk::FastMarchingThresholdStoppingCriterion< ImageTraits >
+   typedef itk::Image< float, 2> ImageType;
+
+   typedef itk::FastMarchingThresholdStoppingCriterion<
+      ImageType::IndexType, float >
     ImageStoppingCriterionType;
 
   ImageStoppingCriterionType::Pointer image_criterion =
       ImageStoppingCriterionType::New();
 
-  typedef itk::MeshFastMarchingTraits< 3,
-      float,
-      itk::DefaultStaticMeshTraits< float, 3, 3 >,
-      float,
-      itk::DefaultStaticMeshTraits< float, 3, 3 > >
-    MeshTraits;
+  typedef itk::Mesh< float, 3, itk::DefaultStaticMeshTraits< float, 3, 3 > >
+      MeshType;
 
-  typedef itk::FastMarchingThresholdStoppingCriterion< MeshTraits >
-    MeshStoppingCriterionType;
+  typedef itk::FastMarchingThresholdStoppingCriterion< MeshType::PointIdentifier,
+      float > MeshStoppingCriterionType;
 
   MeshStoppingCriterionType::Pointer mesh_criterion =
       MeshStoppingCriterionType::New();

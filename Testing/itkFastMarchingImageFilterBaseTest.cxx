@@ -17,24 +17,42 @@
  *=========================================================================*/
 
 #include "itkFastMarchingImageFilterBase.h"
+#include "itkFastMarchingThresholdStoppingCriterion.h"
 #include "itkImage.h"
 
 int main( int argc, char** argv )
   {
-  typedef itk::Image< float, 2 > Image2DType;
+  const unsigned int Dimension2 = 2;
+  typedef float PixelType;
+
+  typedef itk::Image< PixelType, Dimension2 > Image2DType;
   Image2DType::Pointer input2d = Image2DType::New();
 
-  typedef itk::FastMarchingImageFilterBase< 2, float, float > FMM2DType;
+  typedef itk::FastMarchingImageThresholdStoppingCriterion< Image2DType >
+      CriterionType2D;
+
+  typedef itk::FastMarchingImageFilterBase<
+      Dimension2,
+      PixelType,
+      PixelType,
+      CriterionType2D > FMM2DType;
   FMM2DType::Pointer fmm2d = FMM2DType::New();
   fmm2d->SetInput( input2d );
   fmm2d->Update();
 
   Image2DType::Pointer output2d = fmm2d->GetOutput();
 
-  typedef itk::Image< float, 3 > Image3DType;
+  const unsigned int Dimension3 = 3;
+  typedef itk::Image< float, Dimension3 > Image3DType;
   Image3DType::Pointer input3d = Image3DType::New();
 
-  typedef itk::FastMarchingImageFilterBase< 3, float, float > FMM3DType;
+  typedef itk::FastMarchingImageThresholdStoppingCriterion< Image3DType >
+      CriterionType3D;
+
+  typedef itk::FastMarchingImageFilterBase< Dimension3,
+      float,
+      float,
+      CriterionType3D > FMM3DType;
   FMM3DType::Pointer fmm3d = FMM3DType::New();
   fmm3d->SetInput( input3d );
   fmm3d->Update();

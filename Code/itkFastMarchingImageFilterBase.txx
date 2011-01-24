@@ -26,9 +26,12 @@
 namespace itk
 {
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension,
+         typename TInputPixel,
+         typename TOutputPixel,
+         class TCriterion >
 class
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
     InternalNodeStructure
   {
 public:
@@ -47,8 +50,8 @@ public:
 
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 FastMarchingImageFilterBase()
   {
   OutputSizeType outputSize;
@@ -70,17 +73,17 @@ FastMarchingImageFilterBase()
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 ~FastMarchingImageFilterBase()
   {
   }
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 char
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 GetLabelValueForGivenNode( NodeType iNode )
   {
   return m_LabelImage->GetPixel( iNode );
@@ -89,9 +92,9 @@ GetLabelValueForGivenNode( NodeType iNode )
 
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 void
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel )
   {
   m_LabelImage->SetPixel( iNode, iLabel );
@@ -99,9 +102,9 @@ SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 void
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 UpdateNeighbors( NodeType iNode )
   {
   NodeType neighIndex = iNode;
@@ -132,9 +135,9 @@ UpdateNeighbors( NodeType iNode )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 void
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 UpdateValue( NodeType iNode )
   {
   NodeType neighbor_node = iNode;
@@ -204,9 +207,9 @@ UpdateValue( NodeType iNode )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 double
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors )
 {
   // sort the local list
@@ -273,9 +276,9 @@ Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 CheckTopology( NodeType iNode )
   {
   if( this->m_TopologyCheck != Superclass::None )
@@ -371,8 +374,8 @@ CheckTopology( NodeType iNode )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
-void FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
+void FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 InitializeOutput()
   {
   OutputImageType* output = this->GetOutput();
@@ -559,9 +562,9 @@ InitializeOutput()
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 DoesVoxelChangeViolateWellComposedness( NodeType idx )
 {
   bool isChangeWellComposed = false;
@@ -579,9 +582,9 @@ DoesVoxelChangeViolateWellComposedness( NodeType idx )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 DoesVoxelChangeViolateStrictTopology( NodeType idx )
 {
   typename NeighborhoodIteratorType::RadiusType radius;
@@ -622,9 +625,9 @@ DoesVoxelChangeViolateStrictTopology( NodeType idx )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 IsChangeWellComposed2D( NodeType idx )
 {
   typename NeighborhoodIteratorType::RadiusType radius;
@@ -692,9 +695,9 @@ IsChangeWellComposed2D( NodeType idx )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 IsCriticalC1Configuration2D( std::vector<bool> neighborhood )
 {
   return ( !neighborhood[0] &&  neighborhood[1] &&
@@ -704,9 +707,9 @@ IsCriticalC1Configuration2D( std::vector<bool> neighborhood )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 IsCriticalC2Configuration2D( std::vector<bool> neighborhood )
 {
   return ( !neighborhood[0] &&  neighborhood[1] &&
@@ -717,9 +720,9 @@ IsCriticalC2Configuration2D( std::vector<bool> neighborhood )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 IsCriticalC3Configuration2D( std::vector<bool> neighborhood )
 {
   return ( !neighborhood[0] &&  neighborhood[1] &&
@@ -730,9 +733,9 @@ IsCriticalC3Configuration2D( std::vector<bool> neighborhood )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 IsCriticalC4Configuration2D( std::vector<bool> neighborhood )
 {
   return ( !neighborhood[0] &&  neighborhood[1] &&
@@ -743,9 +746,9 @@ IsCriticalC4Configuration2D( std::vector<bool> neighborhood )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 void
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 InitializeIndices2D()
 {
   this->m_RotationIndices[0].SetSize( 9 );
@@ -819,9 +822,9 @@ InitializeIndices2D()
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 IsChangeWellComposed3D( NodeType idx )
 {
   std::vector<bool> neighborhoodPixels( 8 );
@@ -873,9 +876,9 @@ IsChangeWellComposed3D( NodeType idx )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 IsCriticalC1Configuration3D( std::vector<bool> neighborhood )
 {
   return ( (  neighborhood[0] &&  neighborhood[1] &&
@@ -886,9 +889,9 @@ IsCriticalC1Configuration3D( std::vector<bool> neighborhood )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 unsigned int
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 IsCriticalC2Configuration3D( std::vector<bool> neighborhood )
 {
   // Check if Type 1 or Type 2
@@ -925,9 +928,9 @@ IsCriticalC2Configuration3D( std::vector<bool> neighborhood )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 void
-FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 InitializeIndices3D()
 {
   for ( unsigned int i = 0; i <  12; i++ )

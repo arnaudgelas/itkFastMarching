@@ -30,8 +30,8 @@
 namespace itk
 {
 // -----------------------------------------------------------------------------
-template< class TTraits >
-FastMarchingBase< TTraits >::
+template< class TTraits, class TCriterion >
+FastMarchingBase< TTraits, TCriterion >::
 FastMarchingBase()
   {
   this->ProcessObject::SetNumberOfRequiredInputs(0);
@@ -48,17 +48,17 @@ FastMarchingBase()
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
-FastMarchingBase< TTraits >::
+template< class TTraits, class TCriterion >
+FastMarchingBase< TTraits, TCriterion >::
 ~FastMarchingBase()
   {
   }
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 PrintSelf( std::ostream & os, Indent indent ) const
   {
   Superclass::PrintSelf( os, indent );
@@ -70,9 +70,9 @@ PrintSelf( std::ostream & os, Indent indent ) const
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 SetAliveNodes( NodeContainerType iNodes )
   {
   m_AliveNodes = iNodes;
@@ -81,9 +81,9 @@ SetAliveNodes( NodeContainerType iNodes )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue )
   {
   m_AliveNodes.push_back( NodePairType( iNode, iValue ) );
@@ -92,9 +92,9 @@ AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 AddAliveNode( const NodePairType& iPair )
   {
   m_AliveNodes.push_back( iPair );
@@ -103,9 +103,9 @@ AddAliveNode( const NodePairType& iPair )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 SetTrialNodes( NodeContainerType iNodes )
   {
   m_TrialNodes = iNodes;
@@ -114,9 +114,9 @@ SetTrialNodes( NodeContainerType iNodes )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue )
   {
   m_TrialNodes.push_back( NodePairType( iNode, iValue ) );
@@ -125,9 +125,9 @@ AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 AddTrialNode( const NodePairType& iPair )
   {
   m_TrialNodes.push_back( iPair );
@@ -136,9 +136,9 @@ AddTrialNode( const NodePairType& iPair )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 SetForbiddenNodes( std::vector< NodeType > iNodes )
   {
   m_ForbiddenNodes = iNodes;
@@ -147,9 +147,9 @@ SetForbiddenNodes( std::vector< NodeType > iNodes )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 AddForbiddenNode( NodeType iNode )
   {
   m_ForbiddenNodes.push_back( iNode );
@@ -158,9 +158,9 @@ AddForbiddenNode( NodeType iNode )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 Initialize()
   {
   if( m_StoppingCriterion.IsNull() )
@@ -193,9 +193,9 @@ Initialize()
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits >
+template< class TTraits, class TCriterion >
 void
-FastMarchingBase< TTraits >::
+FastMarchingBase< TTraits, TCriterion >::
 GenerateData()
   {
   Initialize();

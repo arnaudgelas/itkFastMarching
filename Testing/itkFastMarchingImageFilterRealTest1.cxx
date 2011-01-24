@@ -41,8 +41,11 @@ public:
 };
 }
 
-int main(int, char* [] )
+int main(int argc, char* argv[] )
 {
+  (void) argc;
+  (void) argv;
+
   itk::OutputWindow::SetInstance(itk::TextOutput::New().GetPointer());
 
   // create a fastmarching object
@@ -50,17 +53,18 @@ int main(int, char* [] )
   const unsigned Dimension = 2;
 
   typedef itk::Image< PixelType, Dimension > FloatImageType;
+  typedef itk::FastMarchingImageThresholdStoppingCriterion< FloatImageType >
+      CriterionType;
 
-  typedef itk::FastMarchingImageFilterBase< Dimension, PixelType, PixelType >
+  typedef itk::FastMarchingImageFilterBase< Dimension, PixelType, PixelType, CriterionType >
     FastMarchingType;
-  typedef itk::FastMarchingThresholdStoppingCriterion< FastMarchingType::Traits >
-      StoppingCriterionType;
 
-  StoppingCriterionType::Pointer criterion = StoppingCriterionType::New();
+  CriterionType::Pointer criterion = CriterionType::New();
   criterion->SetThreshold( 100. );
 
   FastMarchingType::Pointer marcher = FastMarchingType::New();
-  marcher->SetStoppingCriterion( criterion.GetPointer() );
+  marcher->SetStoppingCriterion(
+        static_cast< FastMarchingType::StoppingCriterionType* >( criterion.GetPointer() ) );
 
   ShowProgressObject progressWatch(marcher);
   itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;

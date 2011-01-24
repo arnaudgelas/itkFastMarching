@@ -46,9 +46,11 @@ public:
   typedef typename InputDomainType::PixelType InputPixelType;
 
   typedef TNode NodeType;
+
   typedef TOutputDomain OutputDomainType;
   typedef typename OutputDomainType::Pointer OutputDomainPointer;
   typedef typename OutputDomainType::PixelType OutputPixelType;
+
   typedef TSuperclass SuperclassType;
 
   // Here concept checking: make sure TValue is scalar!
@@ -57,7 +59,9 @@ public:
 /**  \class ImageFastMarchingTraits
   \brief
 */
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template<unsigned int VDimension,
+         typename TInputPixel,
+         typename TOutputPixel >
 class ImageFastMarchingTraits :
     public FastMarchingTraits<
       Image< TInputPixel, VDimension >,
@@ -66,9 +70,7 @@ class ImageFastMarchingTraits :
       ImageToImageFilter< Image< TInputPixel, VDimension >,
                           Image< TOutputPixel, VDimension > >
     >
-  {
-
-  };
+  {};
 
 /**  \class MeshFastMarchingTraits
   \brief
@@ -84,7 +86,8 @@ class MeshFastMarchingTraits :
       typename TInputMeshTraits::PointIdentifier,
       Mesh< TOutputPixel, VDimension, TOutputMeshTraits >,
       MeshToMeshFilter< Mesh< TInputPixel, VDimension, TInputMeshTraits >,
-                        Mesh< TOutputPixel, VDimension, TOutputMeshTraits > > >
+                        Mesh< TOutputPixel, VDimension, TOutputMeshTraits > >
+    >
   {};
 
 
@@ -108,7 +111,7 @@ class MeshFastMarchingTraits :
  * Cambridge Press, Second edition, 1999.
  *
 */
-template< class TTraits >
+template< class TTraits, class TStoppingCriterion >
 class FastMarchingBase : public TTraits::SuperclassType
   {
 public:
@@ -130,6 +133,11 @@ public:
   typedef typename Traits::OutputPixelType      OutputPixelType;
 
   typedef typename Traits::NodeType NodeType;
+
+  typedef TStoppingCriterion StoppingCriterionType;
+  typedef typename StoppingCriterionType::Pointer StoppingCriterionPointer;
+
+  /*
   typedef long ElementIdentifier;
 
   typedef MinPriorityQueueElementWrapper< NodeType,
@@ -141,9 +149,8 @@ public:
     OutputPixelType,
     ElementIdentifier > PriorityQueueType;
   typedef typename PriorityQueueType::Pointer PriorityQueuePointer;
+  */
 
-  typedef FastMarchingStoppingCriterionBase< Self > StoppingCriterionType;
-  typedef typename StoppingCriterionType::Pointer   StoppingCriterionPointer;
 
   /** Enum of Fast Marching algorithm point types.
    * Far represent far away points;

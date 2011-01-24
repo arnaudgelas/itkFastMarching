@@ -26,17 +26,21 @@
 namespace itk
 {
 
-template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+template< unsigned int VDimension,
+         typename TInputPixel,
+         typename TOutputPixel,
+         class TCriterion >
 class FastMarchingImageFilterBase :
     public FastMarchingBase<
-      ImageFastMarchingTraits< VDimension, TInputPixel, TOutputPixel >
+      ImageFastMarchingTraits< VDimension, TInputPixel, TOutputPixel >,
+      TCriterion
     >
   {
 public:
   typedef ImageFastMarchingTraits< VDimension, TInputPixel, TOutputPixel > Traits;
 
   typedef FastMarchingImageFilterBase            Self;
-  typedef FastMarchingBase< Traits >             Superclass;
+  typedef FastMarchingBase< Traits, TCriterion >             Superclass;
   typedef SmartPointer< Self >        Pointer;
   typedef SmartPointer< const Self >  ConstPointer;
 
@@ -62,12 +66,14 @@ public:
 
   typedef typename Superclass::NodeType NodeType;
   typedef typename Superclass::NodePairType NodePairType;
+  /*
   typedef typename Superclass::ElementIdentifier ElementIdentifier;
 
   typedef typename Superclass::PriorityQueueElementType PriorityQueueElementType;
 
   typedef typename Superclass::PriorityQueueType PriorityQueueType;
   typedef typename Superclass::PriorityQueuePointer PriorityQueuePointer;
+  */
 
   typedef typename Superclass::LabelType LabelType;
 

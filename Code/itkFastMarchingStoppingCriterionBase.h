@@ -28,7 +28,8 @@ namespace itk
  /** \class FastMarchingStoppingCriterionBase
 
  */
- template< class TTraits >
+ template< class TNode,
+          typename TValue >
  class FastMarchingStoppingCriterionBase : public StoppingCriterionBase
  {
  public:
@@ -37,18 +38,15 @@ namespace itk
   typedef SmartPointer< Self >              Pointer;
   typedef SmartPointer< const Self >        ConstPointer;
 
-  typedef TTraits Traits;
-  typedef typename Traits::OutputPixelType  OutputPixelType;
-  typedef typename Traits::NodeType         NodeType;
-
-
+  typedef TNode NodeType;
+  typedef TValue ValueType;
 
   /** Run-time type information (and related methods). */
   itkTypeMacro(FastMarchingStoppingCriterionBase, StoppingCriterionBase);
 
   virtual void SetCurrentNode( const NodeType& iNode ) = 0;
 
-  void SetCurrentValue( const OutputPixelType& iValue )
+  void SetCurrentValue( const ValueType& iValue )
   {
     if( iValue >= m_CurrentValue )
       {
@@ -64,14 +62,13 @@ namespace itk
  protected:
   FastMarchingStoppingCriterionBase() : Superclass()
   {
-
-    m_CurrentValue = NumericTraits< OutputPixelType >::Zero;
-    m_PreviousValue = NumericTraits< OutputPixelType >::Zero;
+    m_CurrentValue = NumericTraits< ValueType >::Zero;
+    m_PreviousValue = NumericTraits< ValueType >::Zero;
   }
   virtual ~FastMarchingStoppingCriterionBase() {}
 
-  OutputPixelType m_PreviousValue;
-  OutputPixelType m_CurrentValue;
+  ValueType m_PreviousValue;
+  ValueType m_CurrentValue;
 
  private:
   FastMarchingStoppingCriterionBase( const Self& );

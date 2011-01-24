@@ -21,12 +21,13 @@
 
 namespace itk
 {
-template< class TTraits >
-class FastMarchingBaseTestHelper : public FastMarchingBase< TTraits >
+template< class TTraits, class TCriterion >
+class FastMarchingBaseTestHelper :
+    public FastMarchingBase< TTraits, TCriterion >
 {
 public:
   typedef FastMarchingBaseTestHelper Self;
-  typedef FastMarchingBase< TTraits > Superclass;
+  typedef FastMarchingBase< TTraits, TCriterion > Superclass;
   typedef SmartPointer< Self > Pointer;
   typedef SmartPointer< const Self > ConstPointer;
 
@@ -85,14 +86,23 @@ int main( int argc, char* argv[] )
     return EXIT_FAILURE;
     }
 
+  const unsigned Dimension = 3;
+  typedef float PixelType;
+
   if( atoi( argv[1] ) == 0 )
     {
-    typedef itk::ImageFastMarchingTraits< 2, float, float >
+    typedef itk::ImageFastMarchingTraits< Dimension, PixelType, PixelType >
       ImageTraits;
     typedef ImageTraits::InputDomainType InputImageType;
+    typedef ImageTraits::NodeType ImageNodeType;
+
+    typedef itk::FastMarchingStoppingCriterionBase< ImageNodeType, PixelType >
+        ImageCriterionType;
+
     InputImageType::Pointer input = InputImageType::New();
 
-    typedef itk::FastMarchingBaseTestHelper< ImageTraits > ImageFastMarching;
+    typedef itk::FastMarchingBaseTestHelper< ImageTraits, ImageCriterionType >
+        ImageFastMarching;
     ImageFastMarching::Pointer fmm = ImageFastMarching::New();
     fmm->SetInput( input );
     fmm->Update();
@@ -106,16 +116,22 @@ int main( int argc, char* argv[] )
     {
     if( atoi( argv[1] ) == 1 )
       {
-      typedef itk::MeshFastMarchingTraits< 3,
-          float,
-          itk::DefaultStaticMeshTraits< float, 3, 3 >,
-          float,
-          itk::DefaultStaticMeshTraits< float, 3, 3 > >
+      typedef itk::MeshFastMarchingTraits< Dimension,
+          PixelType,
+          itk::DefaultStaticMeshTraits< PixelType, 3, 3 >,
+          PixelType,
+          itk::DefaultStaticMeshTraits< PixelType, 3, 3 > >
         MeshTraits;
+      typedef MeshTraits::NodeType MeshNodetype;
+
+      typedef itk::FastMarchingStoppingCriterionBase< MeshNodetype, PixelType >
+          MeshCriterionType;
+
       typedef MeshTraits::InputDomainType InputMeshType;
       InputMeshType::Pointer input = InputMeshType::New();
 
-      typedef itk::FastMarchingBaseTestHelper< MeshTraits > MeshFastMarching;
+      typedef itk::FastMarchingBaseTestHelper< MeshTraits, MeshCriterionType >
+          MeshFastMarching;
       MeshFastMarching::Pointer fmm = MeshFastMarching::New();
       fmm->SetInput( input );
       fmm->Update();
