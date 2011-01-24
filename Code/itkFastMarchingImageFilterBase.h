@@ -193,9 +193,11 @@ protected:
   void SetLabelValueForGivenNode( NodeType iNode, LabelType iLabel );
   void UpdateNeighbors( OutputImageType* oImage, NodeType iNode );
   void UpdateValue( OutputImageType* oImage, NodeType iValue );
-  bool CheckTopology( NodeType iNode );
+  bool CheckTopology( OutputImageType* oImage, NodeType iNode );
   void InitializeOutput( OutputImageType* oImage );
-  double Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors );
+  double Solve( OutputImageType* oImage,
+               NodeType iNode,
+               std::vector< InternalNodeStructure > iNeighbors );
 
   /**
    * Functions and variables to check for topology changes (2D/3D only).

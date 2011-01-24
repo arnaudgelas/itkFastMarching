@@ -80,6 +80,7 @@ FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >
   }
 // -----------------------------------------------------------------------------
 
+// -----------------------------------------------------------------------------
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 void
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
@@ -98,7 +99,9 @@ GenerateOutputInformation()
     output->SetDirection(m_OutputDirection);
     }
 }
+// -----------------------------------------------------------------------------
 
+// -----------------------------------------------------------------------------
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 void
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
@@ -133,6 +136,7 @@ GetOutputValue( OutputImageType* oImage, NodeType iNode ) const
   {
   return oImage->GetPixel( iNode );
   }
+// -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
@@ -166,26 +170,11 @@ UpdateNeighbors( OutputImageType* oImage, NodeType iNode )
 
   for ( unsigned int j = 0; j < ImageDimension; j++ )
     {
-    //for( int s = -1; s < 2; s+= 2 )
+    for( int s = -1; s < 2; s+= 2 )
       {
-      if ( ( iNode[j] > m_StartIndex[j] ) )//&& ( iNode[j] < m_LastIndex[j] ) )
+      if ( ( iNode[j] > m_StartIndex[j] ) && ( iNode[j] < m_LastIndex[j] ) )
         {
-        //neighIndex[j] += s;
-        neighIndex[j] = iNode[j] - 1;
-        }
-      label = m_LabelImage->GetPixel(neighIndex);
-
-      if ( ( label != Superclass::Alive ) &&
-           ( label != Superclass::InitialTrial ) &&
-           ( label != Superclass::Forbidden ) )
-        {
-        this->UpdateValue( oImage, neighIndex );
-        }
-
-      if ( ( iNode[j] < m_LastIndex[j] ) )
-        {
-        //neighIndex[j] += s;
-        neighIndex[j] = iNode[j] + 1;
+        neighIndex[j] = iNode[j] + s;
         }
       label = m_LabelImage->GetPixel(neighIndex);
 
@@ -258,13 +247,11 @@ UpdateValue( OutputImageType* oImage, NodeType iNode )
 
     } // end for ( unsigned int j = 0; j < SetDimension; j++ )
 
-  double solution = Solve( iNode, NodesUsed );
+  OutputPixelType outputPixel =
+      static_cast< OutputPixelType >( Solve( oImage, iNode, NodesUsed ) );
 
-  if ( solution < this->m_LargeValue )
+  if ( outputPixel < this->m_LargeValue )
     {
-    // write solution to m_OutputLevelSet
-    OutputPixelType outputPixel = static_cast< OutputPixelType >( solution );
-
     oImage->SetPixel(iNode, outputPixel);
 
     // insert point into trial heap
@@ -282,7 +269,9 @@ UpdateValue( OutputImageType* oImage, NodeType iNode )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 double
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors )
+Solve( OutputImageType* oImage,
+      NodeType iNode,
+      std::vector< InternalNodeStructure > iNeighbors )
 {
   // sort the local list
   std::sort( iNeighbors.begin(), iNeighbors.end() );
@@ -293,15 +282,17 @@ Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors )
   double bb( 0.0 );
   double cc( this->m_InverseSpeed );
 
-  if ( this->GetInput() )
+  const InputImageType* input = this->GetInput();
+
+  if ( input )
     {
     cc =
-      static_cast< double >( this->GetInput()->GetPixel(iNode) ) /
+      static_cast< double >( input->GetPixel(iNode) ) /
         this->m_NormalizationFactor;
     cc = -1.0 * vnl_math_sqr(1.0 / cc);
     }
 
-  OutputSpacingType spacing = this->GetOutput()->GetSpacing();
+  OutputSpacingType spacing = oImage->GetSpacing();
 
   double discrim = 0.;
   double value = 0.;
@@ -352,9 +343,8 @@ Solve( NodeType iNode, std::vector< InternalNodeStructure > iNeighbors )
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
 bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
-CheckTopology( NodeType iNode )
+CheckTopology( OutputImageType* oImage, NodeType iNode )
   {
-  /*
   if( this->m_TopologyCheck != Superclass::None )
     {
     if( ( ImageDimension == 2 ) || ( ImageDimension == 3 ) )
@@ -368,7 +358,7 @@ CheckTopology( NodeType iNode )
       if( ( this->m_TopologyCheck == Superclass::Strict ) &&
           ( wellComposednessViolation || strictTopologyViolation ) )
         {
-        this->GetOutput()->SetPixel( iNode, this->m_TopologyValue );
+        oImage->SetPixel( iNode, this->m_TopologyValue );
         this->m_LabelImage->SetPixel( iNode, Superclass::Topology );
         return false;
         }
@@ -376,7 +366,7 @@ CheckTopology( NodeType iNode )
         {
         if( wellComposednessViolation )
           {
-          this->GetOutput()->SetPixel( iNode, this->m_TopologyValue );
+          oImage->SetPixel( iNode, this->m_TopologyValue );
           m_LabelImage->SetPixel( iNode, Superclass::Topology );
           return false;
           }
@@ -394,10 +384,8 @@ CheckTopology( NodeType iNode )
                 this->m_ConnectedComponentImage->GetBufferedRegion() );
           ItC.SetLocation( iNode );
 
-          typename ConnectedComponentImageType::PixelType minLabel
-              = NumericTraits<typename ConnectedComponentImageType::PixelType>::Zero;
-          typename ConnectedComponentImageType::PixelType otherLabel
-              = NumericTraits<typename ConnectedComponentImageType::PixelType>::Zero;
+          unsigned int minLabel = 0;
+          unsigned int otherLabel = 0;
 
           bool doesChangeCreateHandle = false;
 
@@ -412,15 +400,17 @@ CheckTopology( NodeType iNode )
                 }
               else
                 {
-                minLabel = vnl_math_min( ItC.GetNext( d ), ItC.GetPrevious( d ) );
-                otherLabel = vnl_math_max( ItC.GetNext( d ), ItC.GetPrevious( d ) );
+                minLabel = vnl_math_min( ItC.GetNext( d ),
+                                         ItC.GetPrevious( d ) );
+                otherLabel = vnl_math_max( ItC.GetNext( d ),
+                                           ItC.GetPrevious( d ) );
                 }
               break;
               }
             }
           if( doesChangeCreateHandle )
             {
-            this->GetOutput()->SetPixel( iNode, this->m_TopologyValue );
+            oImage->SetPixel( iNode, this->m_TopologyValue );
             this->m_LabelImage->SetPixel( iNode, Superclass::Topology );
             return false;
             }
@@ -442,7 +432,7 @@ CheckTopology( NodeType iNode )
       itkWarningMacro( << "CheckTopology has not be implemented for Dimension != 2 and != 3."
                     << "m_TopologyCheck should be set to None." );
       }
-    }*/
+    }
   return true;
 }
 // -----------------------------------------------------------------------------
@@ -455,6 +445,7 @@ InitializeOutput( OutputImageType* oImage )
   // allocate memory for the output buffer
   oImage->SetBufferedRegion( oImage->GetRequestedRegion() );
   oImage->Allocate();
+  oImage->FillBuffer( this->m_LargeValue );
 
   // cache some buffered region information
   m_BufferedRegion = oImage->GetBufferedRegion();
@@ -482,34 +473,10 @@ InitializeOutput( OutputImageType* oImage )
   m_LabelImage->CopyInformation(oImage);
   m_LabelImage->SetBufferedRegion( oImage->GetBufferedRegion() );
   m_LabelImage->Allocate();
-
-  // set all output value to infinity
-  typedef ImageRegionIterator< OutputImageType > OutputIterator;
-
-  OutputIterator outIt ( oImage, oImage->GetBufferedRegion() );
-
-  // set all points type to FarPoint
-  typedef ImageRegionIterator< LabelImageType > LabelIterator;
-
-  LabelIterator typeIt( m_LabelImage,
-                        m_LabelImage->GetBufferedRegion() );
-
-
-  OutputPixelType outputPixel = this->m_LargeValue;
-
-  outIt.GoToBegin();
-  typeIt.GoToBegin();
-  while( !outIt.IsAtEnd() )
-    {
-    outIt.Set(outputPixel);
-    typeIt.Set( Superclass::Far );
-
-    ++outIt;
-    ++typeIt;
-    }
-
+  m_LabelImage->FillBuffer( Superclass::Far );
 
   NodeType idx;
+  OutputPixelType outputPixel = this->m_LargeValue;
 
   if ( !this->m_AliveNodes.empty() )
     {
@@ -527,11 +494,10 @@ InitializeOutput( OutputImageType* oImage )
         // make this an alive point
         m_LabelImage->SetPixel(idx, Superclass::Alive );
 
-/*      if( this->m_TopologyCheck == Superclass::NoHandles )
+       if( this->m_TopologyCheck == Superclass::NoHandles )
           {
-          m_ConnectedComponentImage->SetPixel( idx,
-            NumericTraits<unsigned int>::One );
-          }*/
+          m_ConnectedComponentImage->SetPixel( idx, 1 );
+          }
 
         outputPixel = pointsIter->second;
         oImage->SetPixel(idx, outputPixel);
@@ -566,7 +532,7 @@ InitializeOutput( OutputImageType* oImage )
       }
     }
 
-/*  if( this->m_TopologyCheck == Superclass::NoHandles )
+  if( this->m_TopologyCheck == Superclass::NoHandles )
     {
     // Now create the connected component image and relabel such that labels
     // are 1, 2, 3, ...
@@ -583,7 +549,7 @@ InitializeOutput( OutputImageType* oImage )
     relabeler->Update();
 
     this->m_ConnectedComponentImage = relabeler->GetOutput();
-    }*/
+    }
 
   // process the input trial points
   if ( !this->m_TrialNodes.empty() )
@@ -612,7 +578,7 @@ InitializeOutput( OutputImageType* oImage )
       }
     }
   // initialize indices if this->m_TopologyCheck is activated
-  /*if( this->m_TopologyCheck != Superclass::None )
+  if( this->m_TopologyCheck != Superclass::None )
     {
     if( ImageDimension == 2 )
       {
@@ -630,7 +596,7 @@ InitializeOutput( OutputImageType* oImage )
               << "Topology checking is only valid for level set dimensions of 2 and 3" );
         }
       }
-    }*/
+    }
   }
 // -----------------------------------------------------------------------------
 

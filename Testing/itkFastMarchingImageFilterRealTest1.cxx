@@ -147,10 +147,9 @@ int main(int argc, char* argv[] )
 
   speedImage->Print( std::cout );
   marcher->SetInput( speedImage );
-  //marcher->SetStoppingValue( 100.0 );
 
   // turn on debugging
-  //marcher->DebugOn();
+  marcher->DebugOn();
 
   // update the marcher
   marcher->Update();
@@ -163,7 +162,7 @@ int main(int argc, char* argv[] )
 
   bool passed = true;
 
-  for ( ; !iterator.IsAtEnd(); ++iterator )
+  while ( !iterator.IsAtEnd() )
     {
 
     FloatImageType::IndexType tempIndex;
@@ -175,25 +174,24 @@ int main(int argc, char* argv[] )
     distance = 0.0;
     for ( int j = 0; j < 2; j++ )
       {
-        distance += tempIndex[j] * tempIndex[j];
+      distance += tempIndex[j] * tempIndex[j];
       }
     distance = vcl_sqrt( distance );
 
     outputValue = iterator.Get();
 
     //std::cout << iterator.GetIndex() <<" ** " <<outputValue <<std::endl;
-    if (distance == 0)
+    if (distance != 0)
       {
-      continue;
+      if ( vnl_math_abs( outputValue ) / distance > 1.42 )
+        {
+        std::cout << iterator.GetIndex() << " ";
+        std::cout << vnl_math_abs( outputValue ) / distance << " ";
+        std::cout << vnl_math_abs( outputValue ) << " " << distance << std::endl;
+        passed = false;
+        }
       }
-    if ( vnl_math_abs( outputValue ) / distance > 1.42 )
-      {
-      std::cout << iterator.GetIndex() << " ";
-      std::cout << vnl_math_abs( outputValue ) / distance << " ";
-      std::cout << vnl_math_abs( outputValue ) << " " << distance << std::endl;
-      passed = false;
-      }
-
+    ++iterator;
     }
 
   // Exercise other member functions

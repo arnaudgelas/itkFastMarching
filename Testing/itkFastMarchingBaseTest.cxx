@@ -71,7 +71,7 @@ protected:
   void UpdateValue( OutputDomainType* oDomain, NodeType iNode )
     { (void) iNode; }
 
-  bool CheckTopology( NodeType iNode )
+  bool CheckTopology( OutputDomainType* oDomain, NodeType iNode )
     { return true; }
 
   virtual void InitializeOutput( OutputDomainType* oDomain ) {}

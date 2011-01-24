@@ -235,12 +235,12 @@ GenerateData()
           m_StoppingCriterion->SetCurrentNode( current_node );
           m_StoppingCriterion->SetCurrentValue( current_value );
 
-          /*if( m_StoppingCriterion->IsSatisfied() )
+          if( m_StoppingCriterion->IsSatisfied() )
             {
             break;
-            }*/
+            }
 
-          //if( this->CheckTopology( current_node ) )
+          if( this->CheckTopology( output, current_node ) )
             {
             // set this node as alive
             this->SetLabelValueForGivenNode( current_node, Alive );

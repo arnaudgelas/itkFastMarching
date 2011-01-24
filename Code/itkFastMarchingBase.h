@@ -278,7 +278,7 @@ protected:
   virtual void UpdateValue( OutputDomainType* oDomain, NodeType iNode ) = 0;
 
   /**    */
-  virtual bool CheckTopology( NodeType iNode ) = 0;
+  virtual bool CheckTopology( OutputDomainType* oDomain, NodeType iNode ) = 0;
 
   /**    */
   void Initialize( OutputDomainType* oDomain );
