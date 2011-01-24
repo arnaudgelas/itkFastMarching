@@ -123,7 +123,7 @@ public:
         if( b_it.Get() == zero_value )
           {
           idx = b_it.GetIndex();
-          //if ( m_BufferedRegion.IsInside( idx ) )
+          if ( m_BufferedRegion.IsInside( idx ) )
             {
             m_LabelImage->SetPixel(idx, Superclass::Forbidden );
             output->SetPixel (idx, zero_value );
@@ -134,6 +134,28 @@ public:
       this->Modified();
       }
     }
+
+  /** The output largeset possible, spacing and origin is computed as follows.
+   * If the speed image is NULL or if the OverrideOutputInformation is true,
+   * the output information is set from user specified parameters. These
+   * parameters can be specified using methods SetOutputRegion(), SetOutputSpacing(), SetOutputDirection(),
+   * and SetOutputOrigin(). Else if the speed image is not NULL, the output information
+   * is copied from the input speed image. */
+  virtual void SetOutputSize(const OutputSizeType & size)
+  { m_OutputRegion = size; }
+  virtual OutputSizeType GetOutputSize() const
+  { return m_OutputRegion.GetSize(); }
+  itkSetMacro(OutputRegion, OutputRegionType);
+  itkGetConstReferenceMacro(OutputRegion, OutputRegionType);
+  itkSetMacro(OutputSpacing, OutputSpacingType);
+  itkGetConstReferenceMacro(OutputSpacing, OutputSpacingType);
+  itkSetMacro(OutputDirection, OutputDirectionType);
+  itkGetConstReferenceMacro(OutputDirection, OutputDirectionType);
+  itkSetMacro(OutputOrigin, OutputPointType);
+  itkGetConstReferenceMacro(OutputOrigin, OutputPointType);
+  itkSetMacro(OverrideOutputInformation, bool);
+  itkGetConstReferenceMacro(OverrideOutputInformation, bool);
+  itkBooleanMacro(OverrideOutputInformation);
 
 protected:
   FastMarchingImageFilterBase();

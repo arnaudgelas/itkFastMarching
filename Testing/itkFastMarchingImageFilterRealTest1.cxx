@@ -19,6 +19,7 @@
 #pragma warning ( disable : 4786 )
 #endif
 #include "itkFastMarchingImageFilterBase.h"
+#include "itkFastMarchingThresholdStoppingCriterion.h"
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"
 #include "itkTextOutput.h"
@@ -52,8 +53,14 @@ int main(int, char* [] )
 
   typedef itk::FastMarchingImageFilterBase< Dimension, PixelType, PixelType >
     FastMarchingType;
+  typedef itk::FastMarchingThresholdStoppingCriterion< FastMarchingType::Traits >
+      StoppingCriterionType;
+
+  StoppingCriterionType::Pointer criterion = StoppingCriterionType::New();
+  criterion->SetThreshold( 100. );
 
   FastMarchingType::Pointer marcher = FastMarchingType::New();
+  marcher->SetStoppingCriterion( criterion.GetPointer() );
 
   ShowProgressObject progressWatch(marcher);
   itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;
@@ -117,7 +124,7 @@ int main(int, char* [] )
 
   // specify the size of the output image
   FloatImageType::SizeType size = {{64,64}};
-  //marcher->SetOutputSize( size );
+  marcher->SetOutputSize( size );
 
   // setup a speed image of ones
   FloatImageType::Pointer speedImage = FloatImageType::New();

@@ -217,6 +217,9 @@ public:
   virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
   virtual void AddForbiddenNode( NodeType iNode );
 
+  itkGetObjectMacro( StoppingCriterion, StoppingCriterionType );
+  itkSetObjectMacro( StoppingCriterion, StoppingCriterionType );
+
 
 protected:
 
