@@ -63,8 +63,7 @@ int main(int argc, char* argv[] )
   criterion->SetThreshold( 100. );
 
   FastMarchingType::Pointer marcher = FastMarchingType::New();
-  marcher->SetStoppingCriterion(
-        static_cast< FastMarchingType::StoppingCriterionType* >( criterion.GetPointer() ) );
+  marcher->SetStoppingCriterion( criterion );
 
   ShowProgressObject progressWatch(marcher);
   itk::SimpleMemberCommand<ShowProgressObject>::Pointer command;

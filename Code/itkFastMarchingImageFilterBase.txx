@@ -281,6 +281,7 @@ bool
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 CheckTopology( NodeType iNode )
   {
+  /*
   if( this->m_TopologyCheck != Superclass::None )
     {
     if( ( ImageDimension == 2 ) || ( ImageDimension == 3 ) )
@@ -368,7 +369,7 @@ CheckTopology( NodeType iNode )
       itkWarningMacro( << "CheckTopology has not be implemented for Dimension != 2 and != 3."
                     << "m_TopologyCheck should be set to None." );
       }
-    }
+    }*/
   return true;
 }
 // -----------------------------------------------------------------------------
@@ -469,7 +470,7 @@ InitializeOutput()
       }
     }
 
-  if( this->m_ForbiddenNodes.empty() )
+  if( !this->m_ForbiddenNodes.empty() )
     {
     typename std::vector< NodeType >::const_iterator
         p_it = this->m_ForbiddenNodes.begin();
@@ -514,7 +515,7 @@ InitializeOutput()
     }
 
   // process the input trial points
-  if ( this->m_TrialNodes.empty() )
+  if ( !this->m_TrialNodes.empty() )
     {
     NodeContainerConstIterator pointsIter = this->m_TrialNodes.begin();
     NodeContainerConstIterator pointsEnd = this->m_TrialNodes.end();
