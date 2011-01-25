@@ -4,10 +4,12 @@ add_executable( itkFastMarchingBaseTest
 target_link_libraries( itkFastMarchingBaseTest ITKCommon )
 
 add_test( itkImageFastMarchingBaseTest
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingBaseTest 0 )
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingBaseTest 0
+)
 
 add_test( itkMeshFastMarchingBaseTest
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingBaseTest 1 )
+ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingBaseTest 1
+)
 
 add_executable( itkFastMarchingImageFilterBaseTest
   itkFastMarchingImageFilterBaseTest.cxx
@@ -15,7 +17,8 @@ add_executable( itkFastMarchingImageFilterBaseTest
 target_link_libraries( itkFastMarchingImageFilterBaseTest ITKCommon )
 
 add_test( itkFastMarchingImageFilterBaseTest
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterBaseTest )
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterBaseTest
+)
 
 
 add_executable( itkFastMarchingStoppingCriterionBaseTest
@@ -54,11 +57,15 @@ TARGET_LINK_LIBRARIES( itkFastMarchingImageTopologicalTest ITKCommon ITKIO )
 ## 2-D
 
 ADD_TEST( TEST_Brain2D_singleSeed_NoTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 2
-  ${DATA_DIRECTORY}/BrainProtonDensitySlice_speed.nii.gz
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_Brain2D_singleSeed_NoTopo.nii.gz
-  ${DATA_DIRECTORY}/BrainProtonDensitySlice_singleSeed.nii.gz
-  150 0 )
+#  --compare ${DATA_DIRECTORY}/test_Brain2D_singleSeed_NoTopo.nii.gz
+#            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_Brain2D_singleSeed_NoTopo.nii.gz
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest
+    2
+    ${DATA_DIRECTORY}/BrainProtonDensitySlice_speed.nii.gz
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_Brain2D_singleSeed_NoTopo.nii.gz
+    ${DATA_DIRECTORY}/BrainProtonDensitySlice_singleSeed.nii.gz
+    150 0
+)
 
 ADD_TEST( TEST_Brain2D_singleSeed_StrictTopo
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 2

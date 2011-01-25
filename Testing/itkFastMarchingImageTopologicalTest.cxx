@@ -199,14 +199,14 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
       {
       std::string filename = std::string( argv[7] ) +
         std::string( "LevelSet.nii.gz" );
-      typedef itk::ImageFileWriter<InternalImageType> WriterType;
-      typename WriterType::Pointer writer = WriterType::New();
-      writer->SetInput( fastMarching->GetOutput() );
-      writer->SetFileName( filename.c_str() );
+      typedef itk::ImageFileWriter<InternalImageType> InternalWriterType;
+      typename InternalWriterType::Pointer internal_writer = InternalWriterType::New();
+      internal_writer->SetInput( fastMarching->GetOutput() );
+      internal_writer->SetFileName( filename.c_str() );
 
       try
         {
-        writer->Update();
+        internal_writer->Update();
         }
       catch( itk::ExceptionObject & excep )
         {

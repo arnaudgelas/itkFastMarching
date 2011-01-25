@@ -73,7 +73,7 @@ protected:
   bool CheckTopology( OutputDomainType* , const NodeType&  )
     { return true; }
 
-  virtual void InitializeOutput( OutputDomainType* oDomain ) {}
+  void InitializeOutput( OutputDomainType* ) {}
 
 private:
   FastMarchingBaseTestHelper( const Self& );
