@@ -9,23 +9,32 @@
 #include "itkRescaleIntensityImageFilter.h"
 
 
-template <unsigned int ImageDimension>
+template <unsigned int VDimension>
 int FastMarchingImageFilter( unsigned int argc, char *argv[] )
 {
   typedef float InternalPixelType;
-  typedef itk::Image<InternalPixelType, ImageDimension>  InternalImageType;
+  typedef itk::Image<InternalPixelType, VDimension>  InternalImageType;
 
   typedef unsigned char OutputPixelType;
-  typedef itk::Image<OutputPixelType, ImageDimension> OutputImageType;
+  typedef itk::Image<OutputPixelType, VDimension> OutputImageType;
 
   InternalPixelType stoppingValue = atof( argv[5] );
 
-  typedef  itk::ImageFileReader< InternalImageType> ReaderType;
+  typedef itk::ImageFileReader< InternalImageType> ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( argv[2] );
-  reader->Update();
+  try
+    {
+    reader->Update();
+    }
+  catch( itk::ExceptionObject & excep )
+    {
+    std::cerr << "Exception caught !" << std::endl;
+    std::cerr << excep << std::endl;
+    return EXIT_FAILURE;
+    }
 
-  typedef  itk::FastMarchingImageFilter
+  typedef itk::FastMarchingImageFilter
     <InternalImageType, InternalImageType> FastMarchingFilterType;
   typename FastMarchingFilterType::Pointer fastMarching
     = FastMarchingFilterType::New();
@@ -38,14 +47,34 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
   typedef itk::ImageFileReader<LabelImageType> LabelImageReaderType;
   typename LabelImageReaderType::Pointer labelImageReader = LabelImageReaderType::New();
   labelImageReader->SetFileName( argv[4] );
-  labelImageReader->Update();
+
+  try
+    {
+    labelImageReader->Update();
+    }
+  catch( itk::ExceptionObject & excep )
+    {
+    std::cerr << "Exception caught !" << std::endl;
+    std::cerr << excep << std::endl;
+    return EXIT_FAILURE;
+    }
 
   typedef itk::LabelContourImageFilter<LabelImageType, LabelImageType> ContourFilterType;
   typename ContourFilterType::Pointer contour = ContourFilterType::New();
   contour->SetInput( labelImageReader->GetOutput() );
   contour->FullyConnectedOff();
   contour->SetBackgroundValue( itk::NumericTraits<typename LabelImageType::PixelType>::Zero );
-  contour->Update();
+
+  try
+    {
+    contour->Update();
+    }
+  catch( itk::ExceptionObject & excep )
+    {
+    std::cerr << "Exception caught !" << std::endl;
+    std::cerr << excep << std::endl;
+    return EXIT_FAILURE;
+    }
 
   typename NodeContainer::Pointer alivePoints = NodeContainer::New();
   alivePoints->Initialize();
@@ -107,6 +136,7 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
     {
     std::cerr << "Exception caught !" << std::endl;
     std::cerr << excep << std::endl;
+    return EXIT_FAILURE;
     }
 
   typedef itk::BinaryThresholdImageFilter
@@ -120,36 +150,78 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
   thresholder->SetInsideValue( 1 );
   thresholder->SetInput( fastMarching->GetOutput() );
 
-  typedef  itk::ImageFileWriter<OutputImageType> WriterType;
+  try
+    {
+    thresholder->Update();
+    }
+   catch( itk::ExceptionObject & excep )
+    {
+    std::cerr << "Exception caught !" << std::endl;
+    std::cerr << excep << std::endl;
+    return EXIT_FAILURE;
+    }
+
+
+  typedef itk::ImageFileWriter<OutputImageType> WriterType;
   typename WriterType::Pointer writer = WriterType::New();
   writer->SetInput( thresholder->GetOutput() );
   writer->SetFileName( argv[3] );
-  writer->Update();
+
+  try
+    {
+    writer->Update();
+    }
+  catch( itk::ExceptionObject & excep )
+    {
+    std::cerr << "Exception caught !" << std::endl;
+    std::cerr << excep << std::endl;
+    return EXIT_FAILURE;
+    }
 
   if( argc > 7 )
     {
-    {
-    std::string filename = std::string( argv[7] ) +
-      std::string( "LevelSet.nii.gz" );
-    typedef  itk::ImageFileWriter<InternalImageType> WriterType;
-    typename WriterType::Pointer writer = WriterType::New();
-    writer->SetInput( fastMarching->GetOutput() );
-    writer->SetFileName( filename.c_str() );
-    writer->Update();
+      {
+      std::string filename = std::string( argv[7] ) +
+        std::string( "LevelSet.nii.gz" );
+      typedef itk::ImageFileWriter<InternalImageType> WriterType;
+      typename WriterType::Pointer writer = WriterType::New();
+      writer->SetInput( fastMarching->GetOutput() );
+      writer->SetFileName( filename.c_str() );
+
+      try
+        {
+        writer->Update();
+        }
+      catch( itk::ExceptionObject & excep )
+        {
+        std::cerr << "Exception caught !" << std::endl;
+        std::cerr << excep << std::endl;
+        return EXIT_FAILURE;
+        }
+      }
+
+      {
+      std::string filename = std::string( argv[7] ) +
+        std::string( "LabelMap.nii.gz" );
+      typedef itk::ImageFileWriter< LabelImageType > LabelImageWriterType;
+      typename LabelImageWriterType::Pointer mapWriter = LabelImageWriterType::New();
+      mapWriter->SetInput( fastMarching->GetLabelImage() );
+      mapWriter->SetFileName( filename.c_str() );
+
+      try
+        {
+        mapWriter->Update();
+        }
+      catch( itk::ExceptionObject & excep )
+        {
+        std::cerr << "Exception caught !" << std::endl;
+        std::cerr << excep << std::endl;
+        return EXIT_FAILURE;
+        }
+      }
     }
 
-    {
-    std::string filename = std::string( argv[7] ) +
-      std::string( "LabelMap.nii.gz" );
-    typedef itk::ImageFileWriter< LabelImageType > LabelImageWriterType;
-    typename LabelImageWriterType::Pointer mapWriter = LabelImageWriterType::New();
-    mapWriter->SetInput( fastMarching->GetLabelImage() );
-    mapWriter->SetFileName( filename.c_str() );
-    mapWriter->Update();
-    }
-    }
-
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 int main( int argc, char *argv[] )
@@ -160,20 +232,18 @@ int main( int argc, char *argv[] )
     std::cerr << " speedImage outputImage seedImage ";
     std::cerr << " stoppingValue [checkTopology] [otherFilePrefix]"
       << std::endl;
-    return 1;
+    return EXIT_FAILURE;
     }
 
   switch( atoi( argv[1] ) )
    {
    case 2:
-     FastMarchingImageFilter<2>( argc, argv );
-     break;
+     return FastMarchingImageFilter<2>( argc, argv );
    case 3:
-     FastMarchingImageFilter<3>( argc, argv );
-     break;
+     return FastMarchingImageFilter<3>( argc, argv );
    default:
-      std::cerr << "Unsupported dimension" << std::endl;
-      exit( EXIT_FAILURE );
+     std::cerr << "Unsupported dimension" << std::endl;
+     return EXIT_FAILURE;
    }
 }
 
