@@ -98,6 +98,8 @@ int main( int argc, char* argv[] )
   const unsigned Dimension = 3;
   typedef float PixelType;
 
+  bool exception_caught = false;
+
   if( atoi( argv[1] ) == 0 )
     {
     typedef itk::ImageFastMarchingTraits< Dimension, PixelType, PixelType >
@@ -114,7 +116,17 @@ int main( int argc, char* argv[] )
         ImageFastMarching;
     ImageFastMarching::Pointer fmm = ImageFastMarching::New();
     fmm->SetInput( input );
-    fmm->Update();
+
+    try
+      {
+      fmm->Update();
+      }
+    catch( itk::ExceptionObject & excep )
+      {
+      std::cerr << "Exception caught !" << std::endl;
+      std::cerr << excep << std::endl;
+      exception_caught = true;
+      }
 
     typedef ImageFastMarching::OutputDomainType OutputImageType;
     OutputImageType::Pointer output = fmm->GetOutput();
@@ -143,7 +155,17 @@ int main( int argc, char* argv[] )
           MeshFastMarching;
       MeshFastMarching::Pointer fmm = MeshFastMarching::New();
       fmm->SetInput( input );
-      fmm->Update();
+
+      try
+        {
+        fmm->Update();
+        }
+      catch( itk::ExceptionObject & excep )
+        {
+        std::cerr << "Exception caught !" << std::endl;
+        std::cerr << excep << std::endl;
+        exception_caught = true;
+        }
 
       typedef MeshFastMarching::OutputDomainType OutputMeshType;
       OutputMeshType::Pointer output = fmm->GetOutput();
@@ -152,5 +174,12 @@ int main( int argc, char* argv[] )
       }
     }
 
-  return EXIT_SUCCESS;
+  if( exception_caught )
+    {
+    return EXIT_SUCCESS;
+    }
+  else
+    {
+    return EXIT_FAILURE;
+    }
 }
