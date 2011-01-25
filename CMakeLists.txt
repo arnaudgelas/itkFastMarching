@@ -12,6 +12,10 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY
     ${FMM_BINARY_DIR}/bin
   )
 
+set( DATA_DIRECTORY
+  ${FMM_SOURCE_DIR}/Data
+  )
+
 set( BASE_SOURCE ${FMM_SOURCE_DIR}/Code/itkStoppingCriterionBase.cxx )
 
 include_directories( Code )
