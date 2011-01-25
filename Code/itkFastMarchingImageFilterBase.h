@@ -110,11 +110,11 @@ public:
     nullsize.Fill( 0 );
 
 
-    if( m_BufferedRegion.GetSize() == nullsize )
-      {
-      itkGenericExceptionMacro( << "m_BufferedRegion has not been set yet" );
-      }
-    else
+    //if( m_BufferedRegion.GetSize() == nullsize )
+    //  {
+    //  itkGenericExceptionMacro( << "m_BufferedRegion has not been set yet" );
+    //  }
+    //else
       {
       typedef Image< TPixel, ImageDimension > InternalImageType;
       typedef ImageRegionConstIteratorWithIndex< InternalImageType >
@@ -122,7 +122,7 @@ public:
       InternalRegionIterator b_it( iImage, iImage->GetLargestPossibleRegion() );
       b_it.GoToBegin();
 
-      OutputImageType* output = this->GetOutput();
+      //OutputImageType* output = this->GetOutput();
 
       TPixel zero_value = NumericTraits< TPixel >::Zero;
       NodeType idx;
@@ -132,11 +132,13 @@ public:
         if( b_it.Get() == zero_value )
           {
           idx = b_it.GetIndex();
-          if ( m_BufferedRegion.IsInside( idx ) )
-            {
-            m_LabelImage->SetPixel(idx, Superclass::Forbidden );
-            output->SetPixel (idx, zero_value );
-            }
+
+          this->m_ForbiddenNodes.push_back( idx );
+          //if ( m_BufferedRegion.IsInside( idx ) )
+          //  {
+          //  m_LabelImage->SetPixel(idx, Superclass::Forbidden );
+          //  output->SetPixel (idx, zero_value );
+          //  }
           }
         ++b_it;
         }
