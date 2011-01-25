@@ -23,3 +23,6 @@ include_directories( Code )
 include( CTest )
 add_subdirectory( Testing )
 
+if( BUILD_TESTING )
+  set(BUILDNAME "${BUILDNAME}" CACHE STRING "Name of the build on the dashboard" )
+endif()
