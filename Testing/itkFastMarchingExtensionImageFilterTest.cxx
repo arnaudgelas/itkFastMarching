@@ -182,6 +182,8 @@ int main(int, char* [] )
   auxAliveValues.push_back( vector );
   auxAliveValues.push_back( vector );
 
+  marcher->SetAuxiliaryAliveValues( auxAliveValues );
+
   // deliberately cause an exception by not setting AuxTrialValues
   passed = false;
   try
@@ -221,6 +223,7 @@ int main(int, char* [] )
   auxTrialValues.push_back( vector );
   auxTrialValues.push_back( vector );
 
+  marcher->SetAuxiliaryTrialValues( auxTrialValues );
 
   // run the algorithm
   passed = true;
