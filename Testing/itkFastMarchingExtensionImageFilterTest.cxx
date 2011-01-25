@@ -132,9 +132,10 @@ int main(int, char* [] )
 
   itk::ImageRegionIterator<FloatImageType>
     speedIter( speedImage, speedImage->GetBufferedRegion() );
-  for ( ; !speedIter.IsAtEnd(); ++speedIter )
+  while ( !speedIter.IsAtEnd() )
     {
     speedIter.Set( 1.0 );
+    ++speedIter;
     }
 
   marcher->SetInput( speedImage );
@@ -156,7 +157,7 @@ int main(int, char* [] )
   typedef MarcherType::AuxValueVectorType VectorType;
   typedef MarcherType::AuxValueContainer AuxValueContainer;
 
-  AuxValueContainer::Pointer auxAliveValues = AuxValueContainer::New();
+  AuxValueContainer auxAliveValues;
 
   // deliberately cause an exception setting AuxAliveValues of the wrong size
   marcher->SetAuxiliaryAliveValues( auxAliveValues );
@@ -178,8 +179,8 @@ int main(int, char* [] )
   VectorType vector;
   vector[0] = 48;
 
-  auxAliveValues->InsertElement(0,vector);
-  auxAliveValues->InsertElement(1,vector);
+  auxAliveValues.push_back( vector );
+  auxAliveValues.push_back( vector );
 
   // deliberately cause an exception by not setting AuxTrialValues
   passed = false;
@@ -195,7 +196,7 @@ int main(int, char* [] )
     }
   if ( !passed ) { return EXIT_FAILURE; }
 
-  AuxValueContainer::Pointer auxTrialValues = AuxValueContainer::New();
+  AuxValueContainer auxTrialValues;
 
   // deliberately cause an exception setting AuxTrialValues of the wrong size
   marcher->SetAuxiliaryTrialValues( auxTrialValues );
@@ -214,11 +215,11 @@ int main(int, char* [] )
   if ( !passed ) { return EXIT_FAILURE; }
 
 
-  auxTrialValues->InsertElement(0,vector);
-  auxTrialValues->InsertElement(1,vector);
-  auxTrialValues->InsertElement(2,vector);
-  auxTrialValues->InsertElement(3,vector);
-  auxTrialValues->InsertElement(4,vector);
+  auxTrialValues.push_back( vector );
+  auxTrialValues.push_back( vector );
+  auxTrialValues.push_back( vector );
+  auxTrialValues.push_back( vector );
+  auxTrialValues.push_back( vector );
 
 
   // run the algorithm
@@ -292,10 +293,10 @@ int main(int, char* [] )
     }
 
   // Exercise other member functions
-  std::cout << "Auxiliary alive values: " << marcher->GetAuxiliaryAliveValues();
+  //std::cout << "Auxiliary alive values: " << marcher->GetAuxiliaryAliveValues();
   std::cout << std::endl;
 
-  std::cout << "Auxiliary trial values: " << marcher->GetAuxiliaryTrialValues();
+  //std::cout << "Auxiliary trial values: " << marcher->GetAuxiliaryTrialValues();
   std::cout << std::endl;
 
   marcher->Print( std::cout );

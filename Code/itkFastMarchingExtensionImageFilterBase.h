@@ -19,7 +19,6 @@
 #define __itkFastMarchingExtensionImageFilterBase_h
 
 #include "itkFastMarchingImageFilterBase.h"
-#include "itkLevelSet.h"
 
 namespace itk
 {
@@ -52,8 +51,8 @@ template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
          class TCriterion,
-         class TAuxValue,
-         unsigned int VAuxDimension = 1 >
+         typename TAuxValue,
+         unsigned int VAuxDimension >
 class ITK_EXPORT FastMarchingExtensionImageFilterBase:
   public FastMarchingImageFilterBase< VDimension, TInputPixel,
     TOutputPixel, TCriterion >
@@ -81,15 +80,21 @@ public:
   itkStaticConstMacro(AuxDimension, unsigned int, VAuxDimension);
 
   /** AuxVarType typedef support. */
-  typedef AuxVarTypeDefault< TAuxValue,
-                             itkGetStaticConstMacro(AuxDimension),
-                             itkGetStaticConstMacro(ImageDimension) >
-  AuxVarType;
-  typedef typename AuxVarType::AuxValueType       AuxValueType;
-  typedef typename AuxVarType::AuxValueVectorType AuxValueVectorType;
-  typedef typename AuxVarType::AuxValueContainer  AuxValueContainer;
-  typedef typename AuxVarType::AuxImageType       AuxImageType;
-  typedef typename AuxVarType::AuxImagePointer    AuxImagePointer;
+  //typedef AuxVarTypeDefault< TAuxValue,
+  //                           itkGetStaticConstMacro(AuxDimension),
+  //                           itkGetStaticConstMacro(ImageDimension) >
+  //AuxVarType;
+  typedef TAuxValue       AuxValueType;
+  typedef Vector< AuxValueType, AuxDimension >  AuxValueVectorType;
+  typedef std::vector< AuxValueVectorType >     AuxValueContainer;
+  typedef typename AuxValueContainer::const_iterator AuxValueContainerConstIterator;
+
+  typedef Image< AuxValueType, ImageDimension > AuxImageType;
+  typedef typename AuxImageType::Pointer        AuxImagePointer;
+
+  //typedef typename AuxVarType::AuxValueContainer  AuxValueContainer;
+  //typedef typename AuxVarType::AuxImageType       AuxImageType;
+  //typedef typename AuxVarType::AuxImagePointer    AuxImagePointer;
 
   /** Index typedef support. */
   typedef typename Superclass::NodeType NodeType;
@@ -104,25 +109,25 @@ public:
   AuxImageType * GetAuxiliaryImage(unsigned int idx);
 
   /** Set the container auxiliary values at the initial alive points. */
-  void SetAuxiliaryAliveValues(AuxValueContainer *values)
+  void SetAuxiliaryAliveValues(AuxValueContainer values)
   {
     m_AuxAliveValues = values;
   }
 
   /** Get the container of auxiliary values at the initial alive points. */
-  AuxValueContainer * GetAuxiliaryAliveValues(void)
+  AuxValueContainer GetAuxiliaryAliveValues(void)
   {
-    return m_AuxAliveValues.GetPointer();
+    return m_AuxAliveValues;
   }
 
   /** Set the container of auxiliary values at the initial trial points. */
-  void SetAuxiliaryTrialValues(AuxValueContainer *values)
+  void SetAuxiliaryTrialValues(AuxValueContainer values)
   {
     m_AuxTrialValues = values;
   }
 
   /** Get the container of auxiliary values at the initial trial points. */
-  typename AuxValueContainer::Pointer GetAuxiliaryTrialValues()
+  AuxValueContainer GetAuxiliaryTrialValues()
   {
     return m_AuxTrialValues;
   }
@@ -151,8 +156,8 @@ private:
   FastMarchingExtensionImageFilterBase(const Self &); //purposely not implemented
   void operator=(const Self &);                   //purposely not implemented
 
-  typename AuxValueContainer::Pointer m_AuxAliveValues;
-  typename AuxValueContainer::Pointer m_AuxTrialValues;
+  AuxValueContainer m_AuxAliveValues;
+  AuxValueContainer m_AuxTrialValues;
 };
 } // namespace itk
 
