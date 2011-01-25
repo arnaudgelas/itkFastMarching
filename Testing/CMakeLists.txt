@@ -54,42 +54,42 @@ TARGET_LINK_LIBRARIES( itkFastMarchingImageTopologicalTest ITKCommon ITKIO )
 ## 2-D
 
 ADD_TEST( TEST_Brain2D_singleSeed_NoTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 2
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 2
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_speed.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_Brain2D_singleSeed_NoTopo.nii.gz
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_singleSeed.nii.gz
   150 0 )
 
 ADD_TEST( TEST_Brain2D_singleSeed_StrictTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 2
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 2
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_speed.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_Brain2D_singleSeed_StrictTopo.nii.gz
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_singleSeed.nii.gz
   150 1 )
 
 ADD_TEST( TEST_Brain2D_singleSeed_NoHandlesTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 2
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 2
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_speed.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_Brain2D_singleSeed_NoHandlesTopo.nii.gz
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_singleSeed.nii.gz
   150 2 )
 
 ADD_TEST( TEST_Brain2D_multipleSeeds_NoTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 2
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 2
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_speed.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_Brain2D_multipleSeeds_NoTopo.nii.gz
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_multipleSeeds.nii.gz
   150 0 )
 
 ADD_TEST( TEST_Brain2D_multipleSeeds_StrictTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 2
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 2
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_speed.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_Brain2D_multipleSeeds_StrictTopo.nii.gz
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_multipleSeeds.nii.gz
   150 1 )
 
 ADD_TEST( TEST_Brain2D_multipleSeeds_NoHandlesTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 2
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 2
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_speed.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_Brain2D_multipleSeeds_NoHandlesTopo.nii.gz
   ${DATA_DIRECTORY}/BrainProtonDensitySlice_multipleSeeds.nii.gz
@@ -98,42 +98,42 @@ ADD_TEST( TEST_Brain2D_multipleSeeds_NoHandlesTopo
 ## 3-D
 
 ADD_TEST( TEST_torus_multipleSeeds_NoTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 3
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 3
   ${DATA_DIRECTORY}/torus.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_torus_multipleSeeds_NoTopo.nii.gz
   ${DATA_DIRECTORY}/torus_multipleSeeds.nii.gz
   150 0 )
 
 ADD_TEST( TEST_torus_multipleSeeds_StrictTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 3
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 3
   ${DATA_DIRECTORY}/torus.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_torus_multipleSeeds_StrictTopo.nii.gz
   ${DATA_DIRECTORY}/torus_multipleSeeds.nii.gz
   150 1 )
 
 ADD_TEST( TEST_torus_multipleSeeds_NoHandlesTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 3
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 3
   ${DATA_DIRECTORY}/torus.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_torus_multipleSeeds_NoHandlesTopo.nii.gz
   ${DATA_DIRECTORY}/torus_multipleSeeds.nii.gz
   150 2 )
 
 ADD_TEST( TEST_wm_multipleSeeds_NoTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 3
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 3
   ${DATA_DIRECTORY}/wm.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_wm_multipleSeeds_NoTopo.nii.gz
   ${DATA_DIRECTORY}/wm_multipleSeeds.nii.gz
   150 0 )
 
 ADD_TEST( TEST_wm_multipleSeeds_StrictTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 3
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 3
   ${DATA_DIRECTORY}/wm.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_wm_multipleSeeds_StrictTopo.nii.gz
   ${DATA_DIRECTORY}/wm_multipleSeeds.nii.gz
   150 1 )
 
 ADD_TEST( TEST_wm_multipleSeeds_NoHandlesTopo
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterTest 3
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageTopologicalTest 3
   ${DATA_DIRECTORY}/wm.nii.gz
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_wm_multipleSeeds_NoHandlesTopo.nii.gz
   ${DATA_DIRECTORY}/wm_multipleSeeds.nii.gz
