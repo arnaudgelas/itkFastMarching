@@ -136,9 +136,6 @@ int main(int, char* [] )
   marcher->SetInput( speedImage );
   marcher->GenerateGradientImageOn();
 
-  // update the marcher
-  marcher->Update();
-
   // check the results
   typedef FloatFMType::GradientImageType FloatGradientImage;
   typedef FloatGradientImage::PixelType GradientPixelType;
@@ -194,7 +191,6 @@ int main(int, char* [] )
 
     }
 
-
   // Set up target points.
   // The algorithm will stop when it reaches these points.
   // This point is closest to the AlivePoint:
@@ -216,6 +212,8 @@ int main(int, char* [] )
 
   // Stop the algorithm when ONE of the targets has been reached.
   criterion->SetTargetCondition( CriterionType::OneTarget );
+
+  marcher->SetStoppingCriterion( criterion );
 
   marcher->Update();
 

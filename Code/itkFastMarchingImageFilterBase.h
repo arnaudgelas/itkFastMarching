@@ -200,7 +200,7 @@ protected:
   virtual void UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode );
   void UpdateValue( OutputImageType* oImage, const NodeType& iValue );
   bool CheckTopology( OutputImageType* oImage, const NodeType& iNode );
-  virtual void InitializeOutput( OutputImageType* oImage );
+  void InitializeOutput( OutputImageType* oImage );
   double Solve( OutputImageType* oImage,
                const NodeType& iNode,
                std::vector< InternalNodeStructure >& ioNeighbors ) const;

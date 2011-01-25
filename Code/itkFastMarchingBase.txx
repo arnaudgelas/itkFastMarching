@@ -188,7 +188,7 @@ Initialize( OutputDomainType* oDomain )
     }
   */
 
-  InitializeOutput( oDomain );
+  this->InitializeOutput( oDomain );
   }
 // -----------------------------------------------------------------------------
 

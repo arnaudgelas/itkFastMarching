@@ -67,7 +67,7 @@ void
 FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 InitializeOutput(OutputImageType *output)
 {
-  Superclass::Initialize(output);
+  Superclass::InitializeOutput(output);
 
   // allocate memory for the GradientImage if requested
   if ( m_GenerateGradientImage )
