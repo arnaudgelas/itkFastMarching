@@ -54,6 +54,17 @@ target_link_libraries( itkFastMarchingImageFilterRealTest2 ITKCommon )
 add_test( itkFastMarchingImageFilterRealTest2
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterRealTest2 )
 
+
+add_executable( itkFastMarchingUpwindGradientBaseTest
+  itkFastMarchingUpwindGradientBaseTest.cxx
+  ${BASE_SOURCE}
+)
+
+target_link_libraries( itkFastMarchingUpwindGradientBaseTest ITKCommon )
+
+add_test( itkFastMarchingUpwindGradientBaseTest
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingUpwindGradientBaseTest )
+
 # --------------------------------------------------------------------------
 # Topology constrained front propagation
 # --------------------------------------------------------------------------

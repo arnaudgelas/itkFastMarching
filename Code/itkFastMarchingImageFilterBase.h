@@ -197,10 +197,10 @@ protected:
   char GetLabelValueForGivenNode( const NodeType& iNode ) const;
   void SetLabelValueForGivenNode( const NodeType& iNode,
                                  const LabelType& iLabel );
-  void UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode );
+  virtual void UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode );
   void UpdateValue( OutputImageType* oImage, const NodeType& iValue );
   bool CheckTopology( OutputImageType* oImage, const NodeType& iNode );
-  void InitializeOutput( OutputImageType* oImage );
+  virtual void InitializeOutput( OutputImageType* oImage );
   double Solve( OutputImageType* oImage,
                const NodeType& iNode,
                std::vector< InternalNodeStructure >& ioNeighbors ) const;
