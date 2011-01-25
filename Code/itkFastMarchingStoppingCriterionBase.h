@@ -48,15 +48,23 @@ namespace itk
 
   void SetCurrentValue( const ValueType& iValue )
   {
-    if( iValue >= m_CurrentValue )
+    //if( iValue >= m_CurrentValue )
       {
       m_PreviousValue = m_CurrentValue;
       m_CurrentValue = iValue;
       }
-    else
+    /*else
       {
-      itkExceptionMacro( << "Current value is decreasing!" );
-      }
+      if( iValue == m_TopologyValue )
+        {
+        m_PreviousValue = m_CurrentValue;
+        m_CurrentValue = iValue;
+        }
+      else
+        {
+        itkExceptionMacro( << "Current value is decreasing!" );
+        }
+      }*/
   }
 
  protected:
