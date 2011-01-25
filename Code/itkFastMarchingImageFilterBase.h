@@ -92,6 +92,8 @@ public:
   typedef typename Superclass::NodeContainerType NodeContainerType;
   typedef typename Superclass::NodeContainerConstIterator NodeContainerConstIterator;
 
+  itkGetObjectMacro( LabelImage, LabelImageType );
+
   /** \brief Set a binary mask to limit the propagation of front.
     *
     * Only location with null pixel values are used. Corresponding labels are set

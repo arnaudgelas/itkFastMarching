@@ -1,5 +1,6 @@
 #include "itkImage.h"
-#include "itkFastMarchingImageFilter.h"
+#include "itkFastMarchingImageFilterBase.h"
+#include "itkFastMarchingThresholdStoppingCriterion.h"
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
@@ -13,15 +14,26 @@ template <unsigned int VDimension>
 int FastMarchingImageFilter( unsigned int argc, char *argv[] )
 {
   typedef float InternalPixelType;
-  typedef itk::Image<InternalPixelType, VDimension>  InternalImageType;
+  typedef itk::Image< InternalPixelType, VDimension > InternalImageType;
+  typedef itk::FastMarchingImageThresholdStoppingCriterion< InternalImageType >
+      CriterionType;
 
   typedef unsigned char OutputPixelType;
   typedef itk::Image<OutputPixelType, VDimension> OutputImageType;
 
+  typedef itk::FastMarchingImageThresholdStoppingCriterion< InternalImageType >
+      CriterionType;
+  typedef typename CriterionType::Pointer CriterionPointer;
+
   InternalPixelType stoppingValue = atof( argv[5] );
 
+  CriterionPointer criterion = CriterionType::New();
+  criterion->SetThreshold( stoppingValue );
+
   typedef itk::ImageFileReader< InternalImageType> ReaderType;
-  typename ReaderType::Pointer reader = ReaderType::New();
+  typedef typename ReaderType::Pointer ReaderPointer;
+
+  ReaderPointer reader = ReaderType::New();
   reader->SetFileName( argv[2] );
   try
     {
@@ -34,18 +46,20 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
     return EXIT_FAILURE;
     }
 
-  typedef itk::FastMarchingImageFilter
-    <InternalImageType, InternalImageType> FastMarchingFilterType;
-  typename FastMarchingFilterType::Pointer fastMarching
-    = FastMarchingFilterType::New();
-  fastMarching->SetInput( reader->GetOutput() );
+  typedef itk::FastMarchingImageFilterBase< VDimension,
+      InternalPixelType, InternalPixelType, CriterionType > FastMarchingType;
+  typedef typename FastMarchingType::Pointer FastMarchingPointer;
 
-  typedef typename FastMarchingFilterType::NodeContainer           NodeContainer;
-  typedef typename FastMarchingFilterType::NodeType                NodeType;
-  typedef typename FastMarchingFilterType::LabelImageType LabelImageType;
+  FastMarchingPointer fastMarching = FastMarchingType::New();
+  fastMarching->SetInput( reader->GetOutput() );
+  fastMarching->SetStoppingCriterion( criterion );
+
+  typedef typename FastMarchingType::LabelImageType LabelImageType;
+  typedef typename LabelImageType::PixelType LabelType;
 
   typedef itk::ImageFileReader<LabelImageType> LabelImageReaderType;
-  typename LabelImageReaderType::Pointer labelImageReader = LabelImageReaderType::New();
+  typedef typename LabelImageReaderType::Pointer LabelImageReaderPointer;
+  LabelImageReaderPointer labelImageReader = LabelImageReaderType::New();
   labelImageReader->SetFileName( argv[4] );
 
   try
@@ -59,11 +73,14 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
     return EXIT_FAILURE;
     }
 
-  typedef itk::LabelContourImageFilter<LabelImageType, LabelImageType> ContourFilterType;
+  LabelType label_zero = itk::NumericTraits<LabelType>::Zero;
+
+  typedef itk::LabelContourImageFilter<LabelImageType,
+      LabelImageType> ContourFilterType;
   typename ContourFilterType::Pointer contour = ContourFilterType::New();
   contour->SetInput( labelImageReader->GetOutput() );
   contour->FullyConnectedOff();
-  contour->SetBackgroundValue( itk::NumericTraits<typename LabelImageType::PixelType>::Zero );
+  contour->SetBackgroundValue( label_zero );
 
   try
     {
@@ -76,56 +93,55 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
     return EXIT_FAILURE;
     }
 
-  typename NodeContainer::Pointer alivePoints = NodeContainer::New();
-  alivePoints->Initialize();
-  unsigned long aliveCount = 0;
-  typename NodeContainer::Pointer trialPoints = NodeContainer::New();
-  trialPoints->Initialize();
-  unsigned long trialCount = 0;
+  typedef typename FastMarchingType::NodeContainerType NodeContainerType;
+  typedef typename FastMarchingType::NodePairType NodePairType;
+  typedef typename FastMarchingType::NodeType NodeType;
 
-  itk::ImageRegionIteratorWithIndex<LabelImageType> ItL( labelImageReader->GetOutput(),
-    labelImageReader->GetOutput()->GetLargestPossibleRegion() );
-  itk::ImageRegionIteratorWithIndex<LabelImageType> ItC( contour->GetOutput(),
-    contour->GetOutput()->GetLargestPossibleRegion() );
-  for( ItL.GoToBegin(), ItC.GoToBegin(); !ItL.IsAtEnd(); ++ItL, ++ItC )
+  NodeContainerType AliveNodes;
+  NodeContainerType TrialNodes;
+
+  itk::ImageRegionIteratorWithIndex<LabelImageType> ItL(
+        labelImageReader->GetOutput(),
+        labelImageReader->GetOutput()->GetLargestPossibleRegion() );
+
+  itk::ImageRegionIteratorWithIndex<LabelImageType> ItC(
+        contour->GetOutput(),
+        contour->GetOutput()->GetLargestPossibleRegion() );
+
+  ItL.GoToBegin();
+  ItC.GoToBegin();
+
+  while( !ItL.IsAtEnd() )
     {
-    if( ItC.Get() != itk::NumericTraits<typename LabelImageType::PixelType>::Zero )
+    if( ItC.Get() != label_zero )
       {
-      typename LabelImageType::IndexType position = ItC.GetIndex();
-
-      NodeType node;
-      const double value = 0.0;
-
-      node.SetValue( value );
-      node.SetIndex( position );
-      trialPoints->InsertElement( trialCount++, node );
+      TrialNodes.push_back( NodePairType( ItC.GetIndex(), 0. ) );
       }
-    else if( ItL.Get() != itk::NumericTraits<typename LabelImageType::PixelType>::Zero )
+    else
       {
-      typename LabelImageType::IndexType position = ItL.GetIndex();
-
-      NodeType node;
-      const double value = 0.0;
-
-      node.SetValue( value );
-      node.SetIndex( position );
-      alivePoints->InsertElement( aliveCount++, node );
+      if( ItL.Get() != label_zero )
+        {
+        AliveNodes.push_back( NodePairType( ItL.GetIndex(), 0. ) );
+        }
       }
+    ++ItL;
+    ++ItC;
     }
-  fastMarching->SetTrialPoints(  trialPoints  );
-  fastMarching->SetAlivePoints(  alivePoints  );
 
-  fastMarching->SetStoppingValue( stoppingValue );
-  fastMarching->SetTopologyCheck( FastMarchingFilterType::None );
+  fastMarching->SetTrialNodes(  TrialNodes  );
+  fastMarching->SetAliveNodes(  AliveNodes  );
+
+  fastMarching->SetTopologyCheck( FastMarchingType::None );
+
   if( argc > 6 && atoi( argv[6] ) == 1 )
     {
     std::cout << "Strict." << std::endl;
-    fastMarching->SetTopologyCheck( FastMarchingFilterType::Strict );
+    fastMarching->SetTopologyCheck( FastMarchingType::Strict );
     }
   if( argc > 6 && atoi( argv[6] ) == 2 )
     {
     std::cout << "No handles." << std::endl;
-    fastMarching->SetTopologyCheck( FastMarchingFilterType::NoHandles );
+    fastMarching->SetTopologyCheck( FastMarchingType::NoHandles );
     }
 
   try
