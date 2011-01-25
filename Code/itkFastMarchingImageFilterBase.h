@@ -199,7 +199,7 @@ protected:
   void InitializeOutput( OutputImageType* oImage );
   double Solve( OutputImageType* oImage,
                const NodeType& iNode,
-               std::vector< InternalNodeStructure > iNeighbors );
+               std::vector< InternalNodeStructure >& ioNeighbors ) const;
 
   /**
    * Functions and variables to check for topology changes (2D/3D only).

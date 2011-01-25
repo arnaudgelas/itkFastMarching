@@ -271,7 +271,7 @@ double
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 Solve( OutputImageType* oImage,
       const NodeType& iNode,
-      std::vector< InternalNodeStructure > iNeighbors )
+      std::vector< InternalNodeStructure >& iNeighbors ) const
 {
   // sort the local list
   std::sort( iNeighbors.begin(), iNeighbors.end() );
