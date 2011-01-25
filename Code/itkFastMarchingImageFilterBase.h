@@ -198,7 +198,7 @@ protected:
   void SetLabelValueForGivenNode( const NodeType& iNode,
                                  const LabelType& iLabel );
   virtual void UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode );
-  void UpdateValue( OutputImageType* oImage, const NodeType& iValue );
+  virtual void UpdateValue( OutputImageType* oImage, const NodeType& iValue );
   bool CheckTopology( OutputImageType* oImage, const NodeType& iNode );
   void InitializeOutput( OutputImageType* oImage );
   double Solve( OutputImageType* oImage,
