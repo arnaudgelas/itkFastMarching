@@ -41,8 +41,14 @@ add_executable( itkFastMarchingImageFilterRealTest1
 target_link_libraries( itkFastMarchingImageFilterRealTest1 ITKCommon )
 
 
-add_test( itkFastMarchingImageFilterRealTest1
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterRealTest1 )
+add_test( itkFastMarchingImageFilterRealTest2
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterRealTest2 )
+
+add_executable( itkFastMarchingImageFilterRealTest2
+  itkFastMarchingImageFilterRealTest2.cxx
+  ${BASE_SOURCE}
+)
+target_link_libraries( itkFastMarchingImageFilterRealTest2 ITKCommon )
 
 # --------------------------------------------------------------------------Topology constrained front propagation
 # --------------------------------------------------------------------------
