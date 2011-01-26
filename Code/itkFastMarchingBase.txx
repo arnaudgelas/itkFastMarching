@@ -70,91 +70,91 @@ PrintSelf( std::ostream & os, Indent indent ) const
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+/*template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
 SetAliveNodes( const NodeContainerType& iNodes )
   {
   m_AliveNodes = iNodes;
   this->Modified();
-  }
+  }*/
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+/*template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
 AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue )
   {
   m_AliveNodes.push_back( NodePairType( iNode, iValue ) );
   this->Modified();
-  }
+  }*/
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+/*template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
 AddAliveNode( const NodePairType& iPair )
   {
   m_AliveNodes.push_back( iPair );
   this->Modified();
-  }
+  }*/
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+/*template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
 SetTrialNodes( NodeContainerType iNodes )
   {
   m_TrialNodes = iNodes;
   this->Modified();
-  }
+  }*/
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+/*template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
 AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue )
   {
   m_TrialNodes.push_back( NodePairType( iNode, iValue ) );
   this->Modified();
-  }
+  }*/
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+/*template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
 AddTrialNode( const NodePairType& iPair )
   {
   m_TrialNodes.push_back( iPair );
   this->Modified();
-  }
+  }*/
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+/*template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
 SetForbiddenNodes( std::vector< NodeType > iNodes )
   {
   m_ForbiddenNodes = iNodes;
   this->Modified();
-  }
+  }*/
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+/*template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
 AddForbiddenNode( const NodeType& iNode )
   {
   m_ForbiddenNodes.push_back( iNode );
   this->Modified();
-  }
+  }*/
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------

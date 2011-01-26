@@ -19,6 +19,8 @@
 #ifndef __itkFastMarchingTraits_h
 #define __itkFastMarchingTraits_h
 
+#include "itkIntTypes.h"
+
 #include "itkImage.h"
 #include "itkImageToImageFilter.h"
 
@@ -38,17 +40,61 @@ template< class TInputDomain,
 class FastMarchingTraits
   {
 public:
-  typedef TInputDomain InputDomainType;
-  typedef typename InputDomainType::Pointer InputDomainPointer;
-  typedef typename InputDomainType::PixelType InputPixelType;
+  typedef TInputDomain                                        InputDomainType;
+  typedef typename InputDomainType::Pointer                   InputDomainPointer;
+  typedef typename InputDomainType::PixelType                 InputPixelType;
 
-  typedef TNode NodeType;
+  typedef TNode                                               NodeType;
 
-  typedef TOutputDomain OutputDomainType;
-  typedef typename OutputDomainType::Pointer OutputDomainPointer;
-  typedef typename OutputDomainType::PixelType OutputPixelType;
+  typedef TOutputDomain                                       OutputDomainType;
+  typedef typename OutputDomainType::Pointer                  OutputDomainPointer;
+  typedef typename OutputDomainType::PixelType                OutputPixelType;
 
-  typedef TSuperclass SuperclassType;
+  class NodePair : public std::pair< NodeType, OutputPixelType >
+    {
+  public:
+    typedef NodePair Self;
+    typedef std::pair< NodeType, OutputPixelType > Superclass;
+
+    NodePair() : Superclass() {}
+    NodePair( const NodeType& iNode, const OutputPixelType& iValue ) :
+      Superclass( iNode, iValue ) {}
+
+    void SetValue( const OutputPixelType& iValue )
+      {
+      this->second = iValue;
+      }
+    OutputPixelType GetValue() const
+      {
+      return this->second;
+      }
+    void SetNode( const NodeType& iNode )
+      {
+      this->first = iNode;
+      }
+    NodeType GetNode() const
+      {
+      return this->first;
+      }
+
+    bool operator < ( const Self& iRight ) const
+      {
+      return this->second > iRight.second;
+      }
+    };
+
+  typedef NodePair                                         NodePairType;
+  typedef VectorContainer< IdentifierType, NodePairType >  NodePairContainerType;
+  typedef typename NodePairContainerType::Pointer          NodePairContainerPointer;
+  typedef typename NodePairContainerType::Iterator         NodePairContainerIterator;
+  typedef typename NodePairContainerType::ConstIterator    NodePairContainerConstIterator;
+
+  typedef VectorContainer< IdentifierType, NodeType >      NodeContainerType;
+  typedef typename NodeContainerType::Pointer              NodeContainerPointer;
+  typedef typename NodeContainerType::Iterator             NodeContainerIterator;
+  typedef typename NodeContainerType::ConstIterator        NodeContainerConstIterator;
+
+  typedef TSuperclass                                      SuperclassType;
 
   // Here concept checking: make sure TValue is scalar!
   };

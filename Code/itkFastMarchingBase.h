@@ -80,17 +80,27 @@ public:
   typedef SmartPointer< const Self >  ConstPointer;
 
 
-  typedef typename Traits::InputDomainType     InputDomainType;
-  typedef typename Traits::InputDomainPointer  InputDomainPointer;
-  typedef typename Traits::InputPixelType      InputPixelType;
+  typedef typename Traits::InputDomainType        InputDomainType;
+  typedef typename Traits::InputDomainPointer     InputDomainPointer;
+  typedef typename Traits::InputPixelType         InputPixelType;
 
-  typedef typename Traits::OutputDomainType     OutputDomainType;
-  typedef typename Traits::OutputDomainPointer  OutputDomainPointer;
-  typedef typename Traits::OutputPixelType      OutputPixelType;
+  typedef typename Traits::OutputDomainType       OutputDomainType;
+  typedef typename Traits::OutputDomainPointer    OutputDomainPointer;
+  typedef typename Traits::OutputPixelType        OutputPixelType;
 
-  typedef typename Traits::NodeType NodeType;
+  typedef typename Traits::NodeType                 NodeType;
+  typedef typename Traits::NodePairType             NodePairType;
+  typedef typename Traits::NodePairContainerType    NodePairContainerType;
+  typedef typename Traits::NodePairContainerPointer NodePairContainerPointer;
+  typedef typename Traits::NodePairContainerConstIterator
+    NodePairContainerConstIterator;
 
-  typedef TStoppingCriterion StoppingCriterionType;
+  typedef typename Traits::NodeContainerType        NodeContainerType;
+  typedef typename Traits::NodeContainerPointer     NodeContainerPointer;
+  typedef typename Traits::NodeContainerConstIterator
+    NodeContainerConstIterator;
+
+  typedef TStoppingCriterion                      StoppingCriterionType;
   typedef typename StoppingCriterionType::Pointer StoppingCriterionPointer;
 
   /*
@@ -137,53 +147,35 @@ public:
   itkSetMacro( TopologyCheck, TopologyCheckType );
   itkGetConstReferenceMacro( TopologyCheck, TopologyCheckType );
 
-  class NodePair : public std::pair< NodeType, OutputPixelType >
-    {
-  public:
-    typedef NodePair Self;
-    typedef std::pair< NodeType, OutputPixelType > Superclass;
+  itkSetObjectMacro( TrialNodes, NodePairContainerType );
+  itkGetObjectMacro( TrialNodes, NodePairContainerType );
 
-    NodePair() : Superclass() {}
-    NodePair( const NodeType& iNode, const OutputPixelType& iValue ) :
-      Superclass( iNode, iValue ) {}
+  itkSetObjectMacro( AliveNodes, NodePairContainerType );
+  itkGetObjectMacro( AliveNodes, NodePairContainerType );
 
-    void SetValue( const OutputPixelType& iValue )
-      {
-      this->second = iValue;
-      }
-    void SetNode( const NodeType& iNode )
-      {
-      this->first = iNode;
-      }
+  itkSetObjectMacro( ProcessedNodes, NodePairContainerType );
+  itkGetObjectMacro( ProcessedNodes, NodePairContainerType );
 
-    bool operator < ( const Self& iRight ) const
-      {
-      return this->second > iRight.second;
-      }
-    };
-
-  typedef typename Self::NodePair NodePairType;
-  typedef std::vector< NodePairType > NodeContainerType;
-  typedef typename NodeContainerType::const_iterator NodeContainerConstIterator;
-  typedef typename NodeContainerType::iterator NodeContainerIterator;
+  itkSetObjectMacro( ForbiddenNodes, NodeContainerType );
+  itkGetObjectMacro( ForbiddenNodes, NodeContainerType );
 
   /** \brief Set the container of Alive Nodes.*/
-  virtual void SetAliveNodes( const NodeContainerType& iNodes );
+  //virtual void SetAliveNodes( const NodeContainerType& iNodes );
 
   /** \brief Add one node as alive to the initial front.
     \param[in] iNode
     \param[in] iValue */
-  virtual void AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue );
-  virtual void AddAliveNode( const NodePairType& iPair );
+  //virtual void AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue );
+  //virtual void AddAliveNode( const NodePairType& iPair );
 
   /** \brief Set the container of Trial Nodes representing the initial front.*/
-  virtual void SetTrialNodes( NodeContainerType iNodes );
-  virtual void AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue );
-  virtual void AddTrialNode( const NodePairType& iPair );
+  //virtual void SetTrialNodes( NodeContainerType iNodes );
+  //virtual void AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue );
+  //virtual void AddTrialNode( const NodePairType& iPair );
 
   /** \brief Set Forbidden Nodes */
-  virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
-  virtual void AddForbiddenNode( const NodeType& iNode );
+  //virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
+  //virtual void AddForbiddenNode( const NodeType& iNode );
 
   /** \brief Set/Get the Stopping Criterion */
   itkGetObjectMacro( StoppingCriterion, StoppingCriterionType );
@@ -204,8 +196,8 @@ public:
   /** Get thConste Collect Points flag. */
   itkGetConstReferenceMacro(CollectPoints, bool);
   itkBooleanMacro(CollectPoints);
-  
-  
+
+
 protected:
 
   /** \brief Constructor */
@@ -223,15 +215,15 @@ protected:
   OutputPixelType m_LargeValue;
   OutputPixelType m_TopologyValue;
 
-  NodeContainerType m_TrialNodes;
-  NodeContainerType m_AliveNodes;
-  NodeContainerType m_ProcessedNodes;
-  std::vector< NodeType > m_ForbiddenNodes;
+  NodePairContainerPointer  m_TrialNodes;
+  NodePairContainerPointer  m_AliveNodes;
+  NodePairContainerPointer  m_ProcessedNodes;
+  NodeContainerPointer      m_ForbiddenNodes;
 
   bool m_CollectPoints;
-  
+
   //PriorityQueuePointer m_Heap;
-  std::priority_queue< NodeType, NodeContainerType > m_Heap;
+  std::priority_queue< NodeType, NodePairContainerType > m_Heap;
 
   TopologyCheckType m_TopologyCheck;
 
