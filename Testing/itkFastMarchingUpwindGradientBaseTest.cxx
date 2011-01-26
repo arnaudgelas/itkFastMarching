@@ -55,7 +55,7 @@ int main(int, char* [] )
 
   CriterionType::Pointer criterion = CriterionType::New();
 
-  typedef itk::FastMarchingUpwindGradientImageFilterBase<
+  typedef itk::IsotropicFastMarchingUpwindGradientImageFilterBase<
       Dimension, PixelType, PixelType, CriterionType > FloatFMType;
 
   FloatFMType::Pointer marcher = FloatFMType::New();

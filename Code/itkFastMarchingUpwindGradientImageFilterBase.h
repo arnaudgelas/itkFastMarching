@@ -57,10 +57,10 @@ namespace itk
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion >
+         class TCriterion,
+         class TSuperclass >
 class ITK_EXPORT FastMarchingUpwindGradientImageFilterBase:
-  public FastMarchingImageFilterBase< VDimension, TInputPixel,
-    TOutputPixel, TCriterion >
+  public TSuperclass
 {
 public:
   /** Standard class typdedefs. */
@@ -75,7 +75,7 @@ public:
 
   /** Run-time type information (and related methods). */
   itkTypeMacro(FastMarchingUpwindGradientImageFilterBase,
-               FastMarchingImageFilterBase);
+               TSuperclass);
 
   /** The dimension of the level set. */
   itkStaticConstMacro(ImageDimension, unsigned int,
@@ -132,6 +132,64 @@ private:
 
   bool m_GenerateGradientImage;
 };
+
+template< unsigned int VDimension,
+         typename TInputPixel,
+         typename TOutputPixel,
+         class TCriterion >
+class ITK_EXPORT IsotropicFastMarchingUpwindGradientImageFilterBase:
+    public FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel,
+    TOutputPixel, TCriterion,
+    FastMarchingImageFilterBase< VDimension, TInputPixel,
+      TOutputPixel, TCriterion >
+    >
+  {
+public:
+  typedef FastMarchingImageFilterBase< VDimension, TInputPixel,
+    TOutputPixel, TCriterion > GrandParentClassType;
+
+  /** Standard class typdedefs. */
+  typedef IsotropicFastMarchingUpwindGradientImageFilterBase             Self;
+  typedef FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel,
+    TOutputPixel, TCriterion, GrandParentClassType > Superclass;
+  typedef SmartPointer< Self >                              Pointer;
+  typedef SmartPointer< const Self >                        ConstPointer;
+
+  /** Method for creation through the object factory. */
+  itkNewMacro(Self);
+
+  /** Run-time type information (and related methods). */
+  itkTypeMacro(IsotropicFastMarchingUpwindGradientImageFilterBase,
+               FastMarchingUpwindGradientImageFilterBase );
+
+  /** The dimension of the level set. */
+  itkStaticConstMacro(ImageDimension, unsigned int,
+                      Superclass::ImageDimension );
+
+  typedef typename Superclass::NodeType        NodeType;
+  typedef typename Superclass::OutputImageType OutputImageType;
+  typedef typename Superclass::OutputPixelType OutputPixelType;
+  typedef typename Superclass::OutputSpacingType OutputSpacingType;
+
+  /** GradientPixel typedef support. */
+  typedef CovariantVector< OutputPixelType,
+                           ImageDimension > GradientPixelType;
+
+  /** GradientImage typedef support. */
+  typedef Image< GradientPixelType,
+                 ImageDimension > GradientImageType;
+
+  /** GradientImagePointer typedef support. */
+  typedef typename GradientImageType::Pointer GradientImagePointer;
+
+protected:
+  IsotropicFastMarchingUpwindGradientImageFilterBase() : Superclass() {}
+  ~IsotropicFastMarchingUpwindGradientImageFilterBase() {}
+
+private:
+  void operator = ( const Self& );
+  IsotropicFastMarchingUpwindGradientImageFilterBase( const Self& );
+  };
 } // namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
