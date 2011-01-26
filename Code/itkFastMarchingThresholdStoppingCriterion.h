@@ -24,6 +24,11 @@
 
 namespace itk
 {
+  /**
+    \class FastMarchingThresholdStoppingCriterion
+    \brief Stopping Criterion is verified when Current Value is Above
+    the provided threshold.
+    */
   template< class TNode,
            typename TValue >
   class FastMarchingThresholdStoppingCriterion :
@@ -68,6 +73,9 @@ namespace itk
     void operator = ( const Self& );
     };
 
+  /** \class FastMarchingImageThresholdStoppingCriterion
+    \brief Partial Specialization of FastMarchingThresholdStoppingCriterion
+    for Image */
   template< class TImage >
   class FastMarchingImageThresholdStoppingCriterion :
     public FastMarchingThresholdStoppingCriterion<
@@ -95,9 +103,6 @@ namespace itk
   protected:
     FastMarchingImageThresholdStoppingCriterion() : Superclass() {}
     ~FastMarchingImageThresholdStoppingCriterion() {}
-
-
-
     };
 
 }
