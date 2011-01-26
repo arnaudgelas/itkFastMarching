@@ -106,28 +106,28 @@ public:
   typedef typename Superclass::InternalNodeStructure InternalNodeStructure;
 
   /** Get one of the extended auxiliary variable image. */
-  AuxImageType * GetAuxiliaryImage(unsigned int idx);
+  AuxImageType * GetAuxiliaryImage( const unsigned int& idx );
 
   /** Set the container auxiliary values at the initial alive points. */
-  void SetAuxiliaryAliveValues(AuxValueContainer values)
+  void SetAuxiliaryAliveValues( const AuxValueContainer& values)
   {
     m_AuxAliveValues = values;
   }
 
   /** Get the container of auxiliary values at the initial alive points. */
-  AuxValueContainer GetAuxiliaryAliveValues(void)
+  AuxValueContainer GetAuxiliaryAliveValues() const
   {
     return m_AuxAliveValues;
   }
 
   /** Set the container of auxiliary values at the initial trial points. */
-  void SetAuxiliaryTrialValues(AuxValueContainer values)
+  void SetAuxiliaryTrialValues(const AuxValueContainer& values)
   {
     m_AuxTrialValues = values;
   }
 
   /** Get the container of auxiliary values at the initial trial points. */
-  AuxValueContainer GetAuxiliaryTrialValues()
+  AuxValueContainer GetAuxiliaryTrialValues() const
   {
     return m_AuxTrialValues;
   }
@@ -161,8 +161,5 @@ private:
 };
 } // namespace itk
 
-#ifndef ITK_MANUAL_INSTANTIATION
 #include "itkFastMarchingExtensionImageFilterBase.txx"
-#endif
-
 #endif

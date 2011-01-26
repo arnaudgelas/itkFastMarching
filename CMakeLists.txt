@@ -16,6 +16,11 @@ set( DATA_DIRECTORY
   ${FMM_SOURCE_DIR}/Data
   )
 
+set( CTEST_CUSTOM_COVERAGE_EXCLUDE
+  ${CTEST_CUSTOM_COVERAGE_EXCLUDE}
+  "/Testing/*"
+)
+
 set( BASE_SOURCE ${FMM_SOURCE_DIR}/Code/itkStoppingCriterionBase.cxx )
 
 include_directories( Code )

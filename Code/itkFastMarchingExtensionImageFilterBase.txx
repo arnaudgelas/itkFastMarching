@@ -35,7 +35,7 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
   this->ProcessObject::SetNumberOfRequiredOutputs(1 + AuxDimension);
 
   AuxImagePointer ptr;
-  for ( unsigned int k = 0; k < VAuxDimension; k++ )
+  for ( unsigned int k = 0; k < AuxDimension; k++ )
     {
     ptr = AuxImageType::New();
     this->ProcessObject::SetNthOutput( k + 1, ptr.GetPointer() );
@@ -72,7 +72,7 @@ typename FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputP
 ::AuxImageType *
 FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
   TCriterion, TAuxValue, VAuxDimension >
-::GetAuxiliaryImage(unsigned int idx)
+::GetAuxiliaryImage(const unsigned int& idx)
 {
   if ( idx >= AuxDimension || this->GetNumberOfOutputs() < idx + 2 )
     {
@@ -102,7 +102,7 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
   // set the size of all the auxiliary outputs
   // to be the same as the primary output
   OutputImageType* primaryOutput = this->GetOutput();
-  for ( unsigned int k = 0; k < VAuxDimension; k++ )
+  for ( unsigned int k = 0; k < AuxDimension; k++ )
     {
     AuxImageType *ptr = this->GetAuxiliaryImage(k);
     ptr->CopyInformation(primaryOutput);
@@ -163,7 +163,7 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
   AuxImagePointer auxImages[AuxDimension];
 
   // allocate memory for the auxiliary outputs
-  for ( unsigned int k = 0; k < VAuxDimension; k++ )
+  for ( unsigned int k = 0; k < AuxDimension; k++ )
     {
     AuxImageType *ptr = this->GetAuxiliaryImage(k);
     ptr->SetBufferedRegion( ptr->GetRequestedRegion() );
@@ -190,7 +190,7 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
       // check if node index is within the output level set
       if ( this->m_BufferedRegion.IsInside( node ) )
         {
-        for ( unsigned int k = 0; k < VAuxDimension; k++ )
+        for ( unsigned int k = 0; k < AuxDimension; k++ )
           {
           auxImages[k]->SetPixel( node, auxVec[k] );
           }
@@ -214,7 +214,7 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
       // check if node index is within the output level set
       if ( this->m_BufferedRegion.IsInside( node ) )
         {
-        for ( unsigned int k = 0; k < VAuxDimension; k++ )
+        for ( unsigned int k = 0; k < AuxDimension; k++ )
           {
           auxImages[k]->SetPixel( node, auxVec[k]);
           }
@@ -314,7 +314,7 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
     this->m_Heap.push( NodePairType( iNode, outputPixel ) );
 
     // update auxiliary values
-    for ( unsigned int k = 0; k < VAuxDimension; k++ )
+    for ( unsigned int k = 0; k < AuxDimension; k++ )
       {
       double       numer = 0.0;
       double       denom = 0.;

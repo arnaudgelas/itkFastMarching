@@ -416,12 +416,15 @@ CheckTopology( OutputImageType* oImage, const NodeType& iNode )
             }
           else
             {
-            for( ItC.GoToBegin(); !ItC.IsAtEnd(); ++ItC )
+            ItC.GoToBegin();
+
+            while( !ItC.IsAtEnd() )
               {
               if( ItC.GetCenterPixel() == otherLabel )
                 {
                 ItC.SetCenterPixel( minLabel );
                 }
+              ++ItC;
               }
             }
           }
