@@ -22,10 +22,40 @@
 #include "itkFastMarchingBase.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
 #include "itkNeighborhoodIterator.h"
+#include "itkFastMarchingTraits.h"
 
 namespace itk
 {
-
+/**
+ * \class FastMarchingImageFilterBase
+ * \brief Fast Marching Method on Image
+ *
+ * The speed function can be specified as a speed image or a
+ * speed constant. The speed image is set using the method
+ * SetInput(). If the speed image is NULL, a constant speed function
+ * is used and is specified using method the SetSpeedConstant().
+ *
+ * If the speed function is constant and of value one, fast marching results
+ * in an approximate distance function from the initial alive points.
+ *
+ * There are two ways to specify the output image information
+ * ( LargestPossibleRegion, Spacing, Origin):
+ * \li it is copied directly from the input speed image
+ * \li it is specified by the user.
+ * Default values are used if the user does not specify all the information.
+ *
+ * The output information is computed as follows.
+ *
+ * If the speed image is NULL or if the OverrideOutputInformation is set to
+ * true, the output information is set from user specified parameters. These
+ * parameters can be specified using methods
+ * \li FastMarchingImageFilterBase::SetOutputRegion(),
+ * \li FastMarchingImageFilterBase::SetOutputSpacing(),
+ * \li FastMarchingImageFilterBase::SetOutputDirection(),
+ * \li FastMarchingImageFilterBase::SetOutputOrigin().
+ *
+ * Else the output information is copied from the input speed image.
+*/
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
@@ -169,7 +199,11 @@ public:
   itkBooleanMacro(OverrideOutputInformation);
 
 protected:
+
+  /** Constructor */
   FastMarchingImageFilterBase();
+
+  /** Destructor */
   ~FastMarchingImageFilterBase();
 
   struct InternalNodeStructure;
@@ -192,23 +226,39 @@ protected:
   LabelImagePointer m_LabelImage;
   ConnectedComponentImagePointer                m_ConnectedComponentImage;
 
+  /** Returns the output value for a given node */
   OutputPixelType GetOutputValue( OutputImageType* oImage,
                                   const NodeType& iNode ) const;
+
+  /** Returns the label value for a given node */
   char GetLabelValueForGivenNode( const NodeType& iNode ) const;
+
+  /** Set the label value for a given node */
   void SetLabelValueForGivenNode( const NodeType& iNode,
                                  const LabelType& iLabel );
+
+  /** Update values for the neighbors of a given node */
   virtual void UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode );
+
+  /** Update value for a given node */
   virtual void UpdateValue( OutputImageType* oImage, const NodeType& iValue );
+
+  /** Make sure the given node does not violate any topological constraint*/
   bool CheckTopology( OutputImageType* oImage, const NodeType& iNode );
   void InitializeOutput( OutputImageType* oImage );
 
+  /** Find the nodes were the front will propagate given a node */
   void GetInternalNodesUsed( OutputImageType* oImage,
                             const NodeType& iNode,
                             std::vector< InternalNodeStructure >& ioNodesUsed );
 
+  /** Solve the quadratic equation */
   double Solve( OutputImageType* oImage,
                const NodeType& iNode,
                std::vector< InternalNodeStructure >& ioNeighbors ) const;
+
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   /**
    * Functions and variables to check for topology changes (2D/3D only).

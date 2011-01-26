@@ -25,6 +25,22 @@ set( BASE_SOURCE ${FMM_SOURCE_DIR}/Code/itkStoppingCriterionBase.cxx )
 
 include_directories( Code )
 
+option( BUILD_DOCUMENTATION "build doxygen doc" OFF )
+
+if( BUILD_DOCUMENTATION )
+  find_package( Doxygen )
+
+  configure_file( ${FMM_SOURCE_DIR}/doxygen.config.in
+    ${FMM_BINARY_DIR}/doxygen.config)
+
+
+  add_custom_target(Documentation ALL
+    COMMAND ${DOXYGEN_EXECUTABLE} ${FMM_BINARY_DIR}/doxygen.config
+    MAIN_DEPENDENCY ${FMM_BINARY_DIR}/doxygen.config
+    WORKING_DIRECTORY ${FMM_BINARY_DIR}/
+  )
+endif()
+
 include( CTest )
 add_subdirectory( Testing )
 

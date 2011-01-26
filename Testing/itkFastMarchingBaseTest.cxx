@@ -16,6 +16,7 @@
  *
  *=========================================================================*/
 
+#include "itkFastMarchingTraits.h"
 #include "itkFastMarchingBase.h"
 #include "itkDefaultStaticMeshTraits.h"
 

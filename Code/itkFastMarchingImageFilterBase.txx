@@ -236,35 +236,38 @@ GetInternalNodesUsed( OutputImageType* oImage,
   InternalNodeStructure temp_node;
   temp_node.m_Node = iNode;
 
+  int s;
+
   for ( unsigned int j = 0; j < ImageDimension; j++ )
     {
     temp_node.m_Value = this->m_LargeValue;
 
     // find smallest valued neighbor in this dimension
-    for ( int s = -1; s < 2; s = s + 2 )
+    for ( s = -1; s < 2; s = s + 2 )
       {
       neighbor_node[j] = iNode[j] + s;
 
       // make sure neighIndex is not outside from the image
-      if ( ( neighbor_node[j] > m_LastIndex[j] ) ||
-           ( neighbor_node[j] < m_StartIndex[j] ) )
+      if ( ( neighbor_node[j] <= m_LastIndex[j] ) &&
+           ( neighbor_node[j] >= m_StartIndex[j] ) )
         {
-        continue;
-        }
-
-      if ( m_LabelImage->GetPixel( neighbor_node ) == Superclass::Alive )
-        {
-        neighValue =
+        if ( m_LabelImage->GetPixel( neighbor_node ) == Superclass::Alive )
+          {
+          neighValue =
             static_cast< OutputPixelType >( oImage->GetPixel( neighbor_node ) );
 
-        // let's find the minimum value given a direction j
-        if ( temp_node.m_Value > neighValue )
-          {
-          temp_node.m_Value = neighValue;
-          temp_node.m_Node = neighbor_node;
-          }
-        }
-      } // end for ( int s = -1; s < 2; s = s + 2 )
+          // let's find the minimum value given a direction j
+          if ( temp_node.m_Value > neighValue )
+            {
+            temp_node.m_Value = neighValue;
+            temp_node.m_Node = neighbor_node;
+            } // if ( temp_node.m_Value > neighValue )
+
+          } // if ( m_LabelImage->GetPixel( neighbor_node ) == ...
+
+        } //  if ( ( neighbor_node[j] <= m_LastIndex[j] ) && ...
+
+      } // for ( int s = -1; s < 2; s = s + 2 )
 
     // put the minimum neighbor onto the heap
     temp_node.m_Axis = j;
@@ -273,7 +276,7 @@ GetInternalNodesUsed( OutputImageType* oImage,
     // reset neighIndex
     neighbor_node[j] = iNode[j];
 
-    } // end for ( unsigned int j = 0; j < SetDimension; j++ )
+    } // for ( unsigned int j = 0; j < SetDimension; j++ )
   }
 // -----------------------------------------------------------------------------
 
@@ -298,8 +301,7 @@ Solve( OutputImageType* oImage,
 
   if ( input )
     {
-    cc =
-      static_cast< double >( input->GetPixel(iNode) ) /
+    cc = static_cast< double >( input->GetPixel(iNode) ) /
         this->m_NormalizationFactor;
     cc = -1.0 * vnl_math_sqr(1.0 / cc);
     }
@@ -373,7 +375,7 @@ CheckTopology( OutputImageType* oImage, const NodeType& iNode )
         oImage->SetPixel( iNode, this->m_TopologyValue );
         this->m_LabelImage->SetPixel( iNode, Superclass::Topology );
         return false;
-        }
+        } // if( ( this->m_TopologyCheck == Superclass::Strict ) && ...
       if( this->m_TopologyCheck == Superclass::NoHandles )
         {
         if( wellComposednessViolation )
@@ -391,8 +393,8 @@ CheckTopology( OutputImageType* oImage, const NodeType& iNode )
             this->m_LabelImage->GetBufferedRegion() );
           ItL.SetLocation( iNode );
 
-          NeighborhoodIterator<ConnectedComponentImageType> ItC(
-                radius, this->m_ConnectedComponentImage,
+          NeighborhoodIterator<ConnectedComponentImageType>
+              ItC( radius, this->m_ConnectedComponentImage,
                 this->m_ConnectedComponentImage->GetBufferedRegion() );
           ItC.SetLocation( iNode );
 
@@ -440,14 +442,16 @@ CheckTopology( OutputImageType* oImage, const NodeType& iNode )
               }
             }
           }
-        }
-      }
+
+        } // if( this->m_TopologyCheck == Superclass::NoHandles )
+
+      } // if( ( ImageDimension == 2 ) || ( ImageDimension == 3 ) )
     else
       {
       itkWarningMacro( << "CheckTopology has not be implemented for Dimension != 2 and != 3."
                     << "m_TopologyCheck should be set to None." );
       }
-    }
+    } // if( this->m_TopologyCheck != Superclass::None )
   return true;
 }
 // -----------------------------------------------------------------------------
