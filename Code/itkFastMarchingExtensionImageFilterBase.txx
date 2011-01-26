@@ -249,54 +249,11 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
   // "Level Set Methods and Fast Marching Methods", J.A. Sethian,
   // Cambridge Press, Second edition, 1999.
 
-  NodeType neighbor_node = iNode;
-
-  OutputPixelType neighValue;
-
   std::vector< InternalNodeStructure > NodesUsed( ImageDimension );
 
-  // just to make sure the index is initialized (really cautious)
+  GetInternalNodesUsed( oImage, iNode, NodesUsed );
+
   InternalNodeStructure temp_node;
-  temp_node.m_Node = iNode;
-
-  for ( unsigned int j = 0; j < ImageDimension; j++ )
-    {
-    temp_node.m_Value = this->m_LargeValue;
-
-    // find smallest valued neighbor in this dimension
-    for ( int s = -1; s < 2; s = s + 2 )
-      {
-      neighbor_node[j] = iNode[j] + s;
-
-      // make sure neighIndex is not outside from the image
-      if ( ( neighbor_node[j] > this->m_LastIndex[j] ) ||
-           ( neighbor_node[j] < this->m_StartIndex[j] ) )
-        {
-        continue;
-        }
-
-      if ( this->m_LabelImage->GetPixel( neighbor_node ) == Superclass::Alive )
-        {
-        neighValue =
-            static_cast< OutputPixelType >( oImage->GetPixel( neighbor_node ) );
-
-        // let's find the minimum value given a direction j
-        if ( temp_node.m_Value > neighValue )
-          {
-          temp_node.m_Value = neighValue;
-          temp_node.m_Node = neighbor_node;
-          }
-        }
-      } // end for ( int s = -1; s < 2; s = s + 2 )
-
-    // put the minimum neighbor onto the heap
-    temp_node.m_Axis = j;
-    NodesUsed[j] = temp_node;
-
-    // reset neighIndex
-    neighbor_node[j] = iNode[j];
-
-    } // end for ( unsigned int j = 0; j < SetDimension; j++ )
 
   OutputPixelType outputPixel =
       static_cast< OutputPixelType >( Solve( oImage, iNode, NodesUsed ) );
@@ -316,7 +273,7 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
     // update auxiliary values
     for ( unsigned int k = 0; k < AuxDimension; k++ )
       {
-      double       numer = 0.0;
+      double       numer = 0.;
       double       denom = 0.;
       AuxValueType auxVal;
 
@@ -334,7 +291,7 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
         denom += outputPixel - temp_node.m_Value;
         }
 
-      if ( denom > 0 )
+      if ( denom > vnl_math::eps )
         {
         auxVal = static_cast< AuxValueType >( numer / denom );
         }

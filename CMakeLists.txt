@@ -18,7 +18,7 @@ set( DATA_DIRECTORY
 
 set( CTEST_CUSTOM_COVERAGE_EXCLUDE
   ${CTEST_CUSTOM_COVERAGE_EXCLUDE}
-  "/Testing/*"
+  "${FMM_SOURCE_DIR}/Testing/*"
 )
 
 set( BASE_SOURCE ${FMM_SOURCE_DIR}/Code/itkStoppingCriterionBase.cxx )

@@ -201,6 +201,11 @@ protected:
   virtual void UpdateValue( OutputImageType* oImage, const NodeType& iValue );
   bool CheckTopology( OutputImageType* oImage, const NodeType& iNode );
   void InitializeOutput( OutputImageType* oImage );
+
+  void GetInternalNodesUsed( OutputImageType* oImage,
+                            const NodeType& iNode,
+                            std::vector< InternalNodeStructure >& ioNodesUsed );
+
   double Solve( OutputImageType* oImage,
                const NodeType& iNode,
                std::vector< InternalNodeStructure >& ioNeighbors ) const;

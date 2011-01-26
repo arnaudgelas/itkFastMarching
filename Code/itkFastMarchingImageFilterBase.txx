@@ -198,11 +198,39 @@ void
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
 UpdateValue( OutputImageType* oImage, const NodeType& iNode )
   {
+  std::vector< InternalNodeStructure > NodesUsed( ImageDimension );
+
+  GetInternalNodesUsed( oImage, iNode, NodesUsed );
+
+  OutputPixelType outputPixel =
+      static_cast< OutputPixelType >( Solve( oImage, iNode, NodesUsed ) );
+
+  if ( outputPixel < this->m_LargeValue )
+    {
+    oImage->SetPixel(iNode, outputPixel);
+
+    // insert point into trial heap
+    m_LabelImage->SetPixel( iNode, Superclass::Trial );
+
+    //node.SetValue( outputPixel );
+    //node.SetIndex( index );
+    //m_TrialHeap.push(node);
+    this->m_Heap.push( NodePairType( iNode, outputPixel ) );
+    }
+  }
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel, class TCriterion >
+void
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion >::
+GetInternalNodesUsed( OutputImageType* oImage,
+                      const NodeType& iNode,
+                      std::vector< InternalNodeStructure >& ioNodesUsed )
+  {
   NodeType neighbor_node = iNode;
 
   OutputPixelType neighValue;
-
-  std::vector< InternalNodeStructure > NodesUsed( ImageDimension );
 
   // just to make sure the index is initialized (really cautious)
   InternalNodeStructure temp_node;
@@ -240,28 +268,12 @@ UpdateValue( OutputImageType* oImage, const NodeType& iNode )
 
     // put the minimum neighbor onto the heap
     temp_node.m_Axis = j;
-    NodesUsed[j] = temp_node;
+    ioNodesUsed[j] = temp_node;
 
     // reset neighIndex
     neighbor_node[j] = iNode[j];
 
     } // end for ( unsigned int j = 0; j < SetDimension; j++ )
-
-  OutputPixelType outputPixel =
-      static_cast< OutputPixelType >( Solve( oImage, iNode, NodesUsed ) );
-
-  if ( outputPixel < this->m_LargeValue )
-    {
-    oImage->SetPixel(iNode, outputPixel);
-
-    // insert point into trial heap
-    m_LabelImage->SetPixel( iNode, Superclass::Trial );
-
-    //node.SetValue( outputPixel );
-    //node.SetIndex( index );
-    //m_TrialHeap.push(node);
-    this->m_Heap.push( NodePairType( iNode, outputPixel ) );
-    }
   }
 // -----------------------------------------------------------------------------
 
