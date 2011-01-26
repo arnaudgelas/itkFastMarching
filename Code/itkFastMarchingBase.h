@@ -19,97 +19,53 @@
 #ifndef __itkFastMarchingBase_h
 #define __itkFastMarchingBase_h
 
-#include "itkImage.h"
-#include "itkImageToImageFilter.h"
-
-#include "itkMesh.h"
-#include "itkMeshToMeshFilter.h"
-
 #include "itkFastMarchingStoppingCriterionBase.h"
 
-#include "itkPriorityQueueContainer.h"
+//#include "itkPriorityQueueContainer.h"
+#include <queue>
 
 namespace itk
 {
-/**  \class FastMarchingTraits
-  \brief
-  */
-template< class TInputDomain,
-          class TNode,
-          class TOutputDomain,
-          class TSuperclass >
-class FastMarchingTraits
-  {
-public:
-  typedef TInputDomain InputDomainType;
-  typedef typename InputDomainType::Pointer InputDomainPointer;
-  typedef typename InputDomainType::PixelType InputPixelType;
-
-  typedef TNode NodeType;
-
-  typedef TOutputDomain OutputDomainType;
-  typedef typename OutputDomainType::Pointer OutputDomainPointer;
-  typedef typename OutputDomainType::PixelType OutputPixelType;
-
-  typedef TSuperclass SuperclassType;
-
-  // Here concept checking: make sure TValue is scalar!
-  };
-
-/**  \class ImageFastMarchingTraits
-  \brief
-*/
-template<unsigned int VDimension,
-         typename TInputPixel,
-         typename TOutputPixel >
-class ImageFastMarchingTraits :
-    public FastMarchingTraits<
-      Image< TInputPixel, VDimension >,
-      Index< VDimension >,
-      Image< TOutputPixel, VDimension >,
-      ImageToImageFilter< Image< TInputPixel, VDimension >,
-                          Image< TOutputPixel, VDimension > >
-    >
-  {};
-
-/**  \class MeshFastMarchingTraits
-  \brief
-*/
-template< unsigned int VDimension,
-          typename TInputPixel,
-          class TInputMeshTraits,
-          typename TOutputPixel,
-          class TOutputMeshTraits >
-class MeshFastMarchingTraits :
-    public FastMarchingTraits<
-      Mesh< TInputPixel, VDimension, TInputMeshTraits >,
-      typename TInputMeshTraits::PointIdentifier,
-      Mesh< TOutputPixel, VDimension, TOutputMeshTraits >,
-      MeshToMeshFilter< Mesh< TInputPixel, VDimension, TInputMeshTraits >,
-                        Mesh< TOutputPixel, VDimension, TOutputMeshTraits > >
-    >
-  {};
-
-
 /**
  * \class FastMarchingBase
- * \brief Solve an Eikonal equation (see equation below) using Fast Marching
+ * \brief Abstract class to solve an Eikonal based-equation using Fast Marching
+ * Method.
  *
  * Fast marching solves an Eikonal equation where the speed is always
  * non-negative and depends on the position only. Starting from an
  * initial position on the front, fast marching systematically moves the
- * front forward one grid point at a time.
+ * front forward one node at a time.
  *
  * Updates are preformed using an entropy satisfy scheme where only
- * "upwind" neighborhoods are used.
+ * "upwind" neighborhoods are used. This implementation of Fast Marching
+ * uses a std::priority_queue to locate the next proper node to
+ * update.
  *
  * Fast Marching sweeps through N grid points in (N log N) steps to obtain
- * the arrival time value as the front propagates through the grid.
+ * the arrival time value as the front propagates through the domain.
  *
  * Implementation of this class is based on Chapter 8 of
  * "Level Set Methods and Fast Marching Methods", J.A. Sethian,
  * Cambridge Press, Second edition, 1999.
  *
+ * The initial front is specified by two containers:
+ * \li one containing the known nodes (Alive Nodes: nodes that are already part
+ * of the object),
+ * \li one containing the trial nodes (Trial Nodes: nodes that are considered
+ * for inclusion).
+ *
+ * In order for the filter to evolve, at least some trial nodes must be
+ * specified. These can for instance be specified as the layer of
+ * nodes around the alive ones.
+ *
+ * The algorithm is terminated early by setting an appropriate stopping
+ * criterion, or if there are no more nodes to process.
+ *
+ * \todo In the current implemenation, std::priority_queue only allows
+ * taking nodes out from the front and putting nodes in from the back.
+ * Use itk::PriorityQueueContainer instead.
+ *
+ * \sa FastMarchingStoppingCriterionBase
 */
 template< class TTraits, class TStoppingCriterion >
 class FastMarchingBase : public TTraits::SuperclassType
@@ -152,24 +108,30 @@ public:
   */
 
 
-  /** Enum of Fast Marching algorithm point types.
-   * Far represent far away points;
-   * Trial represent points within a narrowband of the propagating front;
-   * Alive represent points which have already been processed.
-   * Forbidden represent points where the front can not propagate.
-   * Topology points were trial points but their inclusion
-   * would have violated topology checks.
-   */
-  enum LabelType { Far = 0,
-                   Alive,
-                   Trial,
-                   InitialTrial,
-                   Forbidden,
-                   Topology };
+  /** \enum LabelType Fast Marching algorithm nodes types. */
+  enum LabelType {
+    /** \c Far represent far away nodes*/
+    Far = 0,
+    /** \c Alive represent nodes which have already been processed*/
+    Alive,
+    /** \c Trial represent nodes within a narrowband of the propagating front */
+    Trial,
+    /** \c InitialTrial represent nodes from where the propagation is initiated */
+    InitialTrial,
+    /** \c Forbidden represent nodes where the front can not propagate */
+    Forbidden,
+    /** \c Topology represent trial nodes but their inclusion would have violated
+    topology checks. */
+    Topology };
 
-  enum TopologyCheckType { None = 0,
-                           NoHandles,
-                           Strict };
+  /** \enum TopologyCheckType */
+  enum TopologyCheckType {
+    /** \c None */
+    None = 0,
+    /** \c NoHandles */
+    NoHandles,
+    /** \c Strict */
+    Strict };
 
   /** Set/Get boolean macro indicating whether the user wants to check topology. */
   itkSetMacro( TopologyCheck, TopologyCheckType );
@@ -200,22 +162,21 @@ public:
       }
     };
 
-  //typedef std::pair< NodeType, OutputPixelType > NodePairType;
   typedef typename Self::NodePair NodePairType;
   typedef std::vector< NodePairType > NodeContainerType;
   typedef typename NodeContainerType::const_iterator NodeContainerConstIterator;
   typedef typename NodeContainerType::iterator NodeContainerIterator;
 
-  /** \brief Set Alive nodes representing the initial front. */
-  virtual void SetAliveNodes( NodeContainerType iNodes );
+  /** \brief Set the container of Alive Nodes.*/
+  virtual void SetAliveNodes( const NodeContainerType& iNodes );
 
   /** \brief Add one node as alive to the initial front.
     \param[in] iNode
-    \param[in] ivalue */
+    \param[in] iValue */
   virtual void AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue );
   virtual void AddAliveNode( const NodePairType& iPair );
 
-  /** \brief Set Trial Nodes */
+  /** \brief Set the container of Trial Nodes representing the initial front.*/
   virtual void SetTrialNodes( NodeContainerType iNodes );
   virtual void AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue );
   virtual void AddTrialNode( const NodePairType& iPair );
@@ -224,6 +185,7 @@ public:
   virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
   virtual void AddForbiddenNode( const NodeType& iNode );
 
+  /** \brief Set/Get the Stopping Criterion */
   itkGetObjectMacro( StoppingCriterion, StoppingCriterionType );
   itkSetObjectMacro( StoppingCriterion, StoppingCriterionType );
 
@@ -276,7 +238,7 @@ protected:
   virtual OutputPixelType GetOutputValue( OutputDomainType* oDomain,
                                          const NodeType& iNode ) const = 0;
 
-  /** \brief Get the Label Value for a given node
+  /** \brief Get the LabelType Value for a given node
     \param[in] iNode
     \return its label value  */
   virtual char GetLabelValueForGivenNode( const NodeType& iNode ) const = 0;
@@ -288,22 +250,27 @@ protected:
                                          const LabelType& iLabel ) = 0;
 
   /** \brief Update neighbors to a given node
+    \param[in] oDomain
     \param[in] iNode
   */
   virtual void UpdateNeighbors( OutputDomainType* oDomain,
                                const NodeType& iNode ) = 0;
 
   /** \brief Update value for a given node
+    \param[in] oDomain
     \param[in] iNode
     */
   virtual void UpdateValue( OutputDomainType* oDomain,
                            const NodeType& iNode ) = 0;
 
-  /**    */
+  /** \brief Check if the current node violate topological criterion.
+    \param[in] oDomain
+    \param[in] iNode
+   */
   virtual bool CheckTopology( OutputDomainType* oDomain,
                              const NodeType& iNode ) = 0;
 
-  /**    */
+  /** \brief   */
   void Initialize( OutputDomainType* oDomain );
 
   /**    */

@@ -118,16 +118,17 @@ namespace itk
       }
 
   protected:
-    FastMarchingThresholdStoppingCriterion() : Superclass()
+    FastMarchingReachedTargetNodesStoppingCriterion() : Superclass()
     {
       m_TargetCondition = NoTargets;
       m_Satisfied = false;
       m_Initialized = false;
     }
-    ~FastMarchingThresholdStoppingCriterion() {}
+    ~FastMarchingReachedTargetNodesStoppingCriterion() {}
 
     TargetConditionType m_TargetCondition;
     std::vector< NodeType > m_TargetNodes;
+    std::vector< NodeType > m_ReachedTargetNodes;
     size_t m_NumberOfTargetsToBeReached;
     bool m_Satisfied;
     bool m_Initialized;
@@ -160,8 +161,37 @@ namespace itk
       }
 
   private:
-    FastMarchingThresholdStoppingCriterion( const Self& );
+    FastMarchingReachedTargetNodesStoppingCriterion( const Self& );
     void operator = ( const Self& );
+    };
+
+  template< class TImage >
+  class FastMarchingImageReachedTargetNodesStoppingCriterion :
+    public FastMarchingReachedTargetNodesStoppingCriterion<
+      typename TImage::IndexType,
+      typename TImage::PixelType >
+    {
+  public:
+    typedef TImage ImageType;
+    typedef typename ImageType::IndexType NodeType;
+    typedef typename ImageType::PixelType ValueType;
+
+    typedef FastMarchingImageReachedTargetNodesStoppingCriterion Self;
+    typedef FastMarchingReachedTargetNodesStoppingCriterion< NodeType,
+      ValueType > Superclass;
+    typedef SmartPointer< Self >              Pointer;
+    typedef SmartPointer< const Self >        ConstPointer;
+
+    /** Method for creation through the object factory. */
+    itkNewMacro(Self);
+
+    /** Run-time type information (and related methods). */
+    itkTypeMacro(FastMarchingImageReachedTargetNodesStoppingCriterion,
+                 FastMarchingReachedTargetNodesStoppingCriterion );
+
+  protected:
+    FastMarchingImageReachedTargetNodesStoppingCriterion() : Superclass() {}
+    ~FastMarchingImageReachedTargetNodesStoppingCriterion() {}
     };
 }
 #endif // __itkFastMarchingThresholdStoppingCriterion_h

@@ -26,8 +26,8 @@ namespace itk
 {
 
  /** \class FastMarchingStoppingCriterionBase
-
- */
+   \brief Abstract Stopping Criterion dedicated for Fast Marching Methods
+  */
  template< class TNode,
           typename TValue >
  class FastMarchingStoppingCriterionBase : public StoppingCriterionBase
@@ -44,8 +44,10 @@ namespace itk
   /** Run-time type information (and related methods). */
   itkTypeMacro(FastMarchingStoppingCriterionBase, StoppingCriterionBase);
 
+  /** Set the Current Node */
   virtual void SetCurrentNode( const NodeType& iNode ) = 0;
 
+  /** Set the Current Value */
   void SetCurrentValue( const ValueType& iValue )
   {
     m_PreviousValue = m_CurrentValue;
@@ -53,11 +55,13 @@ namespace itk
   }
 
  protected:
+  /** Constructor */
   FastMarchingStoppingCriterionBase() : Superclass()
   {
     m_CurrentValue = NumericTraits< ValueType >::Zero;
     m_PreviousValue = NumericTraits< ValueType >::Zero;
   }
+  /** Destructor */
   virtual ~FastMarchingStoppingCriterionBase() {}
 
   ValueType m_PreviousValue;

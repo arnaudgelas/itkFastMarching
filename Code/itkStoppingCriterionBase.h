@@ -25,6 +25,14 @@
 
 namespace itk
 {
+/**
+  * \class StoppingCriterionBase
+  * \brief Abstract base class to represent a stopping criterion for an iterative
+  * algorithm.
+  *
+  * The main method is StoppingCriterionBase::IsSatisfied that must be
+  * reimplemented in inheriting classes.
+*/
 class StoppingCriterionBase : public Object
 {
 public:
@@ -35,10 +43,15 @@ public:
 
   itkTypeMacro(StoppingCriterionBase, Object);
 
+  /** \return \c true if the stopping criterion is reached (and the algorithm
+  must stop).
+      \return \c fasle else. */
   virtual bool IsSatisfied() const = 0;
 
 protected:
+  /** \brief Constructor */
   StoppingCriterionBase();
+  /** \brief Destructor */
   virtual ~StoppingCriterionBase();
 
 private:

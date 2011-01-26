@@ -73,7 +73,7 @@ PrintSelf( std::ostream & os, Indent indent ) const
 template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
-SetAliveNodes( NodeContainerType iNodes )
+SetAliveNodes( const NodeContainerType& iNodes )
   {
   m_AliveNodes = iNodes;
   this->Modified();
@@ -188,7 +188,7 @@ Initialize( OutputDomainType* oDomain )
     }
   */
 
-  InitializeOutput( oDomain );
+  this->InitializeOutput( oDomain );
   }
 // -----------------------------------------------------------------------------
 
