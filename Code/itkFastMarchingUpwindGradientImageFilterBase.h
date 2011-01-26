@@ -41,18 +41,8 @@ namespace itk
  * information only propagates from points where the wavefront has already
  * passed. This is consistent with how the fast marching method works.
  *
- * One more extra feature is the possibility to define a set of Target points
- * where the propagation stops. This can be used to avoid computing the Eikonal
- * solution for the whole domain.  The front can be stopped either when one
- * Target point is reached or all Target points are reached. The propagation
- * can stop after a time TargetOffset has passed since the stop condition is
- * met. This way the solution is computed a bit downstream the Target points,
- * so that the level sets of T(x) corresponding to the Target are smooth.
- *
- *
  * \author Luca Antiga Ph.D.  Biomedical Technologies Laboratory,
  *                            Bioengineering Deparment, Mario Negri Institute, Italy.
- *
  */
 template< unsigned int VDimension,
          typename TInputPixel,
@@ -112,6 +102,7 @@ public:
 protected:
   FastMarchingUpwindGradientImageFilterBase();
   ~FastMarchingUpwindGradientImageFilterBase(){}
+
   void PrintSelf(std::ostream & os, Indent indent) const;
 
   virtual void InitializeOutput( OutputImageType* oImage );
