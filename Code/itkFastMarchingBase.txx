@@ -242,7 +242,12 @@ GenerateData()
 
           if( this->CheckTopology( output, current_node ) )
             {
-            // set this node as alive
+            if ( m_CollectPoints )
+              {
+              m_ProcessedNodes.push_back( current_node_pair );
+              }
+
+              // set this node as alive
             this->SetLabelValueForGivenNode( current_node, Alive );
 
             // update its neighbors

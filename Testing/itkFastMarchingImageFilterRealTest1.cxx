@@ -194,17 +194,19 @@ int main(int argc, char* argv[] )
     ++iterator;
     }
 
+  std::cout << "SpeedConstant: " << marcher->GetSpeedConstant() << std::endl;
+  std::cout << "StoppingValue: " << marcher->GetTargetReachedValue() << std::endl;
+  std::cout << "SpeedImage: " << marcher->GetInput() << std::endl;
+  
   // Exercise other member functions
   /*
-  std::cout << "SpeedConstant: " << marcher->GetSpeedConstant() << std::endl;
-  std::cout << "StoppingValue: " << marcher->GetStoppingValue() << std::endl;
   std::cout << "CollectPoints: " << marcher->GetCollectPoints() << std::endl;
 
   marcher->SetNormalizationFactor( 2.0 );
   std::cout << "NormalizationFactor: " << marcher->GetNormalizationFactor();
   std::cout << std::endl;
 
-  std::cout << "SpeedImage: " << marcher->GetInput();
+
   std::cout << std::endl;
 
   marcher->Print( std::cout );*/

@@ -227,7 +227,23 @@ public:
   itkGetObjectMacro( StoppingCriterion, StoppingCriterionType );
   itkSetObjectMacro( StoppingCriterion, StoppingCriterionType );
 
+  itkGetMacro( SpeedConstant, double );
+  itkSetMacro( SpeedConstant, double );
 
+  itkGetMacro( TargetReachedValue, OutputPixelType );
+  itkSetMacro( TargetReachedValue, OutputPixelType );
+
+  /** Set the Collect Points flag. Instrument the algorithm to collect
+  * a container of all nodes which it has visited. Useful for
+  * creating Narrowbands for level set algorithms that supports
+  * narrow banding. */
+  itkSetMacro(CollectPoints, bool);
+
+  /** Get thConste Collect Points flag. */
+  itkGetConstReferenceMacro(CollectPoints, bool);
+  itkBooleanMacro(CollectPoints);
+  
+  
 protected:
 
   /** \brief Constructor */
@@ -247,8 +263,11 @@ protected:
 
   NodeContainerType m_TrialNodes;
   NodeContainerType m_AliveNodes;
+  NodeContainerType m_ProcessedNodes;
   std::vector< NodeType > m_ForbiddenNodes;
 
+  bool m_CollectPoints;
+  
   //PriorityQueuePointer m_Heap;
   std::priority_queue< NodeType, NodeContainerType > m_Heap;
 
