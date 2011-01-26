@@ -72,7 +72,7 @@ class FastMarchingBase : public TTraits::SuperclassType
   {
 public:
   typedef TTraits                               Traits;
-  typedef typename Traits::SuperclassType     SuperclassType;
+  typedef typename Traits::SuperclassType       SuperclassType;
 
   typedef FastMarchingBase            Self;
   typedef SuperclassType              Superclass;
@@ -223,7 +223,8 @@ protected:
   bool m_CollectPoints;
 
   //PriorityQueuePointer m_Heap;
-  std::priority_queue< NodeType, NodePairContainerType > m_Heap;
+  typedef std::vector< NodePairType > HeapContainerType;
+  std::priority_queue< NodeType, HeapContainerType > m_Heap;
 
   TopologyCheckType m_TopologyCheck;
 

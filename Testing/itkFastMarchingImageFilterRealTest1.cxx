@@ -99,8 +99,8 @@ int main(int argc, char* argv[] )
 
   marcher->SetAliveNodes( alive );
 
-
   // setup trial points
+  NodePairContainerType::Pointer trial = NodePairContainerType::New();
   node_pair.SetValue( 1.0 );
 
   index.Fill(0);
@@ -108,27 +108,29 @@ int main(int argc, char* argv[] )
 
   index[0] += 1;
   node_pair.SetNode( index );
-  marcher->AddTrialNode( node_pair );
+  trial->push_back( node_pair );
 
   index[0] -= 1;
   index[1] += 1;
   node_pair.SetNode( index );
-  marcher->AddTrialNode( node_pair );
+  trial->push_back( node_pair );
 
   index[0] -= 1;
   index[1] -= 1;
   node_pair.SetNode( index );
-  marcher->AddTrialNode( node_pair );
+  trial->push_back( node_pair );
 
   index[0] += 1;
   index[1] -= 1;
   node_pair.SetNode( index );
-  marcher->AddTrialNode( node_pair );
+  trial->push_back( node_pair );
 
   node_pair.SetValue( 42.0 );
   index.Fill( 300 ); // this node is out of ranage
   node_pair.SetNode( index );
-  marcher->AddTrialNode( node_pair );
+  trial->push_back( node_pair );
+
+  marcher->SetTrialNodes( trial );
 
   // specify the size of the output image
   FloatImageType::SizeType size = {{64,64}};

@@ -32,6 +32,9 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
   TCriterion, TAuxValue, VAuxDimension >
 ::FastMarchingExtensionImageFilterBase()
 {
+  m_AuxiliaryAliveValues = NULL;
+  m_AuxiliaryTrialValues = NULL;
+
   this->ProcessObject::SetNumberOfRequiredOutputs(1 + AuxDimension);
 
   AuxImagePointer ptr;
@@ -55,9 +58,9 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
 {
   Superclass::PrintSelf(os, indent);
   os << indent << "Aux alive values: ";
-  //os << m_AuxAliveValues.GetPointer() << std::endl;
+  //os << m_AuxiliaryAliveValues.GetPointer() << std::endl;
   os << indent << "Aux trail values: ";
-  //os << m_AuxTrialValues.GetPointer() << std::endl;
+  //os << m_AuxiliaryTrialValues.GetPointer() << std::endl;
 }
 
 
@@ -150,12 +153,20 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
 {
   this->Superclass::InitializeOutput( oImage );
 
-  if ( m_AuxAliveValues.size() != ( this->m_AliveNodes.size() ) )
+  if ( !m_AuxiliaryAliveValues )
+    {
+    itkExceptionMacro(<< "in Initialize(): Null pointer for AuxAliveValues");
+    }
+  if ( m_AuxiliaryAliveValues->size() != ( this->m_AliveNodes->size() ) )
     {
     itkExceptionMacro(<< "in Initialize(): AuxAliveValues is the wrong size");
     }
 
-  if ( m_AuxTrialValues.size() != this->m_TrialNodes.size() )
+  if( !m_AuxiliaryTrialValues )
+    {
+    itkExceptionMacro(<< "in Initialize(): Null pointer for AuxTrialValues");
+    }
+  if ( m_AuxiliaryTrialValues->size() != this->m_TrialNodes->size() )
     {
     itkExceptionMacro(<< "in Initialize(): AuxTrialValues is the wrong size");
     }
@@ -176,16 +187,16 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
 
   AuxValueVectorType auxVec;
 
-  if ( !m_AuxAliveValues.empty() )
+  if ( m_AuxiliaryAliveValues )
     {
-    AuxValueContainerConstIterator auxIter = m_AuxAliveValues.begin();
-    NodeContainerConstIterator pointsIter =  this->m_AliveNodes.begin();
-    NodeContainerConstIterator pointsEnd =  this->m_AliveNodes.end();
+    AuxValueContainerConstIterator auxIter = m_AuxiliaryAliveValues->Begin();
+    NodePairContainerConstIterator pointsIter =  this->m_AliveNodes->Begin();
+    NodePairContainerConstIterator pointsEnd =  this->m_AliveNodes->Begin();
 
     while( pointsIter != pointsEnd )
       {
-      node = pointsIter->first;
-      auxVec = *auxIter;
+      node = pointsIter->Value().GetNode();
+      auxVec = auxIter->Value();
 
       // check if node index is within the output level set
       if ( this->m_BufferedRegion.IsInside( node ) )
@@ -200,16 +211,16 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
       } // end container while
     }   // if AuxAliveValues set
 
-  if ( !m_AuxTrialValues.empty() )
+  if ( m_AuxiliaryTrialValues )
     {
-    AuxValueContainerConstIterator auxIter = m_AuxTrialValues.begin();
-    NodeContainerConstIterator pointsIter =  this->m_TrialNodes.begin();
-    NodeContainerConstIterator pointsEnd =  this->m_TrialNodes.end();
+    AuxValueContainerConstIterator auxIter = m_AuxiliaryTrialValues->Begin();
+    NodePairContainerConstIterator pointsIter =  this->m_TrialNodes->Begin();
+    NodePairContainerConstIterator pointsEnd =  this->m_TrialNodes->End();
 
     while ( pointsIter != pointsEnd )
       {
-      node = pointsIter->first;
-      auxVec = *auxIter;
+      node = pointsIter->Value().GetNode();
+      auxVec = auxIter->Value();
 
       // check if node index is within the output level set
       if ( this->m_BufferedRegion.IsInside( node ) )

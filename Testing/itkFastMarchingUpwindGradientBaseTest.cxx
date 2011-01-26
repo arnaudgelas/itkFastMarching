@@ -71,45 +71,45 @@ int main(int, char* [] )
 
   typedef FloatFMType::NodeType     NodeType;
   typedef FloatFMType::NodePairType NodePairType;
-  typedef FloatFMType::NodeContainerType NodeContainerType;
+  typedef FloatFMType::NodePairContainerType NodePairContainerType;
 
   // setup alive points
-  NodeContainerType AliveNodes;
+  NodePairContainerType::Pointer AliveNodes = NodePairContainerType::New();
 
   FloatImageType::OffsetType offset0 = {{28,35}};
 
   itk::Index<2> index;
   index.Fill(0);
 
-  AliveNodes.push_back( NodePairType( index + offset0, 0. ) );
-  AliveNodes.push_back( NodePairType( index + offset0, 42. ) );
+  AliveNodes->push_back( NodePairType( index + offset0, 0. ) );
+  AliveNodes->push_back( NodePairType( index + offset0, 42. ) );
 
   marcher->SetAliveNodes( AliveNodes );
 
 
   // setup trial points
-  NodeContainerType TrialNodes;
+  NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
 
   index.Fill(0);
   index += offset0;
 
   index[0] += 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index[0] -= 1;
   index[1] += 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index[0] -= 1;
   index[1] -= 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index[0] += 1;
   index[1] -= 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index.Fill( 300 ); // this node is out of ranage
-  TrialNodes.push_back( NodePairType( index, 42. ) );
+  TrialNodes->push_back( NodePairType( index, 42. ) );
 
   marcher->SetTrialNodes( TrialNodes );
 

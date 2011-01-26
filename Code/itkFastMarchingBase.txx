@@ -25,7 +25,9 @@
 #include "itkMesh.h"
 #include "itkMeshToMeshFilter.h"
 
-#include "itkPriorityQueueContainer.h"
+#include "itkFastMarchingBase.h"
+
+//#include "itkPriorityQueueContainer.h"
 
 namespace itk
 {
@@ -244,7 +246,7 @@ GenerateData()
             {
             if ( m_CollectPoints )
               {
-              m_ProcessedNodes.push_back( current_node_pair );
+              m_ProcessedNodes->push_back( current_node_pair );
               }
 
               // set this node as alive
