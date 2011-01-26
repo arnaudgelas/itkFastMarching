@@ -20,47 +20,65 @@
 #include "itkFastMarchingThresholdStoppingCriterion.h"
 #include "itkImage.h"
 
+template< unsigned int VDimension >
+int FastMarchingImageFilterBase( )
+  {
+  typedef float PixelType;
+
+  typedef itk::Image< PixelType, VDimension > ImageType;
+  typename ImageType::Pointer input = ImageType::New();
+
+  typedef itk::FastMarchingImageThresholdStoppingCriterion< ImageType >
+      CriterionType;
+
+  typedef itk::FastMarchingImageFilterBase<
+      VDimension,
+      PixelType,
+      PixelType,
+      CriterionType > FMMType;
+  typename FMMType::Pointer fmm = FMMType::New();
+  fmm->SetInput( input );
+
+  bool exception_caught = false;
+
+  try
+    {
+    fmm->Update();
+    }
+  catch( itk::ExceptionObject & excep )
+    {
+    std::cerr << "Exception caught !" << std::endl;
+    std::cerr << excep << std::endl;
+    exception_caught = true;
+    }
+
+  if( !exception_caught )
+    {
+    std::cout <<"Exception is not caught!" <<std::endl;
+    return EXIT_FAILURE;
+    }
+
+  typename ImageType::Pointer output = fmm->GetOutput();
+
+  return EXIT_SUCCESS;
+  }
+
+
+// ----------------------------------------------------------------------------
 int main( int argc, char** argv )
   {
   (void) argc;
   (void) argv;
 
-  const unsigned int Dimension2 = 2;
-  typedef float PixelType;
-
-  typedef itk::Image< PixelType, Dimension2 > Image2DType;
-  Image2DType::Pointer input2d = Image2DType::New();
-
-  typedef itk::FastMarchingImageThresholdStoppingCriterion< Image2DType >
-      CriterionType2D;
-
-  typedef itk::FastMarchingImageFilterBase<
-      Dimension2,
-      PixelType,
-      PixelType,
-      CriterionType2D > FMM2DType;
-  FMM2DType::Pointer fmm2d = FMM2DType::New();
-  fmm2d->SetInput( input2d );
-  fmm2d->Update();
-
-  Image2DType::Pointer output2d = fmm2d->GetOutput();
-
-  const unsigned int Dimension3 = 3;
-  typedef itk::Image< float, Dimension3 > Image3DType;
-  Image3DType::Pointer input3d = Image3DType::New();
-
-  typedef itk::FastMarchingImageThresholdStoppingCriterion< Image3DType >
-      CriterionType3D;
-
-  typedef itk::FastMarchingImageFilterBase< Dimension3,
-      float,
-      float,
-      CriterionType3D > FMM3DType;
-  FMM3DType::Pointer fmm3d = FMM3DType::New();
-  fmm3d->SetInput( input3d );
-  fmm3d->Update();
-
-  Image3DType::Pointer output3d = fmm3d->GetOutput();
-
+  if( FastMarchingImageFilterBase< 2 >() == EXIT_FAILURE )
+    {
+    std::cerr << "2D Fails" <<std::endl;
+    return EXIT_FAILURE;
+    }
+  if( FastMarchingImageFilterBase< 3 >() == EXIT_FAILURE )
+    {
+    std::cerr << "3D Fails" <<std::endl;
+    return EXIT_FAILURE;
+    }
   return EXIT_SUCCESS;
   }

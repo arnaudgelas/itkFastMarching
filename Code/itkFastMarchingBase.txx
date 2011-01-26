@@ -73,7 +73,7 @@ PrintSelf( std::ostream & os, Indent indent ) const
 template< class TTraits, class TCriterion >
 void
 FastMarchingBase< TTraits, TCriterion >::
-SetAliveNodes( NodeContainerType iNodes )
+SetAliveNodes( const NodeContainerType& iNodes )
   {
   m_AliveNodes = iNodes;
   this->Modified();
@@ -188,7 +188,7 @@ Initialize( OutputDomainType* oDomain )
     }
   */
 
-  InitializeOutput( oDomain );
+  this->InitializeOutput( oDomain );
   }
 // -----------------------------------------------------------------------------
 
@@ -242,7 +242,12 @@ GenerateData()
 
           if( this->CheckTopology( output, current_node ) )
             {
-            // set this node as alive
+            if ( m_CollectPoints )
+              {
+              m_ProcessedNodes.push_back( current_node_pair );
+              }
+
+              // set this node as alive
             this->SetLabelValueForGivenNode( current_node, Alive );
 
             // update its neighbors

@@ -22,6 +22,7 @@
 #include "itkFastMarchingThresholdStoppingCriterion.h"
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"
+#include "itkImageRegionIteratorWithIndex.h"
 #include "itkTextOutput.h"
 #include "itkCommand.h"
 
@@ -137,16 +138,37 @@ int main(int argc, char* argv[] )
   speedImage->SetBufferedRegion( region );
   speedImage->Allocate();
 
+  // setup a binary mask image in float (to make sure it works with float)
+  FloatImageType::Pointer MaskImage = FloatImageType::New();
+  MaskImage->SetLargestPossibleRegion( region );
+  MaskImage->SetBufferedRegion( region );
+  MaskImage->Allocate();
+
   itk::ImageRegionIterator<FloatImageType>
     speedIter( speedImage, speedImage->GetBufferedRegion() );
+  itk::ImageRegionIteratorWithIndex<FloatImageType>
+    maskIter( MaskImage, MaskImage->GetBufferedRegion() );
   while ( !speedIter.IsAtEnd() )
     {
     speedIter.Set( 1.0 );
+    FloatImageType::IndexType idx = maskIter.GetIndex();
+    if( ( ( idx[0] > 22 ) && ( idx [0] < 42 ) && ( idx[1] > 27 ) && ( idx[1] < 37 ) ) ||
+        ( ( idx[1] > 22 ) && ( idx [1] < 42 ) && ( idx[0] > 27 ) && ( idx[0] < 37 ) ) )
+      {
+      maskIter.Set( 1.0 );
+      }
+    else
+      {
+      maskIter.Set( 0.0 );
+      }
+
+    ++maskIter;
     ++speedIter;
     }
 
   speedImage->Print( std::cout );
   marcher->SetInput( speedImage );
+  marcher->SetBinaryMask( MaskImage.GetPointer() );
 
   // turn on debugging
   marcher->DebugOn();
@@ -156,33 +178,33 @@ int main(int argc, char* argv[] )
 
   // check the results
   FloatImageType::Pointer output = marcher->GetOutput();
-
   itk::ImageRegionIterator<FloatImageType>
     iterator( output, output->GetBufferedRegion() );
 
   bool passed = true;
 
-  while ( !iterator.IsAtEnd() )
+  for(; !iterator.IsAtEnd(); ++iterator )
     {
-
-    FloatImageType::IndexType tempIndex;
     double distance;
-    float outputValue;
 
-    tempIndex = iterator.GetIndex();
-    tempIndex -= offset0;
-    distance = 0.0;
-    for ( int j = 0; j < 2; j++ )
+    FloatImageType::IndexType tempIndex = iterator.GetIndex();
+    float outputValue = (float) iterator.Get();
+
+    if( ( ( tempIndex[0] > 22 ) && ( tempIndex [0] < 42 ) && ( tempIndex[1] > 27 ) && ( tempIndex[1] < 37 ) ) ||
+        ( ( tempIndex[1] > 22 ) && ( tempIndex [1] < 42 ) && ( tempIndex[0] > 27 ) && ( tempIndex[0] < 37 ) ) )
       {
-      distance += tempIndex[j] * tempIndex[j];
-      }
-    distance = vcl_sqrt( distance );
+      tempIndex -= offset0;
+      distance = 0.0;
+      for ( int j = 0; j < 2; j++ )
+        {
+          distance += tempIndex[j] * tempIndex[j];
+        }
+      distance = vcl_sqrt( distance );
 
-    outputValue = iterator.Get();
-
-    //std::cout << iterator.GetIndex() <<" ** " <<outputValue <<std::endl;
-    if (distance != 0)
-      {
+      if (distance != 0)
+        {
+        continue;
+        }
       if ( vnl_math_abs( outputValue ) / distance > 1.42 )
         {
         std::cout << iterator.GetIndex() << " ";
@@ -191,25 +213,32 @@ int main(int argc, char* argv[] )
         passed = false;
         }
       }
-    ++iterator;
+    else
+      {
+      if( outputValue != 0. )
+        {
+        std::cout << iterator.GetIndex() << " ";
+        std::cout << outputValue << " " << 0.;
+        std::cout << std::endl;
+        passed = false;
+        }
+      }
     }
 
-  std::cout << "SpeedConstant: " << marcher->GetSpeedConstant() << std::endl;
-  std::cout << "StoppingValue: " << marcher->GetTargetReachedValue() << std::endl;
-  std::cout << "SpeedImage: " << marcher->GetInput() << std::endl;
-  
   // Exercise other member functions
   /*
+  std::cout << "SpeedConstant: " << marcher->GetSpeedConstant() << std::endl;
+  std::cout << "StoppingValue: " << marcher->GetStoppingValue() << std::endl;
   std::cout << "CollectPoints: " << marcher->GetCollectPoints() << std::endl;
 
   marcher->SetNormalizationFactor( 2.0 );
   std::cout << "NormalizationFactor: " << marcher->GetNormalizationFactor();
   std::cout << std::endl;
 
+  std::cout << "SpeedImage: " << marcher->GetInput();
+  std::cout << std::endl;*/
 
-  std::cout << std::endl;
-
-  marcher->Print( std::cout );*/
+  marcher->Print( std::cout );
 
   if ( passed )
     {
