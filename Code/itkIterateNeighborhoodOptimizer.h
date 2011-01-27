@@ -9,8 +9,8 @@
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -22,7 +22,7 @@
 
 namespace itk
 {
-  
+
 /** \class IterateNeighborhoodOptimizer
  * \brief Finds the local minima/maxima by iteratively choosing the
  *        minimum/maximum value in a neighborhood.
@@ -30,9 +30,9 @@ namespace itk
  * This optimizer is designed to operate on a monotonic cost function
  * WITHOUT using gradient information (derivatives). The user must set
  * the Neighborhood size, and optionally the connectivity.
- * 
+ *
  * \ingroup Numerics Optimizers
- */  
+ */
 class ITK_EXPORT IterateNeighborhoodOptimizer :
     public SingleValuedNonLinearOptimizer
 {
@@ -76,7 +76,7 @@ public:
   /** Stop optimization.
    * \sa ResumeOptimization */
   void StopOptimization( void );
-  
+
   /**
    * Get/set whether the nieghborhood is defined by face connectivity or
    * by face+edge+vertex connectivity.  Default is FullyConnectedOn.
@@ -106,7 +106,7 @@ protected:
 private:
   IterateNeighborhoodOptimizer(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
-  
+
   bool                 m_Stop;
   bool                 m_Maximize;
   bool                 m_FullyConnected;
@@ -117,9 +117,5 @@ private:
 };
 
 } // end namespace itk
-
-#ifndef ITK_MANUAL_INSTANTIATION
-#include "itkIterateNeighborhoodOptimizer.txx"
-#endif
 
 #endif

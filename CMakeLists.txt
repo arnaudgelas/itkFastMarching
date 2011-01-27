@@ -30,7 +30,10 @@ set( CTEST_CUSTOM_COVERAGE_EXCLUDE
   "${FMM_SOURCE_DIR}/Testing/*"
 )
 
-set( BASE_SOURCE ${FMM_SOURCE_DIR}/Code/itkStoppingCriterionBase.cxx )
+set( BASE_SOURCE
+  ${FMM_SOURCE_DIR}/Code/itkStoppingCriterionBase.cxx
+  ${FMM_SOURCE_DIR}/Code/itkIterateNeighborhoodOptimizer.cxx
+)
 
 include_directories( Code )
 

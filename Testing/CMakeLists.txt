@@ -5,7 +5,7 @@ MAKE_DIRECTORY(${TESTING_OUTPUT_PATH})
 add_executable( itkFastMarchingBaseTest
   itkFastMarchingBaseTest.cxx
 )
-target_link_libraries( itkFastMarchingBaseTest ITKCommon )
+target_link_libraries( itkFastMarchingBaseTest ITKCommon ITKNumerics )
 
 add_test( itkImageFastMarchingBaseTest
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingBaseTest 0
@@ -18,7 +18,7 @@ add_test( itkMeshFastMarchingBaseTest
 add_executable( itkFastMarchingImageFilterBaseTest
   itkFastMarchingImageFilterBaseTest.cxx
 )
-target_link_libraries( itkFastMarchingImageFilterBaseTest ITKCommon )
+target_link_libraries( itkFastMarchingImageFilterBaseTest ITKCommon ITKNumerics )
 
 add_test( itkFastMarchingImageFilterBaseTest
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterBaseTest
@@ -29,20 +29,20 @@ add_executable( itkFastMarchingStoppingCriterionBaseTest
   itkFastMarchingStoppingCriterionBaseTest.cxx
   ${BASE_SOURCE}
 )
-target_link_libraries( itkFastMarchingStoppingCriterionBaseTest ITKCommon )
+target_link_libraries( itkFastMarchingStoppingCriterionBaseTest ITKCommon ITKNumerics )
 
 
 add_executable( itkFastMarchingThresholdStoppingCriterionTest
   itkFastMarchingThresholdStoppingCriterionTest.cxx
   ${BASE_SOURCE}
 )
-target_link_libraries( itkFastMarchingThresholdStoppingCriterionTest ITKCommon )
+target_link_libraries( itkFastMarchingThresholdStoppingCriterionTest ITKCommon ITKNumerics )
 
 add_executable( itkFastMarchingImageFilterRealTest1
   itkFastMarchingImageFilterRealTest1.cxx
   ${BASE_SOURCE}
 )
-target_link_libraries( itkFastMarchingImageFilterRealTest1 ITKCommon )
+target_link_libraries( itkFastMarchingImageFilterRealTest1 ITKCommon ITKNumerics )
 
 
 add_test( itkFastMarchingImageFilterRealTest1
@@ -53,7 +53,7 @@ add_executable( itkFastMarchingImageFilterRealTest2
   itkFastMarchingImageFilterRealTest2.cxx
   ${BASE_SOURCE}
 )
-target_link_libraries( itkFastMarchingImageFilterRealTest2 ITKCommon )
+target_link_libraries( itkFastMarchingImageFilterRealTest2 ITKCommon ITKNumerics )
 
 add_test( itkFastMarchingImageFilterRealTest2
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingImageFilterRealTest2 )
@@ -64,7 +64,7 @@ add_executable( itkFastMarchingUpwindGradientBaseTest
   ${BASE_SOURCE}
 )
 
-target_link_libraries( itkFastMarchingUpwindGradientBaseTest ITKCommon )
+target_link_libraries( itkFastMarchingUpwindGradientBaseTest ITKCommon ITKNumerics )
 
 add_test( itkFastMarchingUpwindGradientBaseTest
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingUpwindGradientBaseTest )
@@ -73,7 +73,7 @@ add_executable( itkFastMarchingExtensionImageFilterTest
   itkFastMarchingExtensionImageFilterTest.cxx
   ${BASE_SOURCE}
 )
-target_link_libraries( itkFastMarchingExtensionImageFilterTest ITKCommon )
+target_link_libraries( itkFastMarchingExtensionImageFilterTest ITKCommon ITKNumerics )
 
 add_test( itkFastMarchingExtensionImageFilterTest
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingExtensionImageFilterTest )
@@ -87,7 +87,7 @@ ADD_EXECUTABLE( itkFastMarchingImageTopologicalTest
   itkFastMarchingImageTopologicalTest.cxx
   ${BASE_SOURCE}
 )
-TARGET_LINK_LIBRARIES( itkFastMarchingImageTopologicalTest ITKCommon ITKIO )
+TARGET_LINK_LIBRARIES( itkFastMarchingImageTopologicalTest ITKCommon ITKNumerics ITKIO )
 
 ## 2-D
 
@@ -190,11 +190,11 @@ SET(Source_Test_Files
 )
 
 # Main library
-ADD_EXECUTABLE(MinimalPathMain main.cxx)
+ADD_EXECUTABLE(MinimalPathMain main.cxx ${BASE_SOURCE})
 TARGET_LINK_LIBRARIES(MinimalPathMain ${ITK_LIBRARIES})
 
 #Add source test driver exe
-ADD_EXECUTABLE( MinimalPathTestDriver MinimalPathTestDriver.cxx ${Source_Test_Files} )
+ADD_EXECUTABLE( MinimalPathTestDriver MinimalPathTestDriver.cxx ${Source_Test_Files} ${BASE_SOURCE} )
 TARGET_LINK_LIBRARIES( MinimalPathTestDriver ${ITK_LIBRARIES} )
 
 #Add tests for the source images
