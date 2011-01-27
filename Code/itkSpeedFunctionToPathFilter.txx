@@ -105,9 +105,6 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
     indexTargetNext
     );
 
-  std::cout << indexTargetPrevious << std::endl;
-  std::cout << indexTargetNext << std::endl;
-    
   // Update the method and set the arrival function
   typename std::vector< NodeType > TargetNodes;
   TargetNodes.push_back( indexTargetPrevious );
@@ -123,8 +120,6 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
     m_Info[Superclass::m_CurrentOutput].GetCurrentFrontAndAdvance(),
     indexTrial
   );
-
-  std::cout << indexTrial << std::endl;
 
   typename NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
   TrialNodes->push_back( NodePairType( indexTrial, 0.0 ) );

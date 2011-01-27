@@ -109,7 +109,10 @@ namespace itk
           ++pointsIter;
           }
         }
-      m_Satisfied = false;
+      else
+        {
+        m_Satisfied = false;
+        }
       }
 
     bool IsSatisfied() const
