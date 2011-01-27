@@ -27,7 +27,6 @@
 #include "itkMesh.h"
 #include "itkMeshToMeshFilter.h"
 
-
 namespace itk
 {
 /**  \class FastMarchingTraits
@@ -96,7 +95,13 @@ public:
 
   typedef TSuperclass                                      SuperclassType;
 
-  // Here concept checking: make sure TValue is scalar!
+#ifdef ITK_USE_CONCEPT_CHECKING
+  itkConceptMacro( DoubleConvertibleOutputCheck,
+                  ( Concept::Convertible< double, OutputPixelType > ) );
+
+  itkConceptMacro( OutputOStreamWritableCheck,
+                  ( Concept::OStreamWritable< OutputPixelType > ) );
+#endif
   };
 
 /**  \class ImageFastMarchingTraits

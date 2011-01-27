@@ -159,24 +159,6 @@ public:
   itkSetObjectMacro( ForbiddenNodes, NodeContainerType );
   itkGetObjectMacro( ForbiddenNodes, NodeContainerType );
 
-  /** \brief Set the container of Alive Nodes.*/
-  //virtual void SetAliveNodes( const NodeContainerType& iNodes );
-
-  /** \brief Add one node as alive to the initial front.
-    \param[in] iNode
-    \param[in] iValue */
-  //virtual void AddAliveNode( const NodeType& iNode, const OutputPixelType& iValue );
-  //virtual void AddAliveNode( const NodePairType& iPair );
-
-  /** \brief Set the container of Trial Nodes representing the initial front.*/
-  //virtual void SetTrialNodes( NodeContainerType iNodes );
-  //virtual void AddTrialNode( const NodeType& iNode, const OutputPixelType& iValue );
-  //virtual void AddTrialNode( const NodePairType& iPair );
-
-  /** \brief Set Forbidden Nodes */
-  //virtual void SetForbiddenNodes( std::vector< NodeType > iNodes );
-  //virtual void AddForbiddenNode( const NodeType& iNode );
-
   /** \brief Set/Get the Stopping Criterion */
   itkGetObjectMacro( StoppingCriterion, StoppingCriterionType );
   itkSetObjectMacro( StoppingCriterion, StoppingCriterionType );
