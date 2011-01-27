@@ -67,7 +67,7 @@ namespace itk
  *
  * \sa FastMarchingStoppingCriterionBase
 */
-template< class TTraits, class TStoppingCriterion >
+template< class TTraits >
 class FastMarchingBase : public TTraits::SuperclassType
   {
 public:
@@ -100,7 +100,8 @@ public:
   typedef typename Traits::NodeContainerConstIterator
     NodeContainerConstIterator;
 
-  typedef TStoppingCriterion                      StoppingCriterionType;
+  typedef FastMarchingStoppingCriterionBase< NodeType, OutputPixelType >
+    StoppingCriterionType;
   typedef typename StoppingCriterionType::Pointer StoppingCriterionPointer;
 
   /*

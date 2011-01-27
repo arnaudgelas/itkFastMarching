@@ -56,7 +56,7 @@ int main(int argc, char* argv[] )
   typedef itk::FastMarchingImageThresholdStoppingCriterion< FloatImageType >
       CriterionType;
 
-  typedef itk::FastMarchingImageFilterBase< Dimension, PixelType, PixelType, CriterionType >
+  typedef itk::FastMarchingImageFilterBase< Dimension, PixelType, PixelType >
     FastMarchingType;
 
   CriterionType::Pointer criterion = CriterionType::New();

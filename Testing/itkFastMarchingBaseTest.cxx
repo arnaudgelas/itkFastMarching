@@ -22,13 +22,13 @@
 
 namespace itk
 {
-template< class TTraits, class TCriterion >
+template< class TTraits >
 class FastMarchingBaseTestHelper :
-    public FastMarchingBase< TTraits, TCriterion >
+    public FastMarchingBase< TTraits >
 {
 public:
   typedef FastMarchingBaseTestHelper Self;
-  typedef FastMarchingBase< TTraits, TCriterion > Superclass;
+  typedef FastMarchingBase< TTraits > Superclass;
   typedef SmartPointer< Self > Pointer;
   typedef SmartPointer< const Self > ConstPointer;
 
@@ -113,7 +113,7 @@ int main( int argc, char* argv[] )
 
     InputImageType::Pointer input = InputImageType::New();
 
-    typedef itk::FastMarchingBaseTestHelper< ImageTraits, ImageCriterionType >
+    typedef itk::FastMarchingBaseTestHelper< ImageTraits >
         ImageFastMarching;
     ImageFastMarching::Pointer fmm = ImageFastMarching::New();
     fmm->SetInput( input );
@@ -152,7 +152,7 @@ int main( int argc, char* argv[] )
       typedef MeshTraits::InputDomainType InputMeshType;
       InputMeshType::Pointer input = InputMeshType::New();
 
-      typedef itk::FastMarchingBaseTestHelper< MeshTraits, MeshCriterionType >
+      typedef itk::FastMarchingBaseTestHelper< MeshTraits >
           MeshFastMarching;
       MeshFastMarching::Pointer fmm = MeshFastMarching::New();
       fmm->SetInput( input );

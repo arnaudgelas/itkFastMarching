@@ -47,7 +47,6 @@ namespace itk
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TSuperclass >
 class ITK_EXPORT FastMarchingUpwindGradientImageFilterBase:
   public TSuperclass
@@ -56,7 +55,7 @@ public:
   /** Standard class typdedefs. */
   typedef FastMarchingUpwindGradientImageFilterBase             Self;
   typedef FastMarchingImageFilterBase< VDimension, TInputPixel,
-    TOutputPixel, TCriterion > Superclass;
+    TOutputPixel > Superclass;
   typedef SmartPointer< Self >                              Pointer;
   typedef SmartPointer< const Self >                        ConstPointer;
 
@@ -126,23 +125,21 @@ private:
 
 template< unsigned int VDimension,
          typename TInputPixel,
-         typename TOutputPixel,
-         class TCriterion >
+         typename TOutputPixel >
 class ITK_EXPORT IsotropicFastMarchingUpwindGradientImageFilterBase:
     public FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel,
-    TOutputPixel, TCriterion,
-    FastMarchingImageFilterBase< VDimension, TInputPixel,
-      TOutputPixel, TCriterion >
+    TOutputPixel,
+    FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >
     >
   {
 public:
   typedef FastMarchingImageFilterBase< VDimension, TInputPixel,
-    TOutputPixel, TCriterion > GrandParentClassType;
+    TOutputPixel > GrandParentClassType;
 
   /** Standard class typdedefs. */
   typedef IsotropicFastMarchingUpwindGradientImageFilterBase             Self;
   typedef FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel,
-    TOutputPixel, TCriterion, GrandParentClassType > Superclass;
+    TOutputPixel, GrandParentClassType > Superclass;
   typedef SmartPointer< Self >                              Pointer;
   typedef SmartPointer< const Self >                        ConstPointer;
 
