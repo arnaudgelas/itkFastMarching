@@ -32,9 +32,8 @@ namespace itk
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TSuperclass >
-FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion, TSuperclass >
+FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TSuperclass >
 ::FastMarchingUpwindGradientImageFilterBase()
 {
   m_GradientImage = GradientImageType::New();
@@ -47,10 +46,9 @@ FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TSuperclass >
 void
-FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion, TSuperclass >
+FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TSuperclass >
 ::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
@@ -64,10 +62,9 @@ FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TSuperclass >
 void
-FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion, TSuperclass >::
+FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TSuperclass >::
 InitializeOutput(OutputImageType *output)
 {
   Superclass::InitializeOutput(output);
@@ -105,10 +102,9 @@ InitializeOutput(OutputImageType *output)
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TSuperclass >
 void
-FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion, TSuperclass >::
+FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TSuperclass >::
 UpdateNeighbors(
   OutputImageType* oImage,
   const NodeType& iNode )
@@ -127,10 +123,9 @@ UpdateNeighbors(
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TSuperclass >
 void
-FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TCriterion, TSuperclass >
+FastMarchingUpwindGradientImageFilterBase< VDimension, TInputPixel, TOutputPixel, TSuperclass >
 ::ComputeGradient( OutputImageType* oImage,
                   const NodeType& iNode )
 {

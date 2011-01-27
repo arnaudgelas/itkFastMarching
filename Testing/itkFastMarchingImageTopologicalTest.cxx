@@ -47,7 +47,7 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
     }
 
   typedef itk::FastMarchingImageFilterBase< VDimension,
-      InternalPixelType, InternalPixelType, CriterionType > FastMarchingType;
+      InternalPixelType, InternalPixelType > FastMarchingType;
   typedef typename FastMarchingType::Pointer FastMarchingPointer;
 
   FastMarchingPointer fastMarching = FastMarchingType::New();

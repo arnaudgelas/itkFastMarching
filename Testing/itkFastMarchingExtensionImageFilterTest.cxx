@@ -55,7 +55,7 @@ int main(int, char* [] )
 
 
   typedef itk::FastMarchingExtensionImageFilterBase<
-      Dimension, PixelType, PixelType, CriterionType, unsigned char, 1 >
+      Dimension, PixelType, PixelType, unsigned char, 1 >
       MarcherType;
 
   MarcherType::Pointer marcher = MarcherType::New();
