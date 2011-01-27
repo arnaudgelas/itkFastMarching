@@ -32,8 +32,8 @@
 namespace itk
 {
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
-FastMarchingBase< TTraits, TCriterion >::
+template< class TTraits >
+FastMarchingBase< TTraits >::
 FastMarchingBase()
   {
   this->ProcessObject::SetNumberOfRequiredInputs(0);
@@ -55,17 +55,17 @@ FastMarchingBase()
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
-FastMarchingBase< TTraits, TCriterion >::
+template< class TTraits >
+FastMarchingBase< TTraits >::
 ~FastMarchingBase()
   {
   }
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+template< class TTraits >
 void
-FastMarchingBase< TTraits, TCriterion >::
+FastMarchingBase< TTraits >::
 PrintSelf( std::ostream & os, Indent indent ) const
   {
   Superclass::PrintSelf( os, indent );
@@ -77,9 +77,9 @@ PrintSelf( std::ostream & os, Indent indent ) const
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+template< class TTraits >
 void
-FastMarchingBase< TTraits, TCriterion >::
+FastMarchingBase< TTraits >::
 Initialize( OutputDomainType* oDomain )
   {
   if( m_TrialNodes.IsNull() )
@@ -123,9 +123,9 @@ Initialize( OutputDomainType* oDomain )
 // -----------------------------------------------------------------------------
 
 // -----------------------------------------------------------------------------
-template< class TTraits, class TCriterion >
+template< class TTraits >
 void
-FastMarchingBase< TTraits, TCriterion >::
+FastMarchingBase< TTraits >::
 GenerateData()
   {
   OutputDomainType* output = this->GetOutput();

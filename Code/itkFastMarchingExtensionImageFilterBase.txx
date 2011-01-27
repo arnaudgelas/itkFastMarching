@@ -25,11 +25,10 @@ namespace itk
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TAuxValue,
          unsigned int VAuxDimension >
 FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
-  TCriterion, TAuxValue, VAuxDimension >
+  TAuxValue, VAuxDimension >
 ::FastMarchingExtensionImageFilterBase()
 {
   m_AuxiliaryAliveValues = NULL;
@@ -48,12 +47,11 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TAuxValue,
          unsigned int VAuxDimension >
 void
 FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
-  TCriterion, TAuxValue, VAuxDimension >
+  TAuxValue, VAuxDimension >
 ::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
@@ -67,14 +65,13 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
  template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TAuxValue,
          unsigned int VAuxDimension >
 typename FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
-  TCriterion, TAuxValue, VAuxDimension >
+  TAuxValue, VAuxDimension >
 ::AuxImageType *
 FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
-  TCriterion, TAuxValue, VAuxDimension >
+  TAuxValue, VAuxDimension >
 ::GetAuxiliaryImage(const unsigned int& idx)
 {
   if ( idx >= AuxDimension || this->GetNumberOfOutputs() < idx + 2 )
@@ -91,12 +88,11 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TAuxValue,
          unsigned int VAuxDimension >
 void
 FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
-  TCriterion, TAuxValue, VAuxDimension >
+  TAuxValue, VAuxDimension >
 ::GenerateOutputInformation()
 {
   // call the superclass implementation of this function
@@ -118,12 +114,11 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TAuxValue,
          unsigned int VAuxDimension >
 void
 FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
-  TCriterion, TAuxValue, VAuxDimension >
+  TAuxValue, VAuxDimension >
 ::EnlargeOutputRequestedRegion(
   DataObject *itkNotUsed(output) )
 {
@@ -143,12 +138,11 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TAuxValue,
          unsigned int VAuxDimension >
 void
 FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
-  TCriterion, TAuxValue, VAuxDimension >
+  TAuxValue, VAuxDimension >
 ::InitializeOutput(OutputImageType* oImage)
 {
   this->Superclass::InitializeOutput( oImage );
@@ -239,12 +233,11 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          class TAuxValue,
          unsigned int VAuxDimension >
 void
 FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
-  TCriterion, TAuxValue, VAuxDimension >
+  TAuxValue, VAuxDimension >
 ::UpdateValue( OutputImageType* oImage, const NodeType& iNode )
 {
   // A extension value at node is choosen such that

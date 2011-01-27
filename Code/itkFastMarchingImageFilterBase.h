@@ -58,19 +58,17 @@ namespace itk
 */
 template< unsigned int VDimension,
          typename TInputPixel,
-         typename TOutputPixel,
-         class TCriterion >
+         typename TOutputPixel >
 class FastMarchingImageFilterBase :
     public FastMarchingBase<
-      ImageFastMarchingTraits< VDimension, TInputPixel, TOutputPixel >,
-      TCriterion
+      ImageFastMarchingTraits< VDimension, TInputPixel, TOutputPixel >
     >
   {
 public:
   typedef ImageFastMarchingTraits< VDimension, TInputPixel, TOutputPixel > Traits;
 
   typedef FastMarchingImageFilterBase            Self;
-  typedef FastMarchingBase< Traits, TCriterion >             Superclass;
+  typedef FastMarchingBase< Traits >             Superclass;
   typedef SmartPointer< Self >        Pointer;
   typedef SmartPointer< const Self >  ConstPointer;
 

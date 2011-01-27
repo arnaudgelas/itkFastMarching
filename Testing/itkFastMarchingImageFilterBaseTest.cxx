@@ -34,8 +34,7 @@ int FastMarchingImageFilterBase( )
   typedef itk::FastMarchingImageFilterBase<
       VDimension,
       PixelType,
-      PixelType,
-      CriterionType > FMMType;
+      PixelType > FMMType;
   typename FMMType::Pointer fmm = FMMType::New();
   fmm->SetInput( input );
 

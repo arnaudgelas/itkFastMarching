@@ -50,18 +50,17 @@ namespace itk
 template< unsigned int VDimension,
          typename TInputPixel,
          typename TOutputPixel,
-         class TCriterion,
          typename TAuxValue,
          unsigned int VAuxDimension >
 class ITK_EXPORT FastMarchingExtensionImageFilterBase:
   public FastMarchingImageFilterBase< VDimension, TInputPixel,
-    TOutputPixel, TCriterion >
+    TOutputPixel >
 {
 public:
   /** Standard class typdedefs. */
   typedef FastMarchingExtensionImageFilterBase                  Self;
   typedef FastMarchingImageFilterBase< VDimension, TInputPixel,
-    TOutputPixel, TCriterion > Superclass;
+    TOutputPixel > Superclass;
   typedef SmartPointer< Self >                              Pointer;
   typedef SmartPointer< const Self >                        ConstPointer;
 
