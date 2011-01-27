@@ -303,6 +303,8 @@ Solve( OutputImageType* oImage,
       const NodeType& iNode,
       std::vector< InternalNodeStructure >& iNeighbors ) const
 {
+  (void) oImage;
+
   // sort the local list
   std::sort( iNeighbors.begin(), iNeighbors.end() );
 
@@ -338,7 +340,7 @@ Solve( OutputImageType* oImage,
       axis = n_it->m_Axis;
 
       // spaceFactor = \frac{1}{spacing[axis]^2}
-      spaceFactor = vnl_math_sqr(1.0 / m_Spacing[axis]);
+      spaceFactor = vnl_math_sqr(1.0 / m_OutputSpacing[axis]);
 
       aa += spaceFactor;
       bb += value * spaceFactor;
