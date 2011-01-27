@@ -165,15 +165,24 @@ FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode )
   {
   NodeType neighIndex = iNode;
+
   unsigned char label;
+
+  typename NodeType::IndexValueType v, start, last;
+
+  int s;
 
   for ( unsigned int j = 0; j < ImageDimension; j++ )
     {
-    for( int s = -1; s < 2; s+= 2 )
+    v = iNode[j];
+    start = m_StartIndex[j];
+    last = m_LastIndex[j];
+
+    for( s = -1; s < 2; s+= 2 )
       {
-      if ( ( iNode[j] > m_StartIndex[j] ) && ( iNode[j] < m_LastIndex[j] ) )
+      if ( ( v > start ) && ( v < last ) )
         {
-        neighIndex[j] = iNode[j] + s;
+        neighIndex[j] = v + s;
         }
       label = m_LabelImage->GetPixel(neighIndex);
 
@@ -186,7 +195,7 @@ UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode )
       }
 
     //reset neighIndex
-    neighIndex[j] = iNode[j];
+    neighIndex[j] = v;
     }
   }
 // -----------------------------------------------------------------------------
@@ -235,21 +244,28 @@ GetInternalNodesUsed( OutputImageType* oImage,
   InternalNodeStructure temp_node;
   temp_node.m_Node = iNode;
 
+  typename NodeType::IndexValueType v, start, last, temp;
+
   int s;
 
   for ( unsigned int j = 0; j < ImageDimension; j++ )
     {
     temp_node.m_Value = this->m_LargeValue;
 
+    v = iNode[j];
+    start = m_StartIndex[j];
+    last = m_LastIndex[j];
+
     // find smallest valued neighbor in this dimension
     for ( s = -1; s < 2; s = s + 2 )
       {
-      neighbor_node[j] = iNode[j] + s;
+      temp = v + s;
 
       // make sure neighIndex is not outside from the image
-      if ( ( neighbor_node[j] <= m_LastIndex[j] ) &&
-           ( neighbor_node[j] >= m_StartIndex[j] ) )
+      if ( ( temp <= last ) && ( temp >= start ) )
         {
+        neighbor_node[j] = temp;
+
         if ( m_LabelImage->GetPixel( neighbor_node ) == Superclass::Alive )
           {
           neighValue =
@@ -273,7 +289,7 @@ GetInternalNodesUsed( OutputImageType* oImage,
     ioNodesUsed[j] = temp_node;
 
     // reset neighIndex
-    neighbor_node[j] = iNode[j];
+    neighbor_node[j] = v;
 
     } // for ( unsigned int j = 0; j < SetDimension; j++ )
   }
@@ -287,6 +303,8 @@ Solve( OutputImageType* oImage,
       const NodeType& iNode,
       std::vector< InternalNodeStructure >& iNeighbors ) const
 {
+  (void) oImage;
+
   // sort the local list
   std::sort( iNeighbors.begin(), iNeighbors.end() );
 
@@ -305,8 +323,6 @@ Solve( OutputImageType* oImage,
     cc = -1.0 * vnl_math_sqr(1.0 / cc);
     }
 
-  OutputSpacingType spacing = oImage->GetSpacing();
-
   double discrim = 0.;
   double value = 0.;
   double spaceFactor = 0.;
@@ -324,7 +340,7 @@ Solve( OutputImageType* oImage,
       axis = n_it->m_Axis;
 
       // spaceFactor = \frac{1}{spacing[axis]^2}
-      spaceFactor = vnl_math_sqr(1.0 / spacing[axis]);
+      spaceFactor = vnl_math_sqr(1.0 / m_OutputSpacing[axis]);
 
       aa += spaceFactor;
       bb += value * spaceFactor;
@@ -470,6 +486,10 @@ InitializeOutput( OutputImageType* oImage )
   m_StartIndex = m_BufferedRegion.GetIndex();
   m_LastIndex = m_StartIndex + m_BufferedRegion.GetSize();
 
+  m_OutputSpacing = oImage->GetSpacing();
+  m_OutputOrigin = oImage->GetOrigin();
+  m_OutputDirection = oImage->GetDirection();
+
   typename OutputImageType::OffsetType offset;
   offset.Fill(1);
   m_LastIndex -= offset;
@@ -479,17 +499,17 @@ InitializeOutput( OutputImageType* oImage )
   if( this->m_TopologyCheck == Superclass::NoHandles )
     {
     m_ConnectedComponentImage = ConnectedComponentImageType::New();
-    m_ConnectedComponentImage->SetOrigin( oImage->GetOrigin() );
-    m_ConnectedComponentImage->SetSpacing( oImage->GetSpacing() );
-    m_ConnectedComponentImage->SetRegions( oImage->GetBufferedRegion() );
-    m_ConnectedComponentImage->SetDirection( oImage->GetDirection() );
+    m_ConnectedComponentImage->SetOrigin( m_OutputOrigin );
+    m_ConnectedComponentImage->SetSpacing( m_OutputSpacing );
+    m_ConnectedComponentImage->SetRegions( m_BufferedRegion );
+    m_ConnectedComponentImage->SetDirection( m_OutputDirection );
     m_ConnectedComponentImage->Allocate();
     m_ConnectedComponentImage->FillBuffer( 0 );
     }
 
   // allocate memory for the PointTypeImage
   m_LabelImage->CopyInformation(oImage);
-  m_LabelImage->SetBufferedRegion( oImage->GetBufferedRegion() );
+  m_LabelImage->SetBufferedRegion( m_BufferedRegion );
   m_LabelImage->Allocate();
   m_LabelImage->FillBuffer( Superclass::Far );
 
