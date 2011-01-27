@@ -165,15 +165,22 @@ FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode )
   {
   NodeType neighIndex = iNode;
+
   unsigned char label;
+
+  typename NodeType::IndexValueType v, start, last;
 
   for ( unsigned int j = 0; j < ImageDimension; j++ )
     {
+    v = iNode[j];
+    start = m_StartIndex[j];
+    last = m_LastIndex[j];
+
     for( int s = -1; s < 2; s+= 2 )
       {
-      if ( ( iNode[j] > m_StartIndex[j] ) && ( iNode[j] < m_LastIndex[j] ) )
+      if ( ( v > start ) && ( v < last ) )
         {
-        neighIndex[j] = iNode[j] + s;
+        neighIndex[j] = v + s;
         }
       label = m_LabelImage->GetPixel(neighIndex);
 
@@ -186,7 +193,7 @@ UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode )
       }
 
     //reset neighIndex
-    neighIndex[j] = iNode[j];
+    neighIndex[j] = v;
     }
   }
 // -----------------------------------------------------------------------------
@@ -235,21 +242,28 @@ GetInternalNodesUsed( OutputImageType* oImage,
   InternalNodeStructure temp_node;
   temp_node.m_Node = iNode;
 
+  typename NodeType::IndexValueType v, start, last, temp;
+
   int s;
 
   for ( unsigned int j = 0; j < ImageDimension; j++ )
     {
     temp_node.m_Value = this->m_LargeValue;
 
+    v = iNode[j];
+    start = m_StartIndex[j];
+    last = m_LastIndex[j];
+
     // find smallest valued neighbor in this dimension
     for ( s = -1; s < 2; s = s + 2 )
       {
-      neighbor_node[j] = iNode[j] + s;
+      temp = v + s;
 
       // make sure neighIndex is not outside from the image
-      if ( ( neighbor_node[j] <= m_LastIndex[j] ) &&
-           ( neighbor_node[j] >= m_StartIndex[j] ) )
+      if ( ( temp <= last ) && ( temp >= start ) )
         {
+        neighbor_node[j] = temp;
+
         if ( m_LabelImage->GetPixel( neighbor_node ) == Superclass::Alive )
           {
           neighValue =
@@ -273,7 +287,7 @@ GetInternalNodesUsed( OutputImageType* oImage,
     ioNodesUsed[j] = temp_node;
 
     // reset neighIndex
-    neighbor_node[j] = iNode[j];
+    neighbor_node[j] = v;
 
     } // for ( unsigned int j = 0; j < SetDimension; j++ )
   }
