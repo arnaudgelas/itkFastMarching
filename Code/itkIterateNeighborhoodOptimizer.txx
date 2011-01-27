@@ -9,8 +9,8 @@
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -99,10 +99,10 @@ IterateNeighborhoodOptimizer
       {
       break;
       }
-  
+
     AdvanceOneStep();
 
-    m_CurrentIteration++;
+    ++m_CurrentIteration;
     }
 }
 
@@ -129,31 +129,34 @@ IterateNeighborhoodOptimizer
   const unsigned int spaceDimension = m_CostFunction->GetNumberOfParameters();
   const ParametersType & currentPosition = this->GetCurrentPosition();
   ParametersType newPosition( spaceDimension );
-  ParametersType neighborPosition( currentPosition );
   double bestValue = m_CurrentValue;
 
   if ( !m_FullyConnected )
     {
     // Iterate face connected values
-    for(unsigned int j=0; j<spaceDimension; j+=1)
+    for(unsigned int j=0; j<spaceDimension; j++)
       {
       for(int i=-1; i<=1; i+=2)
         {
         // Get the neighborhood position
         ParametersType neighborPosition( currentPosition );
         neighborPosition[j] += i * m_NeighborhoodSize[j];
-        
+
         // Check if this value is better than current
         double neighborValue = m_CostFunction->GetValue( neighborPosition );
+
         if ( m_Maximize && neighborValue > bestValue )
           {
           bestValue = neighborValue;
           newPosition = neighborPosition;
           }
-        else if ( !m_Maximize && neighborValue < bestValue )
+        else
           {
-          bestValue = neighborValue;
-          newPosition = neighborPosition;
+          if ( !m_Maximize && neighborValue < bestValue )
+            {
+            bestValue = neighborValue;
+            newPosition = neighborPosition;
+            }
           }
         }
       }
@@ -171,7 +174,7 @@ IterateNeighborhoodOptimizer
           ParametersType neighborPosition( currentPosition );
           neighborPosition[0] += i * m_NeighborhoodSize[0];
           neighborPosition[1] += j * m_NeighborhoodSize[1];
-        
+
           // Check if this value is better than current
           double neighborValue = m_CostFunction->GetValue( neighborPosition );
           if ( m_Maximize && neighborValue > bestValue )
@@ -179,36 +182,50 @@ IterateNeighborhoodOptimizer
             bestValue = neighborValue;
             newPosition = neighborPosition;
             }
-          else if ( !m_Maximize && neighborValue < bestValue )
+          else
             {
-            bestValue = neighborValue;
-            newPosition = neighborPosition;
+            if ( !m_Maximize && neighborValue < bestValue )
+              {
+              bestValue = neighborValue;
+              newPosition = neighborPosition;
+              }
             }
           }// end spaceDimension == 2
-        else if ( spaceDimension == 3 )
+        else
           {
-          for(int k=-1; k<=1; k+=1)
+          if ( spaceDimension == 3 )
             {
-            // Get the neighborhood position
-            ParametersType neighborPosition( currentPosition );
-            neighborPosition[0] += i * m_NeighborhoodSize[0];
-            neighborPosition[1] += j * m_NeighborhoodSize[1];
-            neighborPosition[2] += k * m_NeighborhoodSize[2];
+            for(int k=-1; k<=1; k+=1)
+              {
+              // Get the neighborhood position
+              ParametersType neighborPosition( currentPosition );
+              neighborPosition[0] += i * m_NeighborhoodSize[0];
+              neighborPosition[1] += j * m_NeighborhoodSize[1];
+              neighborPosition[2] += k * m_NeighborhoodSize[2];
 
-            // Check if this value is better than current
-            double neighborValue = m_CostFunction->GetValue( neighborPosition );
-            if ( m_Maximize && neighborValue > bestValue )
-              {
-              bestValue = neighborValue;
-              newPosition = neighborPosition;
-              }
-            else if ( !m_Maximize && neighborValue < bestValue )
-              {
-              bestValue = neighborValue;
-              newPosition = neighborPosition;
-              }
-            }// end for k
-          }//end spaceDimension == 3
+              // Check if this value is better than current
+              double neighborValue = m_CostFunction->GetValue( neighborPosition );
+              if ( m_Maximize && neighborValue > bestValue )
+                {
+                bestValue = neighborValue;
+                newPosition = neighborPosition;
+                }
+              else
+                {
+                if ( !m_Maximize && neighborValue < bestValue )
+                  {
+                  bestValue = neighborValue;
+                  newPosition = neighborPosition;
+                  }
+                }
+              }// end for k
+            }//end spaceDimension == 3
+          else
+            {
+            itkWarningMacro( <<"spaceDimension should be 2 or 3" );
+            return;
+            }
+          }
         }// end for j
       }// end for i
     }// end m_FullyConnected
