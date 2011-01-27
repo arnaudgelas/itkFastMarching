@@ -49,12 +49,11 @@ if( BUILD_TESTING )
 endif()
 
 
-SET(MINIMAL_PATH_DATA_PATH ${FMM_SOURCE_DIR}/Data/Data)
+SET(DATA_PATH ${FMM_SOURCE_DIR}/Data)
 SET(SOURCE_PATH ${FMM_SOURCE_DIR}/Source)
 SET(TESTING_PATH ${FMM_SOURCE_DIR}/Testing)
 
 #The following lines are required to use Dart
-ENABLE_TESTING()
 INCLUDE(Dart)
 FIND_PROGRAM(IMAGE_COMPARE ImageCompare)
 
