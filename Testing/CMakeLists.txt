@@ -1,5 +1,33 @@
-INCLUDE_DIRECTORIES( BEFORE "${FMM_SOURCE_DIR}/Source"
-  "${FMM_BINARY_DIR}/Source" )
+INCLUDE_DIRECTORIES( BEFORE "${FMM_SOURCE_DIR}/Code"
+  "${FMM_BINARY_DIR}/Code" )
+
+# The header files
+SET(HEADERS
+  itkSingleImageCostFunction.h
+  itkArrivalFunctionToPathFilter.h
+  itkSpeedFunctionToPathFilter.h
+)
+
+# The implementation files
+SET(SOURCES
+  itkSingleImageCostFunction.txx
+  itkArrivalFunctionToPathFilter.txx
+  itkSpeedFunctionToPathFilter.txx
+  main.cxx
+  #examples.cxx
+)
+
+# Add this as include directory
+INCLUDE_DIRECTORIES(
+  ${CMAKE_SOURCE_DIR}
+  ${SOURCE_PATH}
+  ${VXL_INCLUDE_DIRS}
+)
+
+# Main library
+ADD_EXECUTABLE(MinimalPathMain ${HEADERS} ${SOURCES})
+TARGET_LINK_LIBRARIES(MinimalPathMain ${ITK_LIBRARIES})
+
 
 add_executable( itkFastMarchingBaseTest
   itkFastMarchingBaseTest.cxx
