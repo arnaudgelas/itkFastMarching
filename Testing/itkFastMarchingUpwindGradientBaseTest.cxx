@@ -127,9 +127,11 @@ int main(int, char* [] )
 
   itk::ImageRegionIterator<FloatImageType>
     speedIter( speedImage, speedImage->GetBufferedRegion() );
-  for ( ; !speedIter.IsAtEnd(); ++speedIter )
+
+  while ( !speedIter.IsAtEnd() )
     {
     speedIter.Set( 1.0 );
+    ++speedIter;
     }
 
 //  speedImage->Print( std::cout );
@@ -145,9 +147,8 @@ int main(int, char* [] )
 
   bool passed = true;
 
-  for ( ; !iterator.IsAtEnd(); ++iterator )
+  while ( !iterator.IsAtEnd() )
     {
-
     FloatGradientImage::IndexType tempIndex;
     double distance;
     GradientPixelType outputPixel;
@@ -180,8 +181,9 @@ int main(int, char* [] )
       dot += tempIndex[j] / distance * outputPixel[j];
       }
 
-    if ( outputPixelNorm < 0.9999 || outputPixelNorm > 1.0001 ||
-         dot < 0.99 || dot > 1.01 )
+    if ( ( outputPixelNorm < 0.9999 ) ||
+         ( outputPixelNorm > 1.0001 ) ||
+         ( dot < 0.99 ) || ( dot > 1.01 ) )
       {
       std::cout << iterator.GetIndex() << " ";
       std::cout << outputPixelNorm << " ";
@@ -189,6 +191,7 @@ int main(int, char* [] )
       passed = false;
       }
 
+    ++iterator;
     }
 
   // Set up target points.
