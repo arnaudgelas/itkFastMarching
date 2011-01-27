@@ -86,8 +86,9 @@ public:
   //AuxVarType;
   typedef TAuxValue       AuxValueType;
   typedef Vector< AuxValueType, AuxDimension >  AuxValueVectorType;
-  typedef std::vector< AuxValueVectorType >     AuxValueContainer;
-  typedef typename AuxValueContainer::const_iterator AuxValueContainerConstIterator;
+  typedef VectorContainer< IdentifierType, AuxValueVectorType > AuxValueContainerType;
+  typedef typename AuxValueContainerType::Pointer AuxValueContainerPointer;
+  typedef typename AuxValueContainerType::ConstIterator AuxValueContainerConstIterator;
 
   typedef Image< AuxValueType, ImageDimension > AuxImageType;
   typedef typename AuxImageType::Pointer        AuxImagePointer;
@@ -99,8 +100,15 @@ public:
   /** Index typedef support. */
   typedef typename Superclass::NodeType NodeType;
   typedef typename Superclass::NodePairType NodePairType;
+
   typedef typename Superclass::NodeContainerType NodeContainerType;
+  typedef typename Superclass::NodeContainerPointer NodeContainerPointer;
   typedef typename Superclass::NodeContainerConstIterator NodeContainerConstIterator;
+
+  typedef typename Superclass::NodePairContainerType NodePairContainerType;
+  typedef typename Superclass::NodePairContainerPointer NodePairContainerPointer;
+  typedef typename Superclass::NodePairContainerConstIterator NodePairContainerConstIterator;
+
   typedef typename Superclass::OutputImageType OutputImageType;
   typedef typename Superclass::OutputPixelType OutputPixelType;
   typedef typename Superclass::InternalNodeStructure InternalNodeStructure;
@@ -109,28 +117,12 @@ public:
   AuxImageType * GetAuxiliaryImage( const unsigned int& idx );
 
   /** Set the container auxiliary values at the initial alive points. */
-  void SetAuxiliaryAliveValues( const AuxValueContainer& values)
-  {
-    m_AuxAliveValues = values;
-  }
-
-  /** Get the container of auxiliary values at the initial alive points. */
-  AuxValueContainer GetAuxiliaryAliveValues() const
-  {
-    return m_AuxAliveValues;
-  }
+  itkSetObjectMacro(AuxiliaryAliveValues, AuxValueContainerType );
+  itkGetObjectMacro(AuxiliaryAliveValues, AuxValueContainerType );
 
   /** Set the container of auxiliary values at the initial trial points. */
-  void SetAuxiliaryTrialValues(const AuxValueContainer& values)
-  {
-    m_AuxTrialValues = values;
-  }
-
-  /** Get the container of auxiliary values at the initial trial points. */
-  AuxValueContainer GetAuxiliaryTrialValues() const
-  {
-    return m_AuxTrialValues;
-  }
+  itkSetObjectMacro(AuxiliaryTrialValues, AuxValueContainerType );
+  itkGetObjectMacro(AuxiliaryTrialValues, AuxValueContainerType );
 
 #ifdef ITK_USE_CONCEPT_CHECKING
   /** Begin concept checking */
@@ -152,12 +144,12 @@ protected:
 
   virtual void EnlargeOutputRequestedRegion(DataObject *output);
 
+  AuxValueContainerPointer m_AuxiliaryAliveValues;
+  AuxValueContainerPointer m_AuxiliaryTrialValues;
+
 private:
   FastMarchingExtensionImageFilterBase(const Self &); //purposely not implemented
   void operator=(const Self &);                   //purposely not implemented
-
-  AuxValueContainer m_AuxAliveValues;
-  AuxValueContainer m_AuxTrialValues;
 };
 } // namespace itk
 

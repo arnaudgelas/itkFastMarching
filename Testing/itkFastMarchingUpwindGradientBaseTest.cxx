@@ -71,45 +71,45 @@ int main(int, char* [] )
 
   typedef FloatFMType::NodeType     NodeType;
   typedef FloatFMType::NodePairType NodePairType;
-  typedef FloatFMType::NodeContainerType NodeContainerType;
+  typedef FloatFMType::NodePairContainerType NodePairContainerType;
 
   // setup alive points
-  NodeContainerType AliveNodes;
+  NodePairContainerType::Pointer AliveNodes = NodePairContainerType::New();
 
   FloatImageType::OffsetType offset0 = {{28,35}};
 
   itk::Index<2> index;
   index.Fill(0);
 
-  AliveNodes.push_back( NodePairType( index + offset0, 0. ) );
-  AliveNodes.push_back( NodePairType( index + offset0, 42. ) );
+  AliveNodes->push_back( NodePairType( index + offset0, 0. ) );
+  AliveNodes->push_back( NodePairType( index + offset0, 42. ) );
 
   marcher->SetAliveNodes( AliveNodes );
 
 
   // setup trial points
-  NodeContainerType TrialNodes;
+  NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
 
   index.Fill(0);
   index += offset0;
 
   index[0] += 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index[0] -= 1;
   index[1] += 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index[0] -= 1;
   index[1] -= 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index[0] += 1;
   index[1] -= 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index.Fill( 300 ); // this node is out of ranage
-  TrialNodes.push_back( NodePairType( index, 42. ) );
+  TrialNodes->push_back( NodePairType( index, 42. ) );
 
   marcher->SetTrialNodes( TrialNodes );
 
@@ -127,9 +127,11 @@ int main(int, char* [] )
 
   itk::ImageRegionIterator<FloatImageType>
     speedIter( speedImage, speedImage->GetBufferedRegion() );
-  for ( ; !speedIter.IsAtEnd(); ++speedIter )
+
+  while ( !speedIter.IsAtEnd() )
     {
     speedIter.Set( 1.0 );
+    ++speedIter;
     }
 
 //  speedImage->Print( std::cout );
@@ -145,9 +147,8 @@ int main(int, char* [] )
 
   bool passed = true;
 
-  for ( ; !iterator.IsAtEnd(); ++iterator )
+  while ( !iterator.IsAtEnd() )
     {
-
     FloatGradientImage::IndexType tempIndex;
     double distance;
     GradientPixelType outputPixel;
@@ -180,8 +181,9 @@ int main(int, char* [] )
       dot += tempIndex[j] / distance * outputPixel[j];
       }
 
-    if ( outputPixelNorm < 0.9999 || outputPixelNorm > 1.0001 ||
-         dot < 0.99 || dot > 1.01 )
+    if ( ( outputPixelNorm < 0.9999 ) ||
+         ( outputPixelNorm > 1.0001 ) ||
+         ( dot < 0.99 ) || ( dot > 1.01 ) )
       {
       std::cout << iterator.GetIndex() << " ";
       std::cout << outputPixelNorm << " ";
@@ -189,6 +191,7 @@ int main(int, char* [] )
       passed = false;
       }
 
+    ++iterator;
     }
 
   // Set up target points.

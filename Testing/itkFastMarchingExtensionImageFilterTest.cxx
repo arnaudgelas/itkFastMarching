@@ -74,47 +74,47 @@ int main(int, char* [] )
   // setup trial points
   typedef MarcherType::NodeType NodeType;
   typedef MarcherType::NodePairType NodePairType;
-  typedef MarcherType::NodeContainerType NodeContainerType;
+  typedef MarcherType::NodePairContainerType NodePairContainerType;
 
   // setup alive points
-  NodeContainerType AliveNodes;
+  NodePairContainerType::Pointer AliveNodes = NodePairContainerType::New();
 
   FloatImageType::OffsetType offset0 = {{28,35}};
 
   itk::Index<2> index;
   index.Fill(0);
 
-  AliveNodes.push_back( NodePairType( index + offset0, 0. ) );
+  AliveNodes->push_back( NodePairType( index + offset0, 0. ) );
 
   index.Fill( 200 );
-  AliveNodes.push_back( NodePairType( index, 42. ) );
+  AliveNodes->push_back( NodePairType( index, 42. ) );
 
   marcher->SetAliveNodes( AliveNodes );
 
 
   // setup trial points
-  NodeContainerType TrialNodes;
+  NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
 
   index.Fill(0);
   index += offset0;
 
   index[0] += 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index[0] -= 1;
   index[1] += 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index[0] -= 1;
   index[1] -= 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index[0] += 1;
   index[1] -= 1;
-  TrialNodes.push_back( NodePairType( index, 1. ) );
+  TrialNodes->push_back( NodePairType( index, 1. ) );
 
   index.Fill( 300 ); // this node is out of ranage
-  TrialNodes.push_back( NodePairType( index, 42. ) );
+  TrialNodes->push_back( NodePairType( index, 42. ) );
 
   marcher->SetTrialNodes( TrialNodes );
 
@@ -155,9 +155,9 @@ int main(int, char* [] )
   if ( !passed ) { return EXIT_FAILURE; }
 
   typedef MarcherType::AuxValueVectorType VectorType;
-  typedef MarcherType::AuxValueContainer AuxValueContainer;
+  typedef MarcherType::AuxValueContainerType AuxValueContainerType;
 
-  AuxValueContainer auxAliveValues;
+  AuxValueContainerType::Pointer auxAliveValues = AuxValueContainerType::New();
 
   // deliberately cause an exception setting AuxAliveValues of the wrong size
   marcher->SetAuxiliaryAliveValues( auxAliveValues );
@@ -179,8 +179,8 @@ int main(int, char* [] )
   VectorType vector;
   vector[0] = 48;
 
-  auxAliveValues.push_back( vector );
-  auxAliveValues.push_back( vector );
+  auxAliveValues->push_back( vector );
+  auxAliveValues->push_back( vector );
 
   marcher->SetAuxiliaryAliveValues( auxAliveValues );
 
@@ -198,7 +198,7 @@ int main(int, char* [] )
     }
   if ( !passed ) { return EXIT_FAILURE; }
 
-  AuxValueContainer auxTrialValues;
+  AuxValueContainerType::Pointer auxTrialValues = AuxValueContainerType::New();
 
   // deliberately cause an exception setting AuxTrialValues of the wrong size
   marcher->SetAuxiliaryTrialValues( auxTrialValues );
@@ -217,11 +217,11 @@ int main(int, char* [] )
   if ( !passed ) { return EXIT_FAILURE; }
 
 
-  auxTrialValues.push_back( vector );
-  auxTrialValues.push_back( vector );
-  auxTrialValues.push_back( vector );
-  auxTrialValues.push_back( vector );
-  auxTrialValues.push_back( vector );
+  auxTrialValues->push_back( vector );
+  auxTrialValues->push_back( vector );
+  auxTrialValues->push_back( vector );
+  auxTrialValues->push_back( vector );
+  auxTrialValues->push_back( vector );
 
   marcher->SetAuxiliaryTrialValues( auxTrialValues );
 

@@ -75,9 +75,11 @@ int main(int argc, char* argv[] )
 
   typedef FastMarchingType::NodeType NodeType;
   typedef FastMarchingType::NodePairType NodePairType;
-  typedef FastMarchingType::NodeContainerType NodeContainerType;
+  typedef FastMarchingType::NodePairContainerType NodePairContainerType;
 
   // setup alive points
+  NodePairContainerType::Pointer alive = NodePairContainerType::New();
+
   NodePairType node_pair;
 
   FloatImageType::OffsetType offset0 = {{28,35}};
@@ -87,16 +89,17 @@ int main(int argc, char* argv[] )
 
   node_pair.SetValue( 0.0 );
   node_pair.SetNode( index + offset0 );
-  marcher->AddAliveNode( node_pair );
+  alive->push_back( node_pair );
 
   node_pair.SetValue( 42.0 );
   index.Fill( 200 );
   node_pair.SetNode( index ); // this node is out of range
+  alive->push_back( node_pair );
 
-  marcher->AddAliveNode( node_pair );
-
+  marcher->SetAliveNodes( alive );
 
   // setup trial points
+  NodePairContainerType::Pointer trial = NodePairContainerType::New();
   node_pair.SetValue( 1.0 );
 
   index.Fill(0);
@@ -104,27 +107,29 @@ int main(int argc, char* argv[] )
 
   index[0] += 1;
   node_pair.SetNode( index );
-  marcher->AddTrialNode( node_pair );
+  trial->push_back( node_pair );
 
   index[0] -= 1;
   index[1] += 1;
   node_pair.SetNode( index );
-  marcher->AddTrialNode( node_pair );
+  trial->push_back( node_pair );
 
   index[0] -= 1;
   index[1] -= 1;
   node_pair.SetNode( index );
-  marcher->AddTrialNode( node_pair );
+  trial->push_back( node_pair );
 
   index[0] += 1;
   index[1] -= 1;
   node_pair.SetNode( index );
-  marcher->AddTrialNode( node_pair );
+  trial->push_back( node_pair );
 
   node_pair.SetValue( 42.0 );
   index.Fill( 300 ); // this node is out of ranage
   node_pair.SetNode( index );
-  marcher->AddTrialNode( node_pair );
+  trial->push_back( node_pair );
+
+  marcher->SetTrialNodes( trial );
 
   // specify the size of the output image
   FloatImageType::SizeType size = {{64,64}};

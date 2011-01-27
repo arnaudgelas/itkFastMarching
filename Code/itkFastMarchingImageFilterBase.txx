@@ -497,15 +497,15 @@ InitializeOutput( OutputImageType* oImage )
   NodeType idx;
   OutputPixelType outputPixel = this->m_LargeValue;
 
-  if ( !this->m_AliveNodes.empty() )
+  if ( this->m_AliveNodes )
     {
-    NodeContainerConstIterator pointsIter = this->m_AliveNodes.begin();
-    NodeContainerConstIterator pointsEnd = this->m_AliveNodes.end();
+    NodePairContainerConstIterator pointsIter = this->m_AliveNodes->Begin();
+    NodePairContainerConstIterator pointsEnd = this->m_AliveNodes->End();
 
     while( pointsIter != pointsEnd )
       {
       // get node from alive points container
-      idx = pointsIter->first;
+      idx = pointsIter->Value().GetNode();
 
       // check if node index is within the output level set
       if ( m_BufferedRegion.IsInside( idx ) )
@@ -518,7 +518,7 @@ InitializeOutput( OutputImageType* oImage )
           m_ConnectedComponentImage->SetPixel( idx, 1 );
           }
 
-        outputPixel = pointsIter->second;
+        outputPixel = pointsIter->Value().GetValue();
         oImage->SetPixel(idx, outputPixel);
         }
 
@@ -526,18 +526,16 @@ InitializeOutput( OutputImageType* oImage )
       }
     }
 
-  if( !this->m_ForbiddenNodes.empty() )
+  if( this->m_ForbiddenNodes )
     {
-    typename std::vector< NodeType >::const_iterator
-        p_it = this->m_ForbiddenNodes.begin();
-    typename std::vector< NodeType >::const_iterator
-        p_end = this->m_ForbiddenNodes.end();
+    NodeContainerConstIterator p_it = this->m_ForbiddenNodes->Begin();
+    NodeContainerConstIterator p_end = this->m_ForbiddenNodes->End();
 
     OutputPixelType zero = NumericTraits< OutputPixelType >::Zero;
 
     while( p_it != p_end )
       {
-      idx = *p_it;
+      idx = p_it->Value();
 
       // check if node index is within the output level set
       if ( m_BufferedRegion.IsInside( idx ) )
@@ -571,15 +569,15 @@ InitializeOutput( OutputImageType* oImage )
     }
 
   // process the input trial points
-  if ( !this->m_TrialNodes.empty() )
+  if ( this->m_TrialNodes )
     {
-    NodeContainerConstIterator pointsIter = this->m_TrialNodes.begin();
-    NodeContainerConstIterator pointsEnd = this->m_TrialNodes.end();
+    NodePairContainerConstIterator pointsIter = this->m_TrialNodes->Begin();
+    NodePairContainerConstIterator pointsEnd = this->m_TrialNodes->End();
 
     while( pointsIter != pointsEnd )
       {
       // get node from trial points container
-      idx = pointsIter->first;
+      idx = pointsIter->Value().GetNode();
 
       // check if node index is within the output level set
       if ( m_BufferedRegion.IsInside( idx ) )
@@ -587,11 +585,11 @@ InitializeOutput( OutputImageType* oImage )
         // make this an initial trial point
         m_LabelImage->SetPixel( idx, Superclass::InitialTrial );
 
-        outputPixel = pointsIter->second;
+        outputPixel = pointsIter->Value().GetValue();
         oImage->SetPixel(idx, outputPixel);
 
         //this->m_Heap->Push( PriorityQueueElementType( idx, pointsIter->second ) );
-        this->m_Heap.push( NodePairType( idx, outputPixel ) );
+        this->m_Heap.push( pointsIter->Value() );
         }
       ++pointsIter;
       }

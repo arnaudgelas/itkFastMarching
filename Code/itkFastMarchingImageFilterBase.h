@@ -94,8 +94,18 @@ public:
   typedef typename OutputImageType::PointType       OutputPointType;
   typedef typename OutputImageType::DirectionType   OutputDirectionType;
 
-  typedef typename Superclass::NodeType NodeType;
-  typedef typename Superclass::NodePairType NodePairType;
+  typedef typename Traits::NodeType                 NodeType;
+  typedef typename Traits::NodePairType             NodePairType;
+  typedef typename Traits::NodePairContainerType    NodePairContainerType;
+  typedef typename Traits::NodePairContainerPointer NodePairContainerPointer;
+  typedef typename Traits::NodePairContainerConstIterator
+    NodePairContainerConstIterator;
+
+  typedef typename Traits::NodeContainerType        NodeContainerType;
+  typedef typename Traits::NodeContainerPointer     NodeContainerPointer;
+  typedef typename Traits::NodeContainerConstIterator
+    NodeContainerConstIterator;
+
   /*
   typedef typename Superclass::ElementIdentifier ElementIdentifier;
 
@@ -118,9 +128,6 @@ public:
 
   typedef NeighborhoodIterator<LabelImageType> NeighborhoodIteratorType;
   typedef typename NeighborhoodIteratorType::RadiusType NeighborhoodRadiusType;
-
-  typedef typename Superclass::NodeContainerType NodeContainerType;
-  typedef typename Superclass::NodeContainerConstIterator NodeContainerConstIterator;
 
   itkGetObjectMacro( LabelImage, LabelImageType );
 
@@ -163,7 +170,7 @@ public:
           {
           idx = b_it.GetIndex();
 
-          this->m_ForbiddenNodes.push_back( idx );
+          this->m_ForbiddenNodes->push_back( idx );
           //if ( m_BufferedRegion.IsInside( idx ) )
           //  {
           //  m_LabelImage->SetPixel(idx, Superclass::Forbidden );
