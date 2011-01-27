@@ -189,13 +189,15 @@ SET(Source_Test_Files
   MinimalPathTests.cxx
 )
 
+include_directories( ${FMM_SOURCE_DIR}/Code )
+
 # Main library
 ADD_EXECUTABLE(MinimalPathMain main.cxx ${BASE_SOURCE})
-TARGET_LINK_LIBRARIES(MinimalPathMain ${ITK_LIBRARIES})
+TARGET_LINK_LIBRARIES(MinimalPathMain ITKCommon ITKIO ITKBasicFilters ITKNumerics )
 
 #Add source test driver exe
 ADD_EXECUTABLE( MinimalPathTestDriver MinimalPathTestDriver.cxx ${Source_Test_Files} ${BASE_SOURCE} )
-TARGET_LINK_LIBRARIES( MinimalPathTestDriver ${ITK_LIBRARIES} )
+TARGET_LINK_LIBRARIES( MinimalPathTestDriver ITKCommon ITKIO ITKBasicFilters ITKNumerics )
 
 #Add tests for the source images
 #Noise-01

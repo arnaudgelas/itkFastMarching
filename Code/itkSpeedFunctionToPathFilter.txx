@@ -83,61 +83,56 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
   InputImagePointer speed =
     const_cast< InputImageType * >( this->GetInput() );
 
-  // Set the fast marching method for computing the arrival function
-  typedef FastMarchingUpwindGradientImageFilter< TInputImage, TInputImage >
-    FastMarchingType;
-  typedef typename FastMarchingType::NodeContainer NodeContainer;
-  typedef typename FastMarchingType::NodeType NodeType;
-  typename FastMarchingType::Pointer marching = FastMarchingType::New();
-  marching->SetInput( speed );
-  marching->SetGenerateGradientImage( false );
-  marching->SetTargetOffset( 2.0 * Superclass::m_TerminationValue );
-  marching->SetTargetReachedModeToAllTargets( );
+  CriterionPointer criterion = CriterionType::New();
+  FloatFMPointer marcher = FloatFMType::New();
+
+  marcher->SetInput( speed );
+  marcher->SetGenerateGradientImage( false );
+//   marcher->SetTargetOffset( 2.0 * Superclass::m_TerminationValue );
 
   // Add next and previous front sources as target points to
   // limit the front propagation to just the required zones
   IndexType indexTargetPrevious;
   IndexType indexTargetNext;
   speed->TransformPhysicalPointToIndex
-    (
-    m_Info[Superclass::m_CurrentOutput].PeekPreviousFront(),
-    indexTargetPrevious
-    );
-  speed->TransformPhysicalPointToIndex
-    (
-    m_Info[Superclass::m_CurrentOutput].PeekNextFront(),
+  (
+  m_Info[Superclass::m_CurrentOutput].PeekPreviousFront(),
+   indexTargetPrevious
+   );
+   speed->TransformPhysicalPointToIndex
+   (
+   m_Info[Superclass::m_CurrentOutput].PeekNextFront(),
     indexTargetNext
     );
-  NodeType nodeTargetPrevious;
-  NodeType nodeTargetNext;
-  nodeTargetPrevious.SetValue( 0.0 );
-  nodeTargetNext.SetValue( 0.0 );
-  nodeTargetPrevious.SetIndex( indexTargetPrevious );
-  nodeTargetNext.SetIndex( indexTargetNext );
-  typename NodeContainer::Pointer targets = NodeContainer::New();
-  targets->Initialize();
-  targets->InsertElement( 0, nodeTargetPrevious );
-  targets->InsertElement( 1, nodeTargetNext );
-  marching->SetTargetPoints( targets );
+
+  std::cout << indexTargetPrevious << std::endl;
+  std::cout << indexTargetNext << std::endl;
+    
+  // Update the method and set the arrival function
+  typename std::vector< NodeType > TargetNodes;
+  TargetNodes.push_back( indexTargetPrevious );
+  TargetNodes.push_back( indexTargetNext );
+
+  criterion->SetTargetNodes( TargetNodes );
+  criterion->SetTargetCondition( CriterionType::AllTargets );
 
   // Get the next Front source point and add as trial point
   IndexType indexTrial;
   speed->TransformPhysicalPointToIndex
-    (
+  (
     m_Info[Superclass::m_CurrentOutput].GetCurrentFrontAndAdvance(),
     indexTrial
-    );
-  NodeType nodeTrial;
-  nodeTrial.SetValue( 0.0 );
-  nodeTrial.SetIndex( indexTrial );
-  typename NodeContainer::Pointer trial = NodeContainer::New();
-  trial->Initialize();
-  trial->InsertElement( 0, nodeTrial );
-  marching->SetTrialPoints( trial );
+  );
 
-  // Update the method and set the arrival function
-  marching->UpdateLargestPossibleRegion( );
-  m_CurrentArrivalFunction = marching->GetOutput( );
+  std::cout << indexTrial << std::endl;
+
+  typename NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
+  TrialNodes->push_back( NodePairType( indexTrial, 0.0 ) );
+  marcher->SetTrialNodes( TrialNodes );
+
+  marcher->SetStoppingCriterion( criterion );
+  marcher->UpdateLargestPossibleRegion( );
+  m_CurrentArrivalFunction = marcher->GetOutput( );
   m_CurrentArrivalFunction->DisconnectPipeline( );
   return m_CurrentArrivalFunction;
 }

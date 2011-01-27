@@ -18,6 +18,8 @@
 #define __itkSpeedFunctionToPathFilter_h
 
 #include "itkArrivalFunctionToPathFilter.h"
+#include "itkFastMarchingUpwindGradientImageFilterBase.h"
+#include "itkFastMarchingReachedTargetNodesStoppingCriterion.h"
 
 namespace itk
 {
@@ -51,7 +53,7 @@ namespace itk
  *     Cambridge Press, 2nd edition, 1999.
  * [2] J. Andrews and J. Sethian. Fast marching methods for the continuous
  *     traveling salesman problem. Proceedings of the National Academy of
- *     Sciences (PNAS), 104(4):1118–1123, 2007.
+ *     Sciences (PNAS), 104(4):1118ï¿½1123, 2007.
  *
  * \author Dan Mueller, Queensland University of Technology, dan.muel[at]gmail.com
  *
@@ -98,6 +100,17 @@ public:
   typedef typename Superclass::PointType           PointType;
   typedef typename Superclass::CostFunctionType    CostFunctionType;
   typedef typename Superclass::OptimizerType       OptimizerType;
+
+  typedef FastMarchingImageReachedTargetNodesStoppingCriterion< InputImageType >
+    CriterionType;
+  typedef typename CriterionType::Pointer CriterionPointer;
+  typedef IsotropicFastMarchingUpwindGradientImageFilterBase<
+    InputImageDimension, InputImagePixelType, InputImagePixelType > FloatFMType;
+  typedef typename FloatFMType::Pointer FloatFMPointer;
+
+  typedef typename FloatFMType::NodeType     NodeType;
+  typedef typename FloatFMType::NodePairType NodePairType;
+  typedef typename FloatFMType::NodePairContainerType NodePairContainerType;
   
   /** Override superclass behaviour.
    *  Warning: SetPathEndPoint() is not valid for this filter.
