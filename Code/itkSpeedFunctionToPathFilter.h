@@ -103,7 +103,7 @@ public:
    *  Warning: SetPathEndPoint() is not valid for this filter.
    *  This method is provided by the superclass, however it is not
    *  used by this subclass. Use AddPathInfo() instead.*/
-  void SetPathEndPoint( const PointType & point )
+  void SetPathEndPoint( const PointType & )
   {
     itkWarningMacro("SetPathEndPoint() is not valid for this filter. Use AddPathInfo() instead.");
   }
@@ -112,7 +112,7 @@ public:
    *  Warning: AddPathEndPoint() is not valid for this filter.
    *  This method is provided by the superclass, however it is not
    *  used by this subclass. Use AddPathInfo() instead.*/
-  void AddPathEndPoint( const PointType & point )
+  void AddPathEndPoint( const PointType & )
   {
     itkWarningMacro("AddPathEndPoint() is not valid for this filter. Use AddPathInfo() instead.");
   };
@@ -151,8 +151,8 @@ public:
       { return m_Info[0]; }
     const PointType & GetWayPoint( unsigned int i ) const
       { return m_Info[2+i]; }
-    const bool HasNextFront( ) const
-      { return m_Front >= 1; }
+    bool HasNextFront( ) const
+      { return ( m_Front >= 1 ); }
     const PointType & GetCurrentFrontAndAdvance( )
       { return m_Info[m_Front--]; }
     const PointType & PeekCurrentFront( )
