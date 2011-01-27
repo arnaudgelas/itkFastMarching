@@ -93,12 +93,13 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
     return EXIT_FAILURE;
     }
 
-  typedef typename FastMarchingType::NodeContainerType NodeContainerType;
   typedef typename FastMarchingType::NodePairType NodePairType;
   typedef typename FastMarchingType::NodeType NodeType;
+  typedef typename FastMarchingType::NodePairContainerType NodePairContainerType;
 
-  NodeContainerType AliveNodes;
-  NodeContainerType TrialNodes;
+
+  typename NodePairContainerType::Pointer AliveNodes = NodePairContainerType::New();
+  typename NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
 
   itk::ImageRegionIteratorWithIndex<LabelImageType> ItL(
         labelImageReader->GetOutput(),
@@ -115,13 +116,13 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
     {
     if( ItC.Get() != label_zero )
       {
-      TrialNodes.push_back( NodePairType( ItC.GetIndex(), 0. ) );
+      TrialNodes->push_back( NodePairType( ItC.GetIndex(), 0. ) );
       }
     else
       {
       if( ItL.Get() != label_zero )
         {
-        AliveNodes.push_back( NodePairType( ItL.GetIndex(), 0. ) );
+        AliveNodes->push_back( NodePairType( ItL.GetIndex(), 0. ) );
         }
       }
     ++ItL;
