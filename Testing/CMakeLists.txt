@@ -3,26 +3,21 @@ INCLUDE_DIRECTORIES( BEFORE "${FMM_SOURCE_DIR}/Code"
 
 # The header files
 SET(HEADERS
-  itkSingleImageCostFunction.h
-  itkArrivalFunctionToPathFilter.h
-  itkSpeedFunctionToPathFilter.h
+  ${CODE_DIRECTORY}/itkSingleImageCostFunction.h
+  ${CODE_DIRECTORY}/itkArrivalFunctionToPathFilter.h
+  ${CODE_DIRECTORY}/itkSpeedFunctionToPathFilter.h
 )
 
 # The implementation files
 SET(SOURCES
-  itkSingleImageCostFunction.txx
-  itkArrivalFunctionToPathFilter.txx
-  itkSpeedFunctionToPathFilter.txx
+  ${CODE_DIRECTORY}/itkSingleImageCostFunction.txx
+  ${CODE_DIRECTORY}/itkArrivalFunctionToPathFilter.txx
+  ${CODE_DIRECTORY}/itkSpeedFunctionToPathFilter.txx
+  MinimalPathTests.cxx
   main.cxx
   #examples.cxx
 )
 
-# Add this as include directory
-INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}
-  ${SOURCE_PATH}
-  ${VXL_INCLUDE_DIRS}
-)
 
 # Main library
 ADD_EXECUTABLE(MinimalPathMain ${HEADERS} ${SOURCES})
@@ -209,19 +204,11 @@ ADD_TEST( TEST_wm_multipleSeeds_NoHandlesTopo
   150 2 )
 
 #Set output path
-SET(TESTING_OUTPUT_PATH "${MinimalPath_BINARY_DIR}/Testing/Temporary")
+SET(TESTING_OUTPUT_PATH "${FMM_BINARY_DIR}/Testing/Temporary")
 MAKE_DIRECTORY(${TESTING_OUTPUT_PATH})
 
 #Set the test drivers
 SET(SOURCE_TEST_DRIVER ${EXECUTABLE_OUTPUT_PATH}/MinimalPathTestDriver)
-
-#Add includes
-INCLUDE_DIRECTORIES (
-  ${SOURCE_PATH}
-  ${DATA_PATH}
-  ${TESTING_PATH}
-  ${VXL_INCLUDE_DIRS}
-)
 
 #Set source test files
 SET(Source_Test_Files

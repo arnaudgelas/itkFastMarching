@@ -7,7 +7,6 @@
 #include <iostream>
 
 // ITK includes
-#include "Testing/MinimalPathTests.cxx"
 
 int main(int argc, char* argv[])
 {
