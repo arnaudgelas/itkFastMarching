@@ -170,13 +170,15 @@ UpdateNeighbors( OutputImageType* oImage, const NodeType& iNode )
 
   typename NodeType::IndexValueType v, start, last;
 
+  int s;
+
   for ( unsigned int j = 0; j < ImageDimension; j++ )
     {
     v = iNode[j];
     start = m_StartIndex[j];
     last = m_LastIndex[j];
 
-    for( int s = -1; s < 2; s+= 2 )
+    for( s = -1; s < 2; s+= 2 )
       {
       if ( ( v > start ) && ( v < last ) )
         {
@@ -319,8 +321,6 @@ Solve( OutputImageType* oImage,
     cc = -1.0 * vnl_math_sqr(1.0 / cc);
     }
 
-  OutputSpacingType spacing = oImage->GetSpacing();
-
   double discrim = 0.;
   double value = 0.;
   double spaceFactor = 0.;
@@ -338,7 +338,7 @@ Solve( OutputImageType* oImage,
       axis = n_it->m_Axis;
 
       // spaceFactor = \frac{1}{spacing[axis]^2}
-      spaceFactor = vnl_math_sqr(1.0 / spacing[axis]);
+      spaceFactor = vnl_math_sqr(1.0 / m_Spacing[axis]);
 
       aa += spaceFactor;
       bb += value * spaceFactor;
@@ -484,6 +484,10 @@ InitializeOutput( OutputImageType* oImage )
   m_StartIndex = m_BufferedRegion.GetIndex();
   m_LastIndex = m_StartIndex + m_BufferedRegion.GetSize();
 
+  m_OutputSpacing = oImage->GetSpacing();
+  m_OutputOrigin = oImage->GetOrigin();
+  m_OutputDirection = oImage->GetDirection();
+
   typename OutputImageType::OffsetType offset;
   offset.Fill(1);
   m_LastIndex -= offset;
@@ -493,17 +497,17 @@ InitializeOutput( OutputImageType* oImage )
   if( this->m_TopologyCheck == Superclass::NoHandles )
     {
     m_ConnectedComponentImage = ConnectedComponentImageType::New();
-    m_ConnectedComponentImage->SetOrigin( oImage->GetOrigin() );
-    m_ConnectedComponentImage->SetSpacing( oImage->GetSpacing() );
-    m_ConnectedComponentImage->SetRegions( oImage->GetBufferedRegion() );
-    m_ConnectedComponentImage->SetDirection( oImage->GetDirection() );
+    m_ConnectedComponentImage->SetOrigin( m_OutputOrigin );
+    m_ConnectedComponentImage->SetSpacing( m_OutputSpacing );
+    m_ConnectedComponentImage->SetRegions( m_BufferedRegion );
+    m_ConnectedComponentImage->SetDirection( m_OutputDirection );
     m_ConnectedComponentImage->Allocate();
     m_ConnectedComponentImage->FillBuffer( 0 );
     }
 
   // allocate memory for the PointTypeImage
   m_LabelImage->CopyInformation(oImage);
-  m_LabelImage->SetBufferedRegion( oImage->GetBufferedRegion() );
+  m_LabelImage->SetBufferedRegion( m_BufferedRegion );
   m_LabelImage->Allocate();
   m_LabelImage->FillBuffer( Superclass::Far );
 
