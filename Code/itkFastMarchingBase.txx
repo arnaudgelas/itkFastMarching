@@ -98,6 +98,13 @@ Initialize( OutputDomainType* oDomain )
     {
     itkExceptionMacro( <<"SpeedConstant is null or negative" );
     }
+  if( m_CollectPoints )
+    {
+    if( m_ProcessedNodes.IsNull() )
+      {
+      m_ProcessedNodes = NodePairContainerType::New();
+      }
+    }
 
   // make sure the heap is empty
   while ( !m_Heap.empty() )

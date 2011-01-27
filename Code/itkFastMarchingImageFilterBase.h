@@ -146,6 +146,11 @@ public:
     OutputSizeType nullsize;
     nullsize.Fill( 0 );
 
+    if( this->m_ForbiddenNodes.IsNull() )
+      {
+      this->m_ForbiddenNodes = NodeContainerType::New();
+      }
+
 
     //if( m_BufferedRegion.GetSize() == nullsize )
     //  {
