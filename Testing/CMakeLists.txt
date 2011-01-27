@@ -1,3 +1,6 @@
+INCLUDE_DIRECTORIES( BEFORE "${FMM_SOURCE_DIR}/Source"
+  "${FMM_BINARY_DIR}/Source" )
+
 add_executable( itkFastMarchingBaseTest
   itkFastMarchingBaseTest.cxx
 )
@@ -177,3 +180,217 @@ ADD_TEST( TEST_wm_multipleSeeds_NoHandlesTopo
   ${DATA_DIRECTORY}/wm_multipleSeeds.nii.gz
   150 2 )
 
+#Set output path
+SET(TESTING_OUTPUT_PATH "${MinimalPath_BINARY_DIR}/Testing/Temporary")
+MAKE_DIRECTORY(${TESTING_OUTPUT_PATH})
+
+#Set the test drivers
+SET(SOURCE_TEST_DRIVER ${EXECUTABLE_OUTPUT_PATH}/MinimalPathTestDriver)
+
+#Add includes
+INCLUDE_DIRECTORIES (
+  ${SOURCE_PATH}
+  ${DATA_PATH}
+  ${TESTING_PATH}
+  ${VXL_INCLUDE_DIRS}
+)
+
+#Set source test files
+SET(Source_Test_Files
+  MinimalPathTests.cxx
+)
+
+#Add source test driver exe
+ADD_EXECUTABLE( MinimalPathTestDriver MinimalPathTestDriver.cxx ${Source_Test_Files} )
+TARGET_LINK_LIBRARIES( MinimalPathTestDriver ${ITK_LIBRARIES} )
+
+#Add tests for the source images
+#Noise-01
+ADD_TEST(
+    Noise_01_NeighborhoodIterate
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_IterateNeighborhood_2D
+    ${TESTING_OUTPUT_PATH}/Noise-01-IterateNeighborhood.png
+    ${DATA_PATH}/Noise-01-Speed.mhd
+    ${DATA_PATH}/Noise-01.path
+    1.0
+    1.0
+)
+ADD_TEST(
+    Noise_01_GradientDescent
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_GradientDescent_2D
+    ${TESTING_OUTPUT_PATH}/Noise-01-GradientDescent.png
+    ${DATA_PATH}/Noise-01-Speed.mhd
+    ${DATA_PATH}/Noise-01.path
+    1.0
+    1000
+)
+ADD_TEST(
+    Noise_01_RegularStepGradientDescent
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_RegularStepGradientDescent_2D
+    ${TESTING_OUTPUT_PATH}/Noise-01-RegularStepGradientDescent.png
+    ${DATA_PATH}/Noise-01-Speed.mhd
+    ${DATA_PATH}/Noise-01.path
+    1.0
+    1000
+    1.0
+    0.5
+)
+#Synthetic-01
+ADD_TEST(
+    Synthetic_01_NeighborhoodIterate
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_IterateNeighborhood_2D
+    ${TESTING_OUTPUT_PATH}/Synthetic-01-IterateNeighborhood.png
+    ${DATA_PATH}/Synthetic-01-Speed.mhd
+    ${DATA_PATH}/Synthetic-01.path
+    1.0
+    1.0
+)
+ADD_TEST(
+    Synthetic_01_GradientDescent
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_GradientDescent_2D
+    ${TESTING_OUTPUT_PATH}/Synthetic-01-GradientDescent.png
+    ${DATA_PATH}/Synthetic-01-Speed.mhd
+    ${DATA_PATH}/Synthetic-01.path
+    1.0
+    1000
+)
+ADD_TEST(
+    Synthetic_01_RegularStepGradientDescent
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_RegularStepGradientDescent_2D
+    ${TESTING_OUTPUT_PATH}/Synthetic-01-RegularStepGradientDescent.png
+    ${DATA_PATH}/Synthetic-01-Speed.mhd
+    ${DATA_PATH}/Synthetic-01.path
+    1.0
+    1000
+    1.0
+    0.5
+)
+#Synthetic-02
+ADD_TEST(
+    Synthetic_02_NeighborhoodIterate
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_IterateNeighborhood_2D
+    ${TESTING_OUTPUT_PATH}/Synthetic-02-IterateNeighborhood.png
+    ${DATA_PATH}/Synthetic-02-Speed.mhd
+    ${DATA_PATH}/Synthetic-02.path
+    1.0
+    1.0
+)
+ADD_TEST(
+    Synthetic_02_GradientDescent
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_GradientDescent_2D
+    ${TESTING_OUTPUT_PATH}/Synthetic-02-GradientDescent.png
+    ${DATA_PATH}/Synthetic-02-Speed.mhd
+    ${DATA_PATH}/Synthetic-02.path
+    1.0
+    3000
+)
+ADD_TEST(
+    Synthetic_02_RegularStepGradientDescent
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_RegularStepGradientDescent_2D
+    ${TESTING_OUTPUT_PATH}/Synthetic-02-RegularStepGradientDescent.png
+    ${DATA_PATH}/Synthetic-02-Speed.mhd
+    ${DATA_PATH}/Synthetic-02.path
+    1.0
+    3000
+    1.0
+    0.5
+)
+#Synthetic-03
+ADD_TEST(
+    Synthetic_03_NeighborhoodIterate
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_IterateNeighborhood_2D
+    ${TESTING_OUTPUT_PATH}/Synthetic-03-IterateNeighborhood.png
+    ${DATA_PATH}/Synthetic-03-Speed.mhd
+    ${DATA_PATH}/Synthetic-03.path
+    1.0
+    1.0
+)
+#Synthetic-04
+ADD_TEST(
+    Synthetic_04_NeighborhoodIterate
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_IterateNeighborhood_3D
+    ${TESTING_OUTPUT_PATH}/Synthetic-04-IterateNeighborhood.mhd
+    ${DATA_PATH}/Synthetic-04-Speed.mhd
+    ${DATA_PATH}/Synthetic-04.path
+    1.0
+    1.0
+)
+ADD_TEST(
+    Synthetic_04_GradientDescent
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_GradientDescent_3D
+    ${TESTING_OUTPUT_PATH}/Synthetic-04-GradientDescent.mhd
+    ${DATA_PATH}/Synthetic-04-Speed.mhd
+    ${DATA_PATH}/Synthetic-04.path
+    1.0
+    3000
+)
+ADD_TEST(
+    Synthetic_04_RegularStepGradientDescent
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_RegularStepGradientDescent_3D
+    ${TESTING_OUTPUT_PATH}/Synthetic-04-RegularStepGradientDescent.mhd
+    ${DATA_PATH}/Synthetic-04-Speed.mhd
+    ${DATA_PATH}/Synthetic-04.path
+    1.0
+    3000
+    1.0
+    0.5
+)
+#Real-DSA-01-01
+ADD_TEST(
+    Real_DSA_01_01_NeighborhoodIterate
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_IterateNeighborhood_2D
+    ${TESTING_OUTPUT_PATH}/Real-DSA-01-01-IterateNeighborhood.png
+    ${DATA_PATH}/Real-DSA-01-Speed-01.mhd
+    ${DATA_PATH}/Real-DSA-01.path
+    1.0
+    0.05
+)
+ADD_TEST(
+    Real_DSA_01_01_RegularStepGradientDescent
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_RegularStepGradientDescent_2D
+    ${TESTING_OUTPUT_PATH}/Real-DSA-01-01-RegularStepGradientDescent.png
+    ${DATA_PATH}/Real-DSA-01-Speed-01.mhd
+    ${DATA_PATH}/Real-DSA-01.path
+    3.0
+    4000
+    0.25
+    0.5
+)
+#Real-DSA-01-02
+ADD_TEST(
+    Real_DSA_01_02_NeighborhoodIterate
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_IterateNeighborhood_2D
+    ${TESTING_OUTPUT_PATH}/Real-DSA-01-02-IterateNeighborhood.png
+    ${DATA_PATH}/Real-DSA-01-Speed-02.mhd
+    ${DATA_PATH}/Real-DSA-01.path
+    1.0
+    0.05
+)
+ADD_TEST(
+    Real_DSA_01_02_RegularStepGradientDescent
+    ${SOURCE_TEST_DRIVER}
+    Test_SpeedToPath_RegularStepGradientDescent_2D
+    ${TESTING_OUTPUT_PATH}/Real-DSA-01-02-RegularStepGradientDescent.png
+    ${DATA_PATH}/Real-DSA-01-Speed-02.mhd
+    ${DATA_PATH}/Real-DSA-01.path
+    3.0
+    4000
+    0.25
+    0.5
+)

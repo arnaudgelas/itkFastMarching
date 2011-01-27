@@ -47,3 +47,38 @@ add_subdirectory( Testing )
 if( BUILD_TESTING )
   set(BUILDNAME "${BUILDNAME}" CACHE STRING "Name of the build on the dashboard" )
 endif()
+
+
+SET(MINIMAL_PATH_DATA_PATH ${FMM_SOURCE_DIR}/Data/Data)
+SET(SOURCE_PATH ${FMM_SOURCE_DIR}/Source)
+SET(TESTING_PATH ${FMM_SOURCE_DIR}/Testing)
+
+#The following lines are required to use Dart
+ENABLE_TESTING()
+INCLUDE(Dart)
+FIND_PROGRAM(IMAGE_COMPARE ImageCompare)
+
+#Construct VXL/VNL includes
+SET(VXL_INCLUDE_DIRS
+    ${ITK_SOURCE_DIR}/Utilities/vxl
+    ${ITK_SOURCE_DIR}/Utilities/vxl/core
+    ${ITK_SOURCE_DIR}/Utilities/vxl/core/vnl
+    ${ITK_SOURCE_DIR}/Utilities/vxl/vcl)
+
+#Set any libraries that your project depends on.
+#examples: ITKCommon, VTKRendering, etc
+SET(VXL_NUMERICS_LIBRARIES
+    itkvnl
+    itkvnl_algo
+    itknetlib)
+
+SET(ITK_LIBRARIES
+    ITKIO
+    ITKCommon
+    ITKNumerics
+    ITKStatistics
+    ITKBasicFilters
+)
+
+#Add Source
+SUBDIRS(Source)
