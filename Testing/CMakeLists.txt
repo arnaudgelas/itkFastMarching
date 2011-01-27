@@ -1,29 +1,6 @@
 INCLUDE_DIRECTORIES( BEFORE "${FMM_SOURCE_DIR}/Code"
   "${FMM_BINARY_DIR}/Code" )
 
-# The header files
-SET(HEADERS
-  ${CODE_DIRECTORY}/itkSingleImageCostFunction.h
-  ${CODE_DIRECTORY}/itkArrivalFunctionToPathFilter.h
-  ${CODE_DIRECTORY}/itkSpeedFunctionToPathFilter.h
-)
-
-# The implementation files
-SET(SOURCES
-  ${CODE_DIRECTORY}/itkSingleImageCostFunction.txx
-  ${CODE_DIRECTORY}/itkArrivalFunctionToPathFilter.txx
-  ${CODE_DIRECTORY}/itkSpeedFunctionToPathFilter.txx
-  MinimalPathTests.cxx
-  main.cxx
-  #examples.cxx
-)
-
-
-# Main library
-ADD_EXECUTABLE(MinimalPathMain ${HEADERS} ${SOURCES})
-TARGET_LINK_LIBRARIES(MinimalPathMain ${ITK_LIBRARIES})
-
-
 add_executable( itkFastMarchingBaseTest
   itkFastMarchingBaseTest.cxx
 )
@@ -409,3 +386,8 @@ ADD_TEST(
     0.25
     0.5
 )
+
+# Main library
+ADD_EXECUTABLE(MinimalPathMain main.cxx)
+TARGET_LINK_LIBRARIES(MinimalPathMain ${ITK_LIBRARIES})
+

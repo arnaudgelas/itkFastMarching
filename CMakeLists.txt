@@ -52,15 +52,6 @@ add_subdirectory( Testing )
 INCLUDE(Dart)
 FIND_PROGRAM(IMAGE_COMPARE ImageCompare)
 
-
-SET(ITK_LIBRARIES
-    ITKIO
-    ITKCommon
-    ITKNumerics
-    ITKStatistics
-    ITKBasicFilters
-)
-
 if( BUILD_TESTING )
   set(BUILDNAME "${BUILDNAME}" CACHE STRING "Name of the build on the dashboard" )
 endif()
