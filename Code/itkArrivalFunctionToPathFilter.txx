@@ -18,7 +18,6 @@
 #ifndef __itkArrivalFunctionToPathFilter_txx
 #define __itkArrivalFunctionToPathFilter_txx
 
-#include "vnl/vnl_math.h"
 #include "itkArrivalFunctionToPathFilter.h"
 
 namespace itk

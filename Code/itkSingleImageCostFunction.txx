@@ -9,8 +9,8 @@
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -30,9 +30,10 @@ template <class TImage>
 SingleImageCostFunction<TImage>
 ::SingleImageCostFunction()
 {
-  m_Image                 = 0;  // Provided by user
-  m_Interpolator          = 0;  // Configured in Initialize()
-  m_GradientImageFunction = 0;  // Configured in Initialize()
+  m_Image                 = NULL;  // Provided by user
+  m_Interpolator          = NULL;  // Configured in Initialize()
+  m_GradientImageFunction = NULL;  // Configured in Initialize()
+  m_DerivativeThreshold   = 15.;
 }
 
 
@@ -45,21 +46,21 @@ SingleImageCostFunction<TImage>
 ::Initialize(void) throw ( ExceptionObject )
 {
   // Ensure image is provided
-  if( !m_Image )
+  if( m_Image.IsNull() )
     {
     itkExceptionMacro(<<"Image is not present");
     }
 
   // Ensure interpolator for image is provided
-  if( !m_Interpolator )
+  if( m_Interpolator.IsNull() )
     {
     m_Interpolator = DefaultInterpolatorType::New();
     }
-    
+
   // Ensure gradient image function is initialized
-  if( !m_GradientImageFunction )
+  if( m_GradientImageFunction.IsNull() )
     {
-        m_GradientImageFunction = GradientImageFunctionType::New();
+    m_GradientImageFunction = GradientImageFunctionType::New();
     }
 
   // If the image is provided by a source, update the source.
@@ -86,19 +87,21 @@ typename SingleImageCostFunction<TImage>::MeasureType
 SingleImageCostFunction<TImage>
 ::GetValue( const ParametersType & parameters ) const
 {
+  typedef typename PointType::ValueType PointValueType;
+
   // Convert parameters to point
   PointType point;
-  for (int i=0; i<ImageDimension; i++)
+
+  for (unsigned int i=0; i<ImageDimension; i++)
     {
-    point[i] = static_cast<typename PointType::ValueType>( parameters[i] );
+    point[i] = static_cast<PointValueType>( parameters[i] );
     }
 
   // Ensure point is inside image
   if ( m_Interpolator->IsInsideBuffer(point) )
     {
     // Evaluate at point
-    return static_cast<MeasureType>
-      ( m_Interpolator->Evaluate(point) );
+    return static_cast<MeasureType>( m_Interpolator->Evaluate(point) );
     }
   else
     {
@@ -116,17 +119,21 @@ SingleImageCostFunction<TImage>
 ::GetDerivative( const ParametersType & parameters,
                  DerivativeType & derivative ) const
 {
+  typedef typename PointType::ValueType PointValueType;
+
   // Init the derivative
   derivative.SetSize(ImageDimension);
   derivative.Fill( 0.0 );
-    
+
+  unsigned int i;
+
   // Convert parameters to point
   PointType point;
-  for (unsigned int i=0; i<ImageDimension; i++)
+  for ( i=0; i<ImageDimension; i++)
     {
-    point[i] = static_cast<typename PointType::ValueType>( parameters[i] );
+    point[i] = static_cast<PointValueType>( parameters[i] );
     }
-  
+
   // Ensure point is inside image
   typename GradientImageFunctionType::OutputType output;
   output.Fill( 0.0 );
@@ -137,16 +144,15 @@ SingleImageCostFunction<TImage>
     }
 
   // Convert the image function output to the cost function derivative
-  const typename DerivativeType::ValueType DerivativeThreshold = 15.0;
-  for (int i=0; i<ImageDimension; i++)
+  for ( i=0; i<ImageDimension; i++)
     {
     derivative[i] = static_cast<typename DerivativeType::ValueType>( output[i] );
-    
+
     // NOTE: The cost function may undefined / unreachable areas
     //		 (indicated by very large values) which may skew the gradient.
     //		 To avoid this skewing effect, we reset gradient values larger
     //		 than a given threshold.
-    if ( vnl_math_abs(derivative[i]) > DerivativeThreshold )
+    if ( vnl_math_abs(derivative[i]) > m_DerivativeThreshold )
       {
       derivative[i] = 0.0;
       }

@@ -9,8 +9,8 @@
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -57,21 +57,25 @@ PhysicalCentralDifferenceImageFunction<TInputImage,TCoordRep>
   OutputType derivative;
   derivative.Fill( 0.0 );
 
-  for(unsigned int dim=0; dim<TInputImage::ImageDimension; dim++)
+  typename InputImageType::SpacingType spacing = this->m_Image->GetSpacing();
+  double s;
+
+  for(unsigned int dim=0; dim < ImageDimension; dim++)
     {
+    s = static_cast< double >( spacing[dim] );
+
     // Get the left neighbor
     PointType pointLeft( point );
-    pointLeft[dim] += -1 * Superclass::m_Image->GetSpacing()[dim];
+    pointLeft[dim] -= s;
     TCoordRep valueLeft = m_Interpolator->Evaluate( pointLeft );
 
     // Get the right neighbor
     PointType pointRight( point );
-    pointRight[dim] += 1 * Superclass::m_Image->GetSpacing()[dim];
+    pointRight[dim] += s;
     TCoordRep valueRight = m_Interpolator->Evaluate( pointRight );
 
     // Compute derivative
-    derivative[dim] = (valueRight - valueLeft) * 
-                      (0.5 / Superclass::m_Image->GetSpacing()[dim]);
+    derivative[dim] = (valueRight - valueLeft) / ( 2. * s );
     }
 
   return ( derivative );
