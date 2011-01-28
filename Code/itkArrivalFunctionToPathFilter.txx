@@ -132,34 +132,39 @@ ArrivalFunctionToPathFilter<TInputImage,TOutputPath>
   // Setup optimizer
   if ( m_Optimizer.IsNull() )
     {
-        // Compute the minimum spacing
-        double minspacing = input->GetSpacing()[0];
-        for (unsigned int dim=1; dim<InputImageDimension; dim++)
-          {
-          if (input->GetSpacing()[dim] < minspacing)
-            {
-            minspacing = input->GetSpacing()[dim];
-            }
-          }
+    typename InputImageType::SpacingType spacing = input->GetSpacing();
 
-        // Create default optimizer
-        typename DefaultOptimizerType::Pointer defaultOptimizer =
-            DefaultOptimizerType::New();
-        defaultOptimizer->SetNumberOfIterations( 1000 );
-        defaultOptimizer->SetMaximumStepLength( 1.5*minspacing );
-        defaultOptimizer->SetMinimumStepLength( 0.5*minspacing );
-        defaultOptimizer->SetRelaxationFactor( 0.999 );
-        m_Optimizer = defaultOptimizer;
+    // Compute the minimum spacing
+    double minspacing = static_cast< double >( spacing[0] );
+    double s;
+
+    for (unsigned int dim=1; dim < InputImageDimension; dim++)
+      {
+      s = static_cast< double >( spacing[dim] );
+      if ( s < minspacing )
+        {
+        minspacing = s;
+        }
+      }
+    // Create default optimizer
+    typename DefaultOptimizerType::Pointer defaultOptimizer =
+        DefaultOptimizerType::New();
+    defaultOptimizer->SetNumberOfIterations( 1000 );
+    defaultOptimizer->SetMaximumStepLength( 1.5*minspacing );
+    defaultOptimizer->SetMinimumStepLength( 0.5*minspacing );
+    defaultOptimizer->SetRelaxationFactor( 0.999 );
+    m_Optimizer = defaultOptimizer;
     }
   m_Optimizer->SetCostFunction( m_CostFunction );
 
   // Observe optimizer
   typename CommandType::Pointer observer = CommandType::New();
   observer->SetFilter( this );
-  unsigned long observerTag = m_Optimizer->AddObserver( itk::IterationEvent(), observer );
+  unsigned long observerTag =
+      m_Optimizer->AddObserver( itk::IterationEvent(), observer );
 
   // Do for each output
-  for ( unsigned int n=0; n<numberOfOutputs; n++ )
+  for ( unsigned int n=0; n < numberOfOutputs; n++ )
     {
     // Set the output index
     // NOTE: m_CurrentOutput is used in Execute() and GetNextEndPoint()
@@ -172,18 +177,19 @@ ArrivalFunctionToPathFilter<TInputImage,TOutputPath>
 
     // Compute the arrival function
     InputImagePointer function = this->ComputeArrivalFunction( );
+
     if ( m_CostFunction->GetImage() != function )
-    {
+      {
       m_CostFunction->SetImage( function );
       m_CostFunction->Initialize( );
-    }
+      }
 
     // Get the end point to back propagate from
     PointType pointEnd = this->GetNextEndPoint();
 
     // Convert end point to parameters type
     typename CostFunctionType::ParametersType end(InputImageDimension);
-    for (int i=0; i<InputImageDimension; i++)
+    for (unsigned int i=0; i<InputImageDimension; i++)
       {
       end[i] = pointEnd[i];
       }
@@ -211,27 +217,47 @@ ArrivalFunctionToPathFilter<TInputImage,TOutputPath>
   // Cast object to optmizer
   typename OptimizerType::Pointer optimizer = (OptimizerType*)
       dynamic_cast< const OptimizerType* >( object );
-  if ( optimizer.IsNull() ) return;
+  if ( optimizer.IsNull() )
+    {
+    return;
+    }
 
   // Get current position and value
-  typename OptimizerType::ParametersType currentParameters = optimizer->GetCurrentPosition();
+  typename OptimizerType::ParametersType
+      currentParameters = optimizer->GetCurrentPosition();
+
   unsigned int lenParameters = currentParameters.GetSize();
-  if ( lenParameters != InputImageDimension ) return;
-  typename OptimizerType::MeasureType currentValue = optimizer->GetValue( currentParameters );
+
+  if ( lenParameters != InputImageDimension )
+    {
+    return;
+    }
+
+  typename OptimizerType::MeasureType
+      currentValue = optimizer->GetValue( currentParameters );
 
   // Check the current value is above given termination threshold
-  if ( currentValue < m_TerminationValue ) return;
+  if ( currentValue < m_TerminationValue )
+    {
+    return;
+    }
 
   // Convert parameters to point
   bool valid = false;
   unsigned int numparams = optimizer->GetCurrentPosition().GetSize();
-  PointType point; point.Fill( 0.0 );
+
+  PointType point;
+  point.Fill( 0.0 );
+
   for ( unsigned int i=0; i<numparams; i++ )
     {
     point[i] = optimizer->GetCurrentPosition()[i];
     valid = true;
     }
-  if ( !valid ) return;
+  if ( !valid )
+    {
+    return;
+    }
 
   // Convert point to continuous index
   InputImagePointer input = const_cast<InputImageType*>( this->GetInput() );

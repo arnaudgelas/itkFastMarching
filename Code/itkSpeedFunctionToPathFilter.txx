@@ -67,7 +67,7 @@ const typename SpeedFunctionToPathFilter<TInputImage,TOutputPath>::PointType &
 SpeedFunctionToPathFilter<TInputImage,TOutputPath>
 ::GetNextEndPoint()
 {
-  return m_Info[Superclass::m_CurrentOutput].GetEndPoint();
+  return m_Info[this->m_CurrentOutput].GetEndPoint();
 }
 
 
@@ -93,16 +93,13 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
   // limit the front propagation to just the required zones
   IndexType indexTargetPrevious;
   IndexType indexTargetNext;
-  speed->TransformPhysicalPointToIndex
-  (
-  m_Info[Superclass::m_CurrentOutput].PeekPreviousFront(),
-   indexTargetPrevious
-   );
-   speed->TransformPhysicalPointToIndex
-   (
-   m_Info[Superclass::m_CurrentOutput].PeekNextFront(),
-    indexTargetNext
-    );
+
+  PathInfo tempInfo = m_Info[this->m_CurrentOutput];
+  speed->TransformPhysicalPointToIndex( tempInfo.PeekPreviousFront(),
+                                       indexTargetPrevious );
+
+  speed->TransformPhysicalPointToIndex( tempInfo.PeekNextFront(),
+                                       indexTargetNext );
 
   // Update the method and set the arrival function
   typename std::vector< NodeType > TargetNodes;
@@ -117,11 +114,8 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
 
   // Get the next Front source point and add as trial point
   IndexType indexTrial;
-  speed->TransformPhysicalPointToIndex
-  (
-    m_Info[Superclass::m_CurrentOutput].GetCurrentFrontAndAdvance(),
-    indexTrial
-  );
+  speed->TransformPhysicalPointToIndex( tempInfo.GetCurrentFrontAndAdvance(),
+                                       indexTrial );
 
   typename NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
   TrialNodes->push_back( NodePairType( indexTrial, 0.0 ) );
@@ -131,6 +125,7 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
   marcher->UpdateLargestPossibleRegion( );
   m_CurrentArrivalFunction = marcher->GetOutput( );
   m_CurrentArrivalFunction->DisconnectPipeline( );
+
   return m_CurrentArrivalFunction;
 }
 
@@ -173,28 +168,45 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
   // Cast object to optmizer
   typename OptimizerType::Pointer optimizer = (OptimizerType*)
       dynamic_cast< const OptimizerType* >( object );
-  if ( optimizer.IsNull() ) return;
+
+  if ( optimizer.IsNull() )
+    {
+    return;
+    }
 
   // Get current position and value
-  typename OptimizerType::ParametersType currentParameters = optimizer->GetCurrentPosition();
+  typename OptimizerType::ParametersType
+      currentParameters = optimizer->GetCurrentPosition();
+
   unsigned int lenParameters = currentParameters.GetSize();
-  if ( lenParameters != InputImageDimension ) return;
-  typename OptimizerType::MeasureType currentValue = optimizer->GetValue( currentParameters );
+
+  if ( lenParameters != InputImageDimension )
+    {
+    return;
+    }
+  typename OptimizerType::MeasureType
+      currentValue = optimizer->GetValue( currentParameters );
 
   // Convert parameters to point
   bool valid = false;
   unsigned int numparams = optimizer->GetCurrentPosition().GetSize();
-  PointType point; point.Fill( 0.0 );
+
+  PointType point;
+  point.Fill( 0.0 );
+
   for ( unsigned int i=0; i<numparams; i++ )
     {
     point[i] = optimizer->GetCurrentPosition()[i];
     valid = true;
     }
-  if ( !valid ) return;
+  if ( !valid )
+    {
+    return;
+    }
 
   // Check if we have reached the termination value
-  if ( currentValue < Superclass::m_TerminationValue &&
-       m_Info[Superclass::m_CurrentOutput].HasNextFront() )
+  if ( currentValue < this->m_TerminationValue &&
+       m_Info[this->m_CurrentOutput].HasNextFront() )
     {
     // We have terminated the current path segment,
     // but there are more fronts to propagate
@@ -203,19 +215,22 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
     //       Change the next front point to be the current point.
 
     // Update the arrival function and re-initialise the cost function
-    Superclass::m_CostFunction->SetImage( this->ComputeArrivalFunction( ) );
-    Superclass::m_CostFunction->Initialize( );
+    this->m_CostFunction->SetImage( this->ComputeArrivalFunction( ) );
+    this->m_CostFunction->Initialize( );
     }
-  else if ( currentValue >= Superclass::m_TerminationValue )
+  else
     {
-    // Convert point to continuous index
-    InputImagePointer input = const_cast<InputImageType*>( this->GetInput() );
-    ContinuousIndexType cindex;
-    input->TransformPhysicalPointToContinuousIndex( point, cindex );
+    if ( currentValue >= this->m_TerminationValue )
+      {
+      // Convert point to continuous index
+      InputImagePointer input = const_cast<InputImageType*>( this->GetInput() );
+      ContinuousIndexType cindex;
+      input->TransformPhysicalPointToContinuousIndex( point, cindex );
 
-    // Add point as vertex in path
-    OutputPathPointer output = this->GetOutput( Superclass::m_CurrentOutput );
-    output->AddVertex( cindex );
+      // Add point as vertex in path
+      OutputPathPointer output = this->GetOutput( this->m_CurrentOutput );
+      output->AddVertex( cindex );
+      }
     }
 }
 
