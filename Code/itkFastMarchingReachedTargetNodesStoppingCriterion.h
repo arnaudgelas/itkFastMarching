@@ -60,6 +60,9 @@ namespace itk
 
     itkGetConstReferenceMacro( TargetCondition, TargetConditionType );
 
+    itkSetMacro( TargetOffset, ValueType );
+    itkGetMacro( TargetOffset, ValueType );
+
     void SetNumberOfTargetsToBeReached( size_t iN )
       {
       m_NumberOfTargetsToBeReached = iN;
@@ -89,41 +92,51 @@ namespace itk
         {
         Initialize();
         }
-      // Only check for reached targets if the mode is not NoTargets and
-      // there is at least one TargetPoint.
-      if ( m_TargetCondition != NoTargets &&  !m_TargetNodes.empty() )
-        {
-        typename std::vector< NodeType >::const_iterator
-            pointsIter = m_TargetNodes.begin();
-        typename std::vector< NodeType >::const_iterator
-            pointsEnd = m_TargetNodes.end();
 
-        while( pointsIter != pointsEnd )
-          {
-          if ( *pointsIter == iNode )
-            {
-            this->m_ReachedTargetNodes.push_back( iNode );
-            m_Satisfied =
-                ( m_ReachedTargetNodes.size() == m_NumberOfTargetsToBeReached );
-            }
-          ++pointsIter;
-          }
-        }
-      else
+      if( !m_Satisfied )
         {
-        m_Satisfied = false;
+        // Only check for reached targets if the mode is not NoTargets and
+        // there is at least one TargetPoint.
+        if ( m_TargetCondition != NoTargets &&  !m_TargetNodes.empty() )
+          {
+          typename std::vector< NodeType >::const_iterator
+              pointsIter = m_TargetNodes.begin();
+          typename std::vector< NodeType >::const_iterator
+              pointsEnd = m_TargetNodes.end();
+
+          while( pointsIter != pointsEnd )
+            {
+            if ( *pointsIter == iNode )
+              {
+              this->m_ReachedTargetNodes.push_back( iNode );
+              m_Satisfied =
+                  ( m_ReachedTargetNodes.size() == m_NumberOfTargetsToBeReached );
+              }
+            ++pointsIter;
+            }
+          if( m_Satisfied )
+            {
+            m_StoppingValue = this->m_CurrentValue + m_TargetOffset;
+            }
+          }
+        else
+          {
+          m_Satisfied = false;
+          }
         }
       }
 
     bool IsSatisfied() const
       {
-      return m_Satisfied;
+      return m_Satisfied && ( this->m_CurrentValue >= m_StoppingValue );
       }
 
   protected:
     FastMarchingReachedTargetNodesStoppingCriterion() : Superclass()
     {
       m_TargetCondition = NoTargets;
+      m_TargetOffset = NumericTraits< ValueType >::Zero;
+      m_StoppingValue = NumericTraits< ValueType >::Zero;
       m_Satisfied = false;
       m_Initialized = false;
     }
@@ -133,6 +146,8 @@ namespace itk
     std::vector< NodeType > m_TargetNodes;
     std::vector< NodeType > m_ReachedTargetNodes;
     size_t m_NumberOfTargetsToBeReached;
+    ValueType m_TargetOffset;
+    ValueType m_StoppingValue;
     bool m_Satisfied;
     bool m_Initialized;
 

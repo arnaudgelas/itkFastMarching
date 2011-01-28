@@ -1,5 +1,5 @@
 /*=========================================================================
-  
+
   Filter:    MinimalPath
   Program:   Insight Segmentation & Registration Toolkit
   Module:    MinimalPathTests.cxx
@@ -90,7 +90,7 @@ int ReadPathFile( const char * PathFilename, typename PathFilterType::Pointer pa
             parts = itksys::SystemTools::SplitString( line.c_str(), ']' );
             unsigned int numNonNullParts = 0;
             for (unsigned int i=0; i<parts.size(); i++)
-                if ( parts[i].length() != 0 ) numNonNullParts++;                
+                if ( parts[i].length() != 0 ) numNonNullParts++;
             for (unsigned int i=0; i<numNonNullParts; i++)
             {
                 if ( parts[i].length() != 0 )
@@ -117,7 +117,7 @@ int ReadPathFile( const char * PathFilename, typename PathFilterType::Pointer pa
 template <int VDimension>
 int Test_SpeedToPath_GradientDescent_ND(int argc, char* argv[])
 {
-	const unsigned int Dimension = VDimension;
+  const unsigned int Dimension = VDimension;
     typedef float PixelType;
     typedef unsigned char OutputPixelType;
     typedef itk::Image< PixelType, Dimension > ImageType;
@@ -194,22 +194,35 @@ int Test_SpeedToPath_GradientDescent_ND(int argc, char* argv[])
         // Compute the path
         std::cout << "Computing path..." << std::endl;
         itk::TimeProbe time;
-        time.Start( );
-        pathFilter->Update( );
-        time.Stop( );
+        try
+        {
+          time.Start( );
+          pathFilter->Update( );
+          time.Stop( );
+        }
+        catch (itk::ExceptionObject & err)
+        {
+          std::cerr << "ExceptionObject caught !" << std::endl;
+          std::cerr << err << std::endl;
+          return EXIT_FAILURE;
+        }
+
         std::cout << std::setprecision(3) << "Path computed in: " << time.GetMeanTime() << " seconds" << std::endl;
 
         // Allocate output image
-        typename OutputImageType::Pointer output = OutputImageType::New();    
+        typename OutputImageType::Pointer output = OutputImageType::New();
         output->SetRegions( speed->GetLargestPossibleRegion() );
         output->SetSpacing( speed->GetSpacing() );
         output->SetOrigin( speed->GetOrigin() );
         output->Allocate( );
         output->FillBuffer( itk::NumericTraits<OutputPixelType>::Zero );
 
-		// Rasterize path
+        // Rasterize path
+        std::cout << pathFilter->GetNumberOfOutputs() <<std::endl;
+
         for (unsigned int i=0; i<pathFilter->GetNumberOfOutputs(); i++)
         {
+            std::cout <<"** " << i <<std::endl;
             // Get the path
             typename PathType::Pointer path = pathFilter->GetOutput( i );
 
@@ -234,12 +247,22 @@ int Test_SpeedToPath_GradientDescent_ND(int argc, char* argv[])
         typename WriterType::Pointer writer = WriterType::New();
         writer->SetFileName( OutputFilename );
         writer->SetInput( output );
-        writer->Update();
+        try
+          {
+          writer->Update();
+          }
+        catch (itk::ExceptionObject & err)
+        {
+          std::cerr << "writer" <<std::endl;
+            std::cerr << "ExceptionObject caught !" << std::endl;
+            std::cerr << err << std::endl;
+            return EXIT_FAILURE;
+        }
     }
     catch (itk::ExceptionObject & err)
-    { 
-        std::cerr << "ExceptionObject caught !" << std::endl; 
-        std::cerr << err << std::endl; 
+    {
+        std::cerr << "ExceptionObject caught !" << std::endl;
+        std::cerr << err << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -254,15 +277,15 @@ int Test_SpeedToPath_RegularStepGradientDescent_ND(int argc, char* argv[])
 {
 	const unsigned int Dimension = VDimension;
 	typedef float PixelType;
-    typedef unsigned char OutputPixelType;
-    typedef itk::Image< PixelType, Dimension > ImageType;
-    typedef itk::Image< OutputPixelType, Dimension > OutputImageType;
-    typedef itk::ImageFileReader< ImageType > ReaderType;
-    typedef itk::ImageFileWriter< OutputImageType > WriterType;
-    typedef itk::PolyLineParametricPath< Dimension > PathType;
-    typedef itk::SpeedFunctionToPathFilter< ImageType, PathType > PathFilterType;
-    typedef typename PathFilterType::CostFunctionType::CoordRepType CoordRepType;
-    typedef itk::PathIterator< OutputImageType, PathType > PathIteratorType;
+		typedef unsigned char OutputPixelType;
+		typedef itk::Image< PixelType, Dimension > ImageType;
+		typedef itk::Image< OutputPixelType, Dimension > OutputImageType;
+		typedef itk::ImageFileReader< ImageType > ReaderType;
+		typedef itk::ImageFileWriter< OutputImageType > WriterType;
+		typedef itk::PolyLineParametricPath< Dimension > PathType;
+		typedef itk::SpeedFunctionToPathFilter< ImageType, PathType > PathFilterType;
+		typedef typename PathFilterType::CostFunctionType::CoordRepType CoordRepType;
+		typedef itk::PathIterator< OutputImageType, PathType > PathIteratorType;
 
     try
     {
@@ -348,14 +371,14 @@ int Test_SpeedToPath_RegularStepGradientDescent_ND(int argc, char* argv[])
         std::cout << std::setprecision(3) << "Path computed in: " << time.GetMeanTime() << " seconds" << std::endl;
 
         // Allocate output image
-        typename OutputImageType::Pointer output = OutputImageType::New();    
+        typename OutputImageType::Pointer output = OutputImageType::New();
         output->SetRegions( speed->GetLargestPossibleRegion() );
         output->SetSpacing( speed->GetSpacing() );
         output->SetOrigin( speed->GetOrigin() );
         output->Allocate( );
         output->FillBuffer( itk::NumericTraits<OutputPixelType>::Zero );
 
-		// Rasterize path
+    // Rasterize path
         for (unsigned int i=0; i<pathFilter->GetNumberOfOutputs(); i++)
         {
             // Get the path
@@ -385,9 +408,9 @@ int Test_SpeedToPath_RegularStepGradientDescent_ND(int argc, char* argv[])
         writer->Update();
     }
     catch (itk::ExceptionObject & err)
-    { 
-        std::cerr << "ExceptionObject caught !" << std::endl; 
-        std::cerr << err << std::endl; 
+    {
+        std::cerr << "ExceptionObject caught !" << std::endl;
+        std::cerr << err << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -402,15 +425,15 @@ int Test_SpeedToPath_IterateNeighborhood_ND(int argc, char* argv[])
 {
 	const unsigned int Dimension = VDimension;
 	typedef float PixelType;
-    typedef unsigned char OutputPixelType;
-    typedef itk::Image< PixelType, Dimension > ImageType;
-    typedef itk::Image< OutputPixelType, Dimension > OutputImageType;
-    typedef itk::ImageFileReader< ImageType > ReaderType;
-    typedef itk::ImageFileWriter< OutputImageType > WriterType;
-    typedef itk::PolyLineParametricPath< Dimension > PathType;
-    typedef itk::SpeedFunctionToPathFilter< ImageType, PathType > PathFilterType;
-    typedef typename PathFilterType::CostFunctionType::CoordRepType CoordRepType;
-    typedef itk::PathIterator< OutputImageType, PathType > PathIteratorType;
+		typedef unsigned char OutputPixelType;
+		typedef itk::Image< PixelType, Dimension > ImageType;
+		typedef itk::Image< OutputPixelType, Dimension > OutputImageType;
+		typedef itk::ImageFileReader< ImageType > ReaderType;
+		typedef itk::ImageFileWriter< OutputImageType > WriterType;
+		typedef itk::PolyLineParametricPath< Dimension > PathType;
+		typedef itk::SpeedFunctionToPathFilter< ImageType, PathType > PathFilterType;
+		typedef typename PathFilterType::CostFunctionType::CoordRepType CoordRepType;
+		typedef itk::PathIterator< OutputImageType, PathType > PathIteratorType;
 
     try
     {
@@ -488,14 +511,14 @@ int Test_SpeedToPath_IterateNeighborhood_ND(int argc, char* argv[])
         std::cout << std::setprecision(3) << "Path computed in: " << time.GetMeanTime() << " seconds" << std::endl;
 
         // Allocate output image
-        typename OutputImageType::Pointer output = OutputImageType::New();    
+        typename OutputImageType::Pointer output = OutputImageType::New();
         output->SetRegions( speed->GetLargestPossibleRegion() );
         output->SetSpacing( speed->GetSpacing() );
         output->SetOrigin( speed->GetOrigin() );
         output->Allocate( );
         output->FillBuffer( itk::NumericTraits<OutputPixelType>::Zero );
 
-		// Rasterize path
+    // Rasterize path
         for (unsigned int i=0; i<pathFilter->GetNumberOfOutputs(); i++)
         {
             // Get the path
@@ -525,9 +548,9 @@ int Test_SpeedToPath_IterateNeighborhood_ND(int argc, char* argv[])
         writer->Update();
     }
     catch (itk::ExceptionObject & err)
-    { 
-        std::cerr << "ExceptionObject caught !" << std::endl; 
-        std::cerr << err << std::endl; 
+    {
+        std::cerr << "ExceptionObject caught !" << std::endl;
+        std::cerr << err << std::endl;
         return EXIT_FAILURE;
     }
 

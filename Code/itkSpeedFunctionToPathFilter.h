@@ -9,8 +9,8 @@
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -18,7 +18,7 @@
 #define __itkSpeedFunctionToPathFilter_h
 
 #include "itkArrivalFunctionToPathFilter.h"
-#include "itkFastMarchingUpwindGradientImageFilterBase.h"
+#include "itkFastMarchingImageFilterBase.h"
 #include "itkFastMarchingReachedTargetNodesStoppingCriterion.h"
 
 namespace itk
@@ -41,7 +41,7 @@ namespace itk
  * The speed function must be a real-valued (float or double) image
  * in the range [0,1]. If multiple PathInfo objects are added,
  * multiple paths are extracted and saved to separate filter outputs.
- 
+
  * A cost function optimizer may also be provided. If an optimizer
  * is not given, a RegularStepGradientDescentOptimizer is created
  * with default settings. Other suitable optimizers include
@@ -74,7 +74,7 @@ public:
 
   /** Run-time type information (and related methods). */
   itkTypeMacro(SpeedFunctionToPathFilter,ArrivalFunctionToPathFilter);
-  
+
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
@@ -86,9 +86,9 @@ public:
   typedef TInputImage InputImageType;
   typedef typename InputImageType::Pointer        InputImagePointer;
   typedef typename InputImageType::ConstPointer   InputImageConstPointer;
-  typedef typename InputImageType::RegionType     InputImageRegionType; 
+  typedef typename InputImageType::RegionType     InputImageRegionType;
   typedef typename InputImageType::PixelType      InputImagePixelType;
-  
+
   /** Some path typedefs. */
   typedef TOutputPath OutputPathType;
   typedef typename OutputPathType::Pointer        OutputPathPointer;
@@ -104,14 +104,15 @@ public:
   typedef FastMarchingImageReachedTargetNodesStoppingCriterion< InputImageType >
     CriterionType;
   typedef typename CriterionType::Pointer CriterionPointer;
-  typedef IsotropicFastMarchingUpwindGradientImageFilterBase<
-    InputImageDimension, InputImagePixelType, InputImagePixelType > FloatFMType;
+
+  typedef FastMarchingImageFilterBase< InputImageDimension,
+    InputImagePixelType, InputImagePixelType > FloatFMType;
   typedef typename FloatFMType::Pointer FloatFMPointer;
 
   typedef typename FloatFMType::NodeType     NodeType;
   typedef typename FloatFMType::NodePairType NodePairType;
   typedef typename FloatFMType::NodePairContainerType NodePairContainerType;
-  
+
   /** Override superclass behaviour.
    *  Warning: SetPathEndPoint() is not valid for this filter.
    *  This method is provided by the superclass, however it is not
@@ -205,7 +206,7 @@ protected:
   SpeedFunctionToPathFilter( );
   ~SpeedFunctionToPathFilter( );
   virtual void PrintSelf( std::ostream& os, Indent indent ) const;
-  
+
   /** Implemention of algorithm. */
   void GenerateData( void );
 
@@ -224,7 +225,7 @@ protected:
 private:
   SpeedFunctionToPathFilter( const Self& ); //purposely not implemented
   void operator=( const Self& ); //purposely not implemented
-    
+
 };
 
 } // end namespace itk

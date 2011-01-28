@@ -87,7 +87,6 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
   FloatFMPointer marcher = FloatFMType::New();
 
   marcher->SetInput( speed );
-  marcher->SetGenerateGradientImage( false );
 //   marcher->SetTargetOffset( 2.0 * Superclass::m_TerminationValue );
 
   // Add next and previous front sources as target points to
@@ -109,6 +108,9 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
   typename std::vector< NodeType > TargetNodes;
   TargetNodes.push_back( indexTargetPrevious );
   TargetNodes.push_back( indexTargetNext );
+
+  std::cout << indexTargetPrevious <<std::endl;
+  std::cout << indexTargetNext <<std::endl;
 
   criterion->SetTargetNodes( TargetNodes );
   criterion->SetTargetCondition( CriterionType::AllTargets );
