@@ -88,7 +88,6 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
 
   marcher->SetInput( speed );
 
-  std::cout << "TargetOffset: " << 2. * this->m_TerminationValue <<std::endl;
   criterion->SetTargetOffset( 2.0 * this->m_TerminationValue );
 
   // Add next and previous front sources as target points to
@@ -96,29 +95,27 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
   IndexType indexTargetPrevious;
   IndexType indexTargetNext;
 
-  PathInfo tempInfo = m_Info[this->m_CurrentOutput];
-  speed->TransformPhysicalPointToIndex( tempInfo.PeekPreviousFront(),
-                                       indexTargetPrevious );
+  speed->TransformPhysicalPointToIndex(
+        m_Info[this->m_CurrentOutput].PeekPreviousFront(),
+        indexTargetPrevious );
 
-  speed->TransformPhysicalPointToIndex( tempInfo.PeekNextFront(),
-                                       indexTargetNext );
+  speed->TransformPhysicalPointToIndex(
+        m_Info[this->m_CurrentOutput].PeekNextFront(),
+        indexTargetNext );
 
   // Update the method and set the arrival function
   typename std::vector< NodeType > TargetNodes;
   TargetNodes.push_back( indexTargetPrevious );
   TargetNodes.push_back( indexTargetNext );
 
-  std::cout <<"***" <<std::endl;
-  std::cout << "Previous: " <<indexTargetPrevious <<std::endl;
-  std::cout << "Next: " << indexTargetNext <<std::endl;
-
   criterion->SetTargetNodes( TargetNodes );
   criterion->SetTargetCondition( CriterionType::AllTargets );
 
   // Get the next Front source point and add as trial point
   IndexType indexTrial;
-  speed->TransformPhysicalPointToIndex( tempInfo.GetCurrentFrontAndAdvance(),
-                                       indexTrial );
+  speed->TransformPhysicalPointToIndex(
+        m_Info[this->m_CurrentOutput].GetCurrentFrontAndAdvance(),
+        indexTrial );
 
   typename NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
   TrialNodes->push_back( NodePairType( indexTrial, 0.0 ) );
@@ -207,7 +204,6 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
     return;
     }
 
-  std::cout <<currentValue <<std::endl;
   // Check if we have reached the termination value
   if ( currentValue < this->m_TerminationValue &&
        m_Info[this->m_CurrentOutput].HasNextFront() )
@@ -234,7 +230,6 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
       // Add point as vertex in path
       OutputPathPointer output = this->GetOutput( this->m_CurrentOutput );
       output->AddVertex( cindex );
-      std::cout <<"# " <<cindex <<std::endl;
       }
     }
 }

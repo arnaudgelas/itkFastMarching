@@ -149,6 +149,10 @@ public:
   public:
     PathInfo()
       { this->ClearInfo(); }
+    PathInfo( const PathInfo& iE ) : m_Info( iE.m_Info ), m_Front( iE.m_Front )
+      {}
+    void operator = ( const PathInfo& iE )
+      { this->m_Info = iE.m_Info; m_Front = iE.m_Front; }
     void ClearInfo()
       { m_Info.clear();  m_Info.resize(2); m_Front = 1; }
     void SetStartPoint( const PointType & start )
