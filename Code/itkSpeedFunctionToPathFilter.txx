@@ -87,7 +87,9 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
   FloatFMPointer marcher = FloatFMType::New();
 
   marcher->SetInput( speed );
-//   marcher->SetTargetOffset( 2.0 * Superclass::m_TerminationValue );
+
+  std::cout << "TargetOffset: " << 2. * this->m_TerminationValue <<std::endl;
+  criterion->SetTargetOffset( 2.0 * this->m_TerminationValue );
 
   // Add next and previous front sources as target points to
   // limit the front propagation to just the required zones
@@ -106,8 +108,9 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
   TargetNodes.push_back( indexTargetPrevious );
   TargetNodes.push_back( indexTargetNext );
 
-  std::cout << indexTargetPrevious <<std::endl;
-  std::cout << indexTargetNext <<std::endl;
+  std::cout <<"***" <<std::endl;
+  std::cout << "Previous: " <<indexTargetPrevious <<std::endl;
+  std::cout << "Next: " << indexTargetNext <<std::endl;
 
   criterion->SetTargetNodes( TargetNodes );
   criterion->SetTargetCondition( CriterionType::AllTargets );
@@ -204,6 +207,7 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
     return;
     }
 
+  std::cout <<currentValue <<std::endl;
   // Check if we have reached the termination value
   if ( currentValue < this->m_TerminationValue &&
        m_Info[this->m_CurrentOutput].HasNextFront() )
@@ -230,6 +234,7 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
       // Add point as vertex in path
       OutputPathPointer output = this->GetOutput( this->m_CurrentOutput );
       output->AddVertex( cindex );
+      std::cout <<"# " <<cindex <<std::endl;
       }
     }
 }

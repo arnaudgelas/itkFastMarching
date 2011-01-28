@@ -1,3 +1,5 @@
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR} )
+
 #Set output path
 SET(TESTING_OUTPUT_PATH "${FMM_BINARY_DIR}/Testing/Temporary")
 MAKE_DIRECTORY(${TESTING_OUTPUT_PATH})

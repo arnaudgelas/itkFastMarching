@@ -162,6 +162,7 @@ ArrivalFunctionToPathFilter<TInputImage,TOutputPath>
   unsigned long observerTag =
       m_Optimizer->AddObserver( itk::IterationEvent(), observer );
 
+  std::cout << "numberOfOutputs : " << numberOfOutputs <<std::endl;
   // Do for each output
   for ( unsigned int n=0; n < numberOfOutputs; n++ )
     {
@@ -185,6 +186,8 @@ ArrivalFunctionToPathFilter<TInputImage,TOutputPath>
 
     // Get the end point to back propagate from
     PointType pointEnd = this->GetNextEndPoint();
+
+    std::cout << "pointEnd: " <<pointEnd <<std::endl;
 
     // Convert end point to parameters type
     typename CostFunctionType::ParametersType end(InputImageDimension);
