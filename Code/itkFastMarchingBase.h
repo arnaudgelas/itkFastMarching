@@ -168,7 +168,6 @@ public:
   itkSetMacro( SpeedConstant, double );
 
   itkGetMacro( TargetReachedValue, OutputPixelType );
-  itkSetMacro( TargetReachedValue, OutputPixelType );
 
   /** Set the Collect Points flag. Instrument the algorithm to collect
   * a container of all nodes which it has visited. Useful for
