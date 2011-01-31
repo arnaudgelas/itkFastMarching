@@ -123,6 +123,11 @@ namespace itk
       return m_Satisfied && ( this->m_CurrentValue >= m_StoppingValue );
       }
 
+    const std::string GetDescription() const
+      {
+      return "Target Nodes Reached with possible overshoot";
+      }
+
   protected:
     FastMarchingReachedTargetNodesStoppingCriterion() : Superclass()
       {

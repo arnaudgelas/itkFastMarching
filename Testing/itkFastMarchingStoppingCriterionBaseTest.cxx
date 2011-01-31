@@ -42,6 +42,7 @@ namespace itk
 
     void SetCurrentNode( const NodeType& iNode ) { (void) iNode; }
     bool IsSatisfied() const { return true; }
+    const std::string GetDescription() const { return "Description"; }
 
   protected:
     FastMarchingStoppingCriterionBaseHelperTest() : Superclass() {}
