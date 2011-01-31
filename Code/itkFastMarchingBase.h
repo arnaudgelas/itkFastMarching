@@ -206,8 +206,13 @@ protected:
   bool m_CollectPoints;
 
   //PriorityQueuePointer m_Heap;
-  typedef std::vector< NodePairType > HeapContainerType;
-  std::priority_queue< NodeType, HeapContainerType > m_Heap;
+  typedef std::vector< NodePairType >   HeapContainerType;
+  typedef std::greater< NodePairType >  NodeComparerType;
+
+  typedef std::priority_queue< NodeType, HeapContainerType, NodeComparerType >
+    PriorityQueueType;
+
+  PriorityQueueType m_Heap;
 
   TopologyCheckType m_TopologyCheck;
 

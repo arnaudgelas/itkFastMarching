@@ -58,6 +58,7 @@ public:
     NodePair() : Superclass() {}
     NodePair( const NodeType& iNode, const OutputPixelType& iValue ) :
       Superclass( iNode, iValue ) {}
+    NodePair( const Self& iPair ) : Superclass( iPair ) {}
 
     void SetValue( const OutputPixelType& iValue )
       {
@@ -78,7 +79,22 @@ public:
 
     bool operator < ( const Self& iRight ) const
       {
+      return this->second < iRight.second;
+      }
+
+    bool operator > ( const Self& iRight ) const
+      {
       return this->second > iRight.second;
+      }
+
+    bool operator <= ( const Self& iRight ) const
+      {
+      return this->second <= iRight.second;
+      }
+
+    bool operator >= ( const Self& iRight ) const
+      {
+      return this->second >= iRight.second;
       }
     };
 
@@ -118,7 +134,9 @@ class ImageFastMarchingTraits :
       ImageToImageFilter< Image< TInputPixel, VDimension >,
                           Image< TOutputPixel, VDimension > >
     >
-  {};
+  {
+  itkStaticConstMacro(ImageDimension, unsigned int, VDimension);
+  };
 
 /**  \class MeshFastMarchingTraits
   \brief traits to be used when dealing with Mesh for FastMarchingBase
@@ -136,6 +154,8 @@ class MeshFastMarchingTraits :
       MeshToMeshFilter< Mesh< TInputPixel, VDimension, TInputMeshTraits >,
                         Mesh< TOutputPixel, VDimension, TOutputMeshTraits > >
     >
-  {};
+  {
+  itkStaticConstMacro(PointDimension, unsigned int, VDimension);
+  };
 }
 #endif // __itkFastMarchingTraits_h
