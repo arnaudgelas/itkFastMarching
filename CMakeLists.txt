@@ -12,8 +12,17 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY
     ${FMM_BINARY_DIR}/bin
   )
 
+set( EXECUTABLE_OUTPUT_PATH
+    ${FMM_BINARY_DIR}/bin
+  )
+
+
 set( DATA_DIRECTORY
   ${FMM_SOURCE_DIR}/Data
+  )
+
+set( CODE_DIRECTORY
+  ${FMM_SOURCE_DIR}/Code
   )
 
 set( CTEST_CUSTOM_COVERAGE_EXCLUDE
@@ -21,7 +30,10 @@ set( CTEST_CUSTOM_COVERAGE_EXCLUDE
   "${FMM_SOURCE_DIR}/Testing/*"
 )
 
-set( BASE_SOURCE ${FMM_SOURCE_DIR}/Code/itkStoppingCriterionBase.cxx )
+set( BASE_SOURCE
+  ${FMM_SOURCE_DIR}/Code/itkStoppingCriterionBase.cxx
+  ${FMM_SOURCE_DIR}/Code/itkIterateNeighborhoodOptimizer.cxx
+)
 
 include_directories( Code )
 
@@ -44,6 +56,12 @@ endif()
 include( CTest )
 add_subdirectory( Testing )
 
+#The following lines are required to use Dart
+INCLUDE(Dart)
+FIND_PROGRAM(IMAGE_COMPARE ImageCompare)
+
 if( BUILD_TESTING )
   set(BUILDNAME "${BUILDNAME}" CACHE STRING "Name of the build on the dashboard" )
 endif()
+
+SET(TESTING_PATH ${FMM_SOURCE_DIR}/Testing)
