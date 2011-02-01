@@ -131,8 +131,6 @@ GenerateData()
 
   OutputPixelType current_value = 0.;
 
-  std::cout << this->GetTotalNumberOfNodes() <<std::endl;
-
   ProgressReporter progress( this, 0, this->GetTotalNumberOfNodes() );
 
   try
