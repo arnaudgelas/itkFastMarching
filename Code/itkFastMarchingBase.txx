@@ -131,6 +131,8 @@ GenerateData()
 
   OutputPixelType current_value = 0.;
 
+  std::cout << this->GetTotalNumberOfNodes() <<std::endl;
+
   ProgressReporter progress( this, 0, this->GetTotalNumberOfNodes() );
 
   try
@@ -178,8 +180,8 @@ GenerateData()
             this->UpdateNeighbors( output, current_node );
             }
           }
+        progress.CompletedPixel();
         }
-      progress.CompletedPixel();
       }
     }
   catch ( ProcessAborted & )
@@ -203,7 +205,6 @@ GenerateData()
     }
 
   m_TargetReachedValue = current_value;
-  this->UpdateProgress(1.0);
 
   // let's release some useless memory...
   while( !m_Heap.empty() )

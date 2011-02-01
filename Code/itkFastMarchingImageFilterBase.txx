@@ -131,7 +131,7 @@ IdentifierType
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 GetTotalNumberOfNodes() const
   {
-  return this->m_OutputRegion.GetNumberOfPixels();
+    return this->m_BufferedRegion.GetNumberOfPixels();
   }
 // -----------------------------------------------------------------------------
 
