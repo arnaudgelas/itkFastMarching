@@ -236,6 +236,8 @@ protected:
   LabelImagePointer m_LabelImage;
   ConnectedComponentImagePointer                m_ConnectedComponentImage;
 
+  IdentifierType GetTotalNumberOfNodes() const;
+
   /** Returns the output value for a given node */
   OutputPixelType GetOutputValue( OutputImageType* oImage,
                                   const NodeType& iNode ) const;

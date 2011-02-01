@@ -18,6 +18,8 @@
 
 #include "itkFastMarchingStoppingCriterionBase.h"
 #include "itkFastMarchingBase.h"
+#include "itkImage.h"
+#include "itkMesh.h"
 
 namespace itk
 {

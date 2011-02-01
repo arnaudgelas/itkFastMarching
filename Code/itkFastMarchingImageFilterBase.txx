@@ -127,6 +127,16 @@ EnlargeOutputRequestedRegion(
 
 // -----------------------------------------------------------------------------
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+IdentifierType
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+GetTotalNumberOfNodes() const
+  {
+  return this->m_OutputRegion.GetNumberOfPixels();
+  }
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
 typename
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 OutputPixelType

@@ -50,6 +50,9 @@ protected:
   FastMarchingBaseTestHelper() {}
   ~FastMarchingBaseTestHelper() {}
 
+  IdentifierType GetTotalNumberOfNodes() const
+    { return 1; }
+
   OutputPixelType GetOutputValue( OutputDomainType* ,
                                   const NodeType& ) const
     {

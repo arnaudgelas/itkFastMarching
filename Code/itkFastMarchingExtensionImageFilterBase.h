@@ -79,38 +79,33 @@ public:
   itkStaticConstMacro(AuxDimension, unsigned int, VAuxDimension);
 
   /** AuxVarType typedef support. */
-  //typedef AuxVarTypeDefault< TAuxValue,
-  //                           itkGetStaticConstMacro(AuxDimension),
-  //                           itkGetStaticConstMacro(ImageDimension) >
-  //AuxVarType;
-  typedef TAuxValue       AuxValueType;
-  typedef Vector< AuxValueType, AuxDimension >  AuxValueVectorType;
+  typedef TAuxValue                                             AuxValueType;
+  typedef Vector< AuxValueType, AuxDimension >                  AuxValueVectorType;
   typedef VectorContainer< IdentifierType, AuxValueVectorType > AuxValueContainerType;
-  typedef typename AuxValueContainerType::Pointer AuxValueContainerPointer;
+
+  typedef typename AuxValueContainerType::Pointer       AuxValueContainerPointer;
   typedef typename AuxValueContainerType::ConstIterator AuxValueContainerConstIterator;
 
   typedef Image< AuxValueType, ImageDimension > AuxImageType;
   typedef typename AuxImageType::Pointer        AuxImagePointer;
 
-  //typedef typename AuxVarType::AuxValueContainer  AuxValueContainer;
-  //typedef typename AuxVarType::AuxImageType       AuxImageType;
-  //typedef typename AuxVarType::AuxImagePointer    AuxImagePointer;
 
   /** Index typedef support. */
-  typedef typename Superclass::NodeType NodeType;
-  typedef typename Superclass::NodePairType NodePairType;
+  typedef typename Superclass::NodeType       NodeType;
+  typedef typename Superclass::NodePairType   NodePairType;
 
-  typedef typename Superclass::NodeContainerType NodeContainerType;
-  typedef typename Superclass::NodeContainerPointer NodeContainerPointer;
+  typedef typename Superclass::NodeContainerType          NodeContainerType;
+  typedef typename Superclass::NodeContainerPointer       NodeContainerPointer;
   typedef typename Superclass::NodeContainerConstIterator NodeContainerConstIterator;
 
-  typedef typename Superclass::NodePairContainerType NodePairContainerType;
+  typedef typename Superclass::NodePairContainerType    NodePairContainerType;
   typedef typename Superclass::NodePairContainerPointer NodePairContainerPointer;
-  typedef typename Superclass::NodePairContainerConstIterator NodePairContainerConstIterator;
+  typedef typename Superclass::NodePairContainerConstIterator
+    NodePairContainerConstIterator;
 
-  typedef typename Superclass::OutputImageType OutputImageType;
-  typedef typename Superclass::OutputPixelType OutputPixelType;
-  typedef typename Superclass::InternalNodeStructure InternalNodeStructure;
+  typedef typename Superclass::OutputImageType        OutputImageType;
+  typedef typename Superclass::OutputPixelType        OutputPixelType;
+  typedef typename Superclass::InternalNodeStructure  InternalNodeStructure;
 
   /** Get one of the extended auxiliary variable image. */
   AuxImageType * GetAuxiliaryImage( const unsigned int& idx );

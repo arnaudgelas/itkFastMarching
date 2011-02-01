@@ -19,6 +19,7 @@
 #ifndef __itkFastMarchingBase_h
 #define __itkFastMarchingBase_h
 
+#include "itkIntTypes.h"
 #include "itkFastMarchingStoppingCriterionBase.h"
 
 //#include "itkPriorityQueueContainer.h"
@@ -214,6 +215,8 @@ protected:
   PriorityQueueType m_Heap;
 
   TopologyCheckType m_TopologyCheck;
+
+  virtual IdentifierType GetTotalNumberOfNodes() const = 0;
 
   virtual OutputPixelType GetOutputValue( OutputDomainType* oDomain,
                                          const NodeType& iNode ) const = 0;

@@ -18,6 +18,8 @@
 
 #include "itkFastMarchingThresholdStoppingCriterion.h"
 #include "itkFastMarchingBase.h"
+#include "itkImage.h"
+#include "itkMesh.h"
 
 int main( int argc, char* argv[] )
   {

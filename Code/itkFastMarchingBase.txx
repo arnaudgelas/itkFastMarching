@@ -19,13 +19,10 @@
 #ifndef __itkFastMarchingBase_txx
 #define __itkFastMarchingBase_txx
 
-#include "itkImage.h"
-#include "itkImageToImageFilter.h"
-
-#include "itkMesh.h"
-#include "itkMeshToMeshFilter.h"
-
 #include "itkFastMarchingBase.h"
+
+#include "itkProgressReporter.h"
+#include "vnl/vnl_math.h"
 
 //#include "itkPriorityQueueContainer.h"
 
@@ -134,13 +131,10 @@ GenerateData()
 
   OutputPixelType current_value = 0.;
 
-  this->UpdateProgress(0.0);   // Send first progress event
+  ProgressReporter progress( this, 0, this->GetTotalNumberOfNodes() );
 
   try
     {
-    //double newProgress = 0.;
-    //double oldProgress = 0.;
-
     //while( !m_Heap->Empty() )
     while( !m_Heap.empty() )
       {
@@ -182,21 +176,10 @@ GenerateData()
 
             // update its neighbors
             this->UpdateNeighbors( output, current_node );
-
-
-            // Send events every certain number of points.
-            /*
-            newProgress = static_cast< double >( current_value ) /
-              static_cast< double >( m_StoppingValue );
-
-            if ( newProgress - oldProgress > 0.01 )
-              {
-              this->UpdateProgress(newProgress);
-              oldProgress = newProgress;
-              }*/
             }
           }
         }
+      progress.CompletedPixel();
       }
     }
   catch ( ProcessAborted & )
