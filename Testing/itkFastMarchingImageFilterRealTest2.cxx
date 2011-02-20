@@ -97,7 +97,7 @@ int main(int argc, char* argv[] )
   node_pair.SetNode( index ); // this node is out of range
   alive->push_back( node_pair );
 
-  marcher->SetAliveNodes( alive );
+  marcher->SetAlivePoints( alive );
 
   // setup trial points
   NodePairContainerType::Pointer trial = NodePairContainerType::New();
@@ -130,7 +130,7 @@ int main(int argc, char* argv[] )
   node_pair.SetNode( index );
   trial->push_back( node_pair );
 
-  marcher->SetTrialNodes( trial );
+  marcher->SetTrialPoints( trial );
 
   // specify the size of the output image
   FloatImageType::SizeType size = {{64,64}};

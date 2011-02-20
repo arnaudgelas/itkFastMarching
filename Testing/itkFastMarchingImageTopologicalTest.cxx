@@ -116,8 +116,8 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
   typedef typename FastMarchingType::NodePairContainerType NodePairContainerType;
 
 
-  typename NodePairContainerType::Pointer AliveNodes = NodePairContainerType::New();
-  typename NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
+  typename NodePairContainerType::Pointer AlivePoints = NodePairContainerType::New();
+  typename NodePairContainerType::Pointer TrialPoints = NodePairContainerType::New();
 
   itk::ImageRegionIteratorWithIndex<LabelImageType> ItL(
         labelImageReader->GetOutput(),
@@ -134,21 +134,21 @@ int FastMarchingImageFilter( unsigned int argc, char *argv[] )
     {
     if( ItC.Get() != label_zero )
       {
-      TrialNodes->push_back( NodePairType( ItC.GetIndex(), 0. ) );
+      TrialPoints->push_back( NodePairType( ItC.GetIndex(), 0. ) );
       }
     else
       {
       if( ItL.Get() != label_zero )
         {
-        AliveNodes->push_back( NodePairType( ItL.GetIndex(), 0. ) );
+        AlivePoints->push_back( NodePairType( ItL.GetIndex(), 0. ) );
         }
       }
     ++ItL;
     ++ItC;
     }
 
-  fastMarching->SetTrialNodes(  TrialNodes  );
-  fastMarching->SetAliveNodes(  AliveNodes  );
+  fastMarching->SetTrialPoints(  TrialPoints  );
+  fastMarching->SetAlivePoints(  AlivePoints  );
 
   fastMarching->SetTopologyCheck( FastMarchingType::None );
 

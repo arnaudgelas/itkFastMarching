@@ -75,44 +75,43 @@ int main(int, char* [] )
   typedef FloatFMType::NodePairContainerType NodePairContainerType;
 
   // setup alive points
-  NodePairContainerType::Pointer AliveNodes = NodePairContainerType::New();
+  NodePairContainerType::Pointer AlivePoints = NodePairContainerType::New();
 
   FloatImageType::OffsetType offset0 = {{28,35}};
 
   itk::Index<2> index;
   index.Fill(0);
 
-  AliveNodes->push_back( NodePairType( index + offset0, 0. ) );
-  AliveNodes->push_back( NodePairType( index + offset0, 42. ) );
+  AlivePoints->push_back( NodePairType( index + offset0, 0. ) );
+  AlivePoints->push_back( NodePairType( index + offset0, 42. ) );
 
-  marcher->SetAliveNodes( AliveNodes );
-
+  marcher->SetAlivePoints( AlivePoints );
 
   // setup trial points
-  NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
+  NodePairContainerType::Pointer TrialPoints = NodePairContainerType::New();
 
   index.Fill(0);
   index += offset0;
 
   index[0] += 1;
-  TrialNodes->push_back( NodePairType( index, 1. ) );
+  TrialPoints->push_back( NodePairType( index, 1. ) );
 
   index[0] -= 1;
   index[1] += 1;
-  TrialNodes->push_back( NodePairType( index, 1. ) );
+  TrialPoints->push_back( NodePairType( index, 1. ) );
 
   index[0] -= 1;
   index[1] -= 1;
-  TrialNodes->push_back( NodePairType( index, 1. ) );
+  TrialPoints->push_back( NodePairType( index, 1. ) );
 
   index[0] += 1;
   index[1] -= 1;
-  TrialNodes->push_back( NodePairType( index, 1. ) );
+  TrialPoints->push_back( NodePairType( index, 1. ) );
 
   index.Fill( 300 ); // this node is out of ranage
-  TrialNodes->push_back( NodePairType( index, 42. ) );
+  TrialPoints->push_back( NodePairType( index, 42. ) );
 
-  marcher->SetTrialNodes( TrialNodes );
+  marcher->SetTrialPoints( TrialPoints );
 
   // specify the size of the output image
   FloatImageType::SizeType size = {{64,64}};

@@ -526,10 +526,10 @@ InitializeOutput( OutputImageType* oImage )
   NodeType idx;
   OutputPixelType outputPixel = this->m_LargeValue;
 
-  if ( this->m_AliveNodes )
+  if ( this->m_AlivePoints )
     {
-    NodePairContainerConstIterator pointsIter = this->m_AliveNodes->Begin();
-    NodePairContainerConstIterator pointsEnd = this->m_AliveNodes->End();
+    NodePairContainerConstIterator pointsIter = this->m_AlivePoints->Begin();
+    NodePairContainerConstIterator pointsEnd = this->m_AlivePoints->End();
 
     while( pointsIter != pointsEnd )
       {
@@ -555,10 +555,10 @@ InitializeOutput( OutputImageType* oImage )
       }
     }
 
-  if( this->m_ForbiddenNodes )
+  if( this->m_ForbiddenPoints )
     {
-    NodeContainerConstIterator p_it = this->m_ForbiddenNodes->Begin();
-    NodeContainerConstIterator p_end = this->m_ForbiddenNodes->End();
+    NodeContainerConstIterator p_it = this->m_ForbiddenPoints->Begin();
+    NodeContainerConstIterator p_end = this->m_ForbiddenPoints->End();
 
     OutputPixelType zero = NumericTraits< OutputPixelType >::Zero;
 
@@ -598,10 +598,10 @@ InitializeOutput( OutputImageType* oImage )
     }
 
   // process the input trial points
-  if ( this->m_TrialNodes )
+  if ( this->m_TrialPoints )
     {
-    NodePairContainerConstIterator pointsIter = this->m_TrialNodes->Begin();
-    NodePairContainerConstIterator pointsEnd = this->m_TrialNodes->End();
+    NodePairContainerConstIterator pointsIter = this->m_TrialPoints->Begin();
+    NodePairContainerConstIterator pointsEnd = this->m_TrialPoints->End();
 
     while( pointsIter != pointsEnd )
       {

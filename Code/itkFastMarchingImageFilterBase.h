@@ -144,9 +144,9 @@ public:
     OutputSizeType nullsize;
     nullsize.Fill( 0 );
 
-    if( this->m_ForbiddenNodes.IsNull() )
+    if( this->m_ForbiddenPoints.IsNull() )
       {
-      this->m_ForbiddenNodes = NodeContainerType::New();
+      this->m_ForbiddenPoints = NodeContainerType::New();
       }
 
 
@@ -173,7 +173,7 @@ public:
           {
           idx = b_it.GetIndex();
 
-          this->m_ForbiddenNodes->push_back( idx );
+          this->m_ForbiddenPoints->push_back( idx );
           //if ( m_BufferedRegion.IsInside( idx ) )
           //  {
           //  m_LabelImage->SetPixel(idx, Superclass::Forbidden );

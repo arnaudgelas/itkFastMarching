@@ -99,9 +99,9 @@ SpeedFunctionToPathFilter<TInputImage,TOutputPath>
         m_Info[this->m_CurrentOutput].GetCurrentFrontAndAdvance(),
         indexTrial );
 
-  typename NodePairContainerType::Pointer TrialNodes = NodePairContainerType::New();
-  TrialNodes->push_back( NodePairType( indexTrial, 0.0 ) );
-  marcher->SetTrialNodes( TrialNodes );
+  typename NodePairContainerType::Pointer TrialPoints = NodePairContainerType::New();
+  TrialPoints->push_back( NodePairType( indexTrial, 0.0 ) );
+  marcher->SetTrialPoints( TrialPoints );
 
   marcher->SetStoppingCriterion( criterion );
   marcher->UpdateLargestPossibleRegion( );

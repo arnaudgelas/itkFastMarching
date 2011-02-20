@@ -151,7 +151,7 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
     {
     itkExceptionMacro(<< "in Initialize(): Null pointer for AuxAliveValues");
     }
-  if ( m_AuxiliaryAliveValues->size() != ( this->m_AliveNodes->size() ) )
+  if ( m_AuxiliaryAliveValues->size() != ( this->m_AlivePoints->size() ) )
     {
     itkExceptionMacro(<< "in Initialize(): AuxAliveValues is the wrong size");
     }
@@ -160,7 +160,7 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
     {
     itkExceptionMacro(<< "in Initialize(): Null pointer for AuxTrialValues");
     }
-  if ( m_AuxiliaryTrialValues->size() != this->m_TrialNodes->size() )
+  if ( m_AuxiliaryTrialValues->size() != this->m_TrialPoints->size() )
     {
     itkExceptionMacro(<< "in Initialize(): AuxTrialValues is the wrong size");
     }
@@ -184,8 +184,8 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
   if ( m_AuxiliaryAliveValues )
     {
     AuxValueContainerConstIterator auxIter = m_AuxiliaryAliveValues->Begin();
-    NodePairContainerConstIterator pointsIter =  this->m_AliveNodes->Begin();
-    NodePairContainerConstIterator pointsEnd =  this->m_AliveNodes->Begin();
+    NodePairContainerConstIterator pointsIter =  this->m_AlivePoints->Begin();
+    NodePairContainerConstIterator pointsEnd =  this->m_AlivePoints->Begin();
 
     while( pointsIter != pointsEnd )
       {
@@ -208,8 +208,8 @@ FastMarchingExtensionImageFilterBase< VDimension, TInputPixel, TOutputPixel,
   if ( m_AuxiliaryTrialValues )
     {
     AuxValueContainerConstIterator auxIter = m_AuxiliaryTrialValues->Begin();
-    NodePairContainerConstIterator pointsIter =  this->m_TrialNodes->Begin();
-    NodePairContainerConstIterator pointsEnd =  this->m_TrialNodes->End();
+    NodePairContainerConstIterator pointsIter =  this->m_TrialPoints->Begin();
+    NodePairContainerConstIterator pointsEnd =  this->m_TrialPoints->End();
 
     while ( pointsIter != pointsEnd )
       {

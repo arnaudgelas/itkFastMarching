@@ -149,17 +149,17 @@ public:
   itkSetMacro( TopologyCheck, TopologyCheckType );
   itkGetConstReferenceMacro( TopologyCheck, TopologyCheckType );
 
-  itkSetObjectMacro( TrialNodes, NodePairContainerType );
-  itkGetObjectMacro( TrialNodes, NodePairContainerType );
+  itkSetObjectMacro( TrialPoints, NodePairContainerType );
+  itkGetObjectMacro( TrialPoints, NodePairContainerType );
 
-  itkSetObjectMacro( AliveNodes, NodePairContainerType );
-  itkGetObjectMacro( AliveNodes, NodePairContainerType );
+  itkSetObjectMacro( AlivePoints, NodePairContainerType );
+  itkGetObjectMacro( AlivePoints, NodePairContainerType );
 
-  itkSetObjectMacro( ProcessedNodes, NodePairContainerType );
-  itkGetObjectMacro( ProcessedNodes, NodePairContainerType );
+  itkSetObjectMacro( ProcessedPoints, NodePairContainerType );
+  itkGetObjectMacro( ProcessedPoints, NodePairContainerType );
 
-  itkSetObjectMacro( ForbiddenNodes, NodeContainerType );
-  itkGetObjectMacro( ForbiddenNodes, NodeContainerType );
+  itkSetObjectMacro( ForbiddenPoints, NodeContainerType );
+  itkGetObjectMacro( ForbiddenPoints, NodeContainerType );
 
   /** \brief Set/Get the Stopping Criterion */
   itkGetObjectMacro( StoppingCriterion, StoppingCriterionType );
@@ -198,10 +198,10 @@ protected:
   OutputPixelType m_LargeValue;
   OutputPixelType m_TopologyValue;
 
-  NodePairContainerPointer  m_TrialNodes;
-  NodePairContainerPointer  m_AliveNodes;
-  NodePairContainerPointer  m_ProcessedNodes;
-  NodeContainerPointer      m_ForbiddenNodes;
+  NodePairContainerPointer  m_TrialPoints;
+  NodePairContainerPointer  m_AlivePoints;
+  NodePairContainerPointer  m_ProcessedPoints;
+  NodeContainerPointer      m_ForbiddenPoints;
 
   bool m_CollectPoints;
 

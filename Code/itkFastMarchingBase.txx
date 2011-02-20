@@ -35,10 +35,10 @@ FastMarchingBase()
   {
   this->ProcessObject::SetNumberOfRequiredInputs(0);
 
-  m_TrialNodes = NULL;
-  m_AliveNodes = NULL;
-  m_ProcessedNodes = NULL;
-  m_ForbiddenNodes = NULL;
+  m_TrialPoints = NULL;
+  m_AlivePoints = NULL;
+  m_ProcessedPoints = NULL;
+  m_ForbiddenPoints = NULL;
 
   //m_Heap = PriorityQueueType::New();
   m_SpeedConstant = 1.;
@@ -79,7 +79,7 @@ void
 FastMarchingBase< TTraits >::
 Initialize( OutputDomainType* oDomain )
   {
-  if( m_TrialNodes.IsNull() )
+  if( m_TrialPoints.IsNull() )
     {
     itkExceptionMacro( <<"No Trial Nodes" );
     }
@@ -97,9 +97,9 @@ Initialize( OutputDomainType* oDomain )
     }
   if( m_CollectPoints )
     {
-    if( m_ProcessedNodes.IsNull() )
+    if( m_ProcessedPoints.IsNull() )
       {
-      m_ProcessedNodes = NodePairContainerType::New();
+      m_ProcessedPoints = NodePairContainerType::New();
       }
     }
 
@@ -168,7 +168,7 @@ GenerateData()
             {
             if ( m_CollectPoints )
               {
-              m_ProcessedNodes->push_back( current_node_pair );
+              m_ProcessedPoints->push_back( current_node_pair );
               }
 
               // set this node as alive

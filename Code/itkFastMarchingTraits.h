@@ -60,6 +60,12 @@ public:
       Superclass( iNode, iValue ) {}
     NodePair( const Self& iPair ) : Superclass( iPair ) {}
 
+    void operator = ( const Self& iPair )
+      {
+      this->first = iPair.first;
+      this->second = iPair.second;
+      }
+
     void SetValue( const OutputPixelType& iValue )
       {
       this->second = iValue;
