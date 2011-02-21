@@ -172,24 +172,20 @@ int main(int argc, char* argv[] )
 
   while ( !iterator.IsAtEnd() )
     {
-
-    FloatImageType::IndexType tempIndex;
-    double distance;
-    float outputValue;
-
-    tempIndex = iterator.GetIndex();
+    FloatImageType::IndexType tempIndex = iterator.GetIndex();
     tempIndex -= offset0;
-    distance = 0.0;
+
+    double distance = 0.0;
     for ( int j = 0; j < 2; j++ )
       {
       distance += tempIndex[j] * tempIndex[j];
       }
     distance = vcl_sqrt( distance );
 
-    outputValue = iterator.Get();
+    double outputValue = static_cast< double >( iterator.Get() );
 
     //std::cout << iterator.GetIndex() <<" ** " <<outputValue <<std::endl;
-    if (distance != 0)
+    if (distance < itk::NumericTraits< double >::epsilon() )
       {
       if ( vnl_math_abs( outputValue ) / distance > 1.42 )
         {

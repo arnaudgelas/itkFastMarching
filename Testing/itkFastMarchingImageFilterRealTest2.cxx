@@ -189,34 +189,31 @@ int main(int argc, char* argv[] )
 
   bool passed = true;
 
-  for(; !iterator.IsAtEnd(); ++iterator )
+  while( !iterator.IsAtEnd() )
     {
-    double distance;
-
     FloatImageType::IndexType tempIndex = iterator.GetIndex();
-    float outputValue = (float) iterator.Get();
+    double outputValue = static_cast< double >( iterator.Get() );
 
     if( ( ( tempIndex[0] > 22 ) && ( tempIndex [0] < 42 ) && ( tempIndex[1] > 27 ) && ( tempIndex[1] < 37 ) ) ||
         ( ( tempIndex[1] > 22 ) && ( tempIndex [1] < 42 ) && ( tempIndex[0] > 27 ) && ( tempIndex[0] < 37 ) ) )
       {
       tempIndex -= offset0;
-      distance = 0.0;
+      double distance = 0.0;
       for ( int j = 0; j < 2; j++ )
         {
-          distance += tempIndex[j] * tempIndex[j];
+        distance += tempIndex[j] * tempIndex[j];
         }
       distance = vcl_sqrt( distance );
 
-      if (distance != 0)
+      if (distance > itk::NumericTraits< double >::epsilon() )
         {
-        continue;
-        }
-      if ( vnl_math_abs( outputValue ) / distance > 1.42 )
-        {
-        std::cout << iterator.GetIndex() << " ";
-        std::cout << vnl_math_abs( outputValue ) / distance << " ";
-        std::cout << vnl_math_abs( outputValue ) << " " << distance << std::endl;
-        passed = false;
+        if ( vnl_math_abs( outputValue ) / distance > 1.42 )
+          {
+          std::cout << iterator.GetIndex() << " ";
+          std::cout << vnl_math_abs( outputValue ) / distance << " ";
+          std::cout << vnl_math_abs( outputValue ) << " " << distance << std::endl;
+          passed = false;
+          }
         }
       }
     else
@@ -229,6 +226,7 @@ int main(int argc, char* argv[] )
         passed = false;
         }
       }
+    ++iterator;
     }
 
   // Exercise other member functions
