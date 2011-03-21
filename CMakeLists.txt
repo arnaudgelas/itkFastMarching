@@ -33,6 +33,26 @@ set( CTEST_CUSTOM_COVERAGE_EXCLUDE
 set( BASE_SOURCE
   ${FMM_SOURCE_DIR}/Code/itkStoppingCriterionBase.cxx
   ${FMM_SOURCE_DIR}/Code/itkIterateNeighborhoodOptimizer.cxx
+  ${FMM_SOURCE_DIR}/Code/itkArrivalFunctionToPathFilter.h
+  ${FMM_SOURCE_DIR}/Code/itkArrivalFunctionToPathFilter.txx
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingBase.h
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingBase.txx
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingExtensionImageFilterBase.h
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingExtensionImageFilterBase.txx
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingImageFilterBase.h
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingImageFilterBase.txx
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingReachedTargetNodesStoppingCriterion.h
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingStoppingCriterionBase.h
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingThresholdStoppingCriterion.h
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingTraits.h
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingUpwindGradientImageFilterBase.h
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingUpwindGradientImageFilterBase.txx
+  ${FMM_SOURCE_DIR}/Code/itkPhysicalCentralDifferenceImageFunction.h
+  ${FMM_SOURCE_DIR}/Code/itkPhysicalCentralDifferenceImageFunction.txx
+  ${FMM_SOURCE_DIR}/Code/itkSingleImageCostFunction.h
+  ${FMM_SOURCE_DIR}/Code/itkSingleImageCostFunction.txx
+  ${FMM_SOURCE_DIR}/Code/itkSpeedFunctionToPathFilter.h
+  ${FMM_SOURCE_DIR}/Code/itkSpeedFunctionToPathFilter.txx
 )
 
 include_directories( Code )
