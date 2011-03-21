@@ -139,8 +139,79 @@ protected:
 
   void InitializeOutput( OutputDomainType* oDomain )
     {
+    this->CopyInputMeshToOutputMesh();
 
-    }
+    OutputMeshPointer output = this->GetOutput();
+
+      {
+      OutputPointsContainerPointer points = output->GetPoints();
+      OutputPointsContainerIterator p_it = points->Begin();
+      OutputPointsContainerIterator p_end = points->End();
+
+      while( p_it != p_end )
+        {
+        output->SetPointData( p_it->Index(), this->m_LargeValue );
+        ++p_it;
+        }
+      }
+
+    m_Label.clear();
+
+    if ( this->m_AlivePoints )
+      {
+      NodePairContainerConstIterator pointsIter = this->m_AlivePoints->Begin();
+      NodePairContainerConstIterator pointsEnd = this->m_AlivePoints->End();
+
+      while( pointsIter != pointsEnd )
+        {
+        // get node from alive points container
+        idx = pointsIter->Value().GetNode();
+        outputPixel = pointsIter->Value().GetValue();
+
+        m_Label[idx] = Superclass::Alive;
+        output->SetPointData( idx, outputPixel );
+
+        ++pointsIter;
+        }
+      }
+    if( this->m_ForbiddenPoints )
+      {
+      NodeContainerConstIterator node_it = this->m_ForbiddenPoints->Begin();
+      NodeContainerConstIterator node_end = this->m_ForbiddenPoints->End();
+
+      OutputPixelType zero = NumericTraits< OutputPixelType >::Zero;
+
+      while( node_it != node_end )
+        {
+        idx = node_it->Value();
+
+        m_Label[idx] = Superclass::Forbidden;
+        output->SetPointData( idx, zero );
+
+        ++node_it;
+        }
+      }
+    if ( this->m_TrialPoints )
+      {
+      NodePairContainerConstIterator pointsIter = this->m_TrialPoints->Begin();
+      NodePairContainerConstIterator pointsEnd = this->m_TrialPoints->End();
+
+      while( pointsIter != pointsEnd )
+        {
+        idx = pointsIter->Value().GetNode();
+        outputPixel = pointsIter->Value().GetValue();
+
+        m_Label[idx] = Superclass::InitialTrial;
+
+        output->SetPointData( idx, outputPixel );
+
+        this->m_Heap.push( pointsIter->Value() );
+
+        ++pointsIter;
+        }
+      }
+
+  };
 
 
 private:
