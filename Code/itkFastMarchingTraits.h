@@ -131,7 +131,7 @@ public:
 */
 template<unsigned int VDimension,
          typename TInputPixel,
-         typename TOutputPixel >
+         typename TOutputPixel > // = TInputPixel >
 class ImageFastMarchingTraits :
     public FastMarchingTraits<
       Image< TInputPixel, VDimension >,
@@ -144,14 +144,30 @@ class ImageFastMarchingTraits :
   itkStaticConstMacro(ImageDimension, unsigned int, VDimension);
   };
 
+template< class TInputImage, class TOutputImage >
+class ImageFastMarchingTraits2 :
+    public FastMarchingTraits<
+      TInputImage,
+      typename TOutputImage::IndexType,
+      TOutputImage,
+      ImageToImageFilter< TInputImage, TOutputImage > >
+{
+  itkStaticConstMacro(ImageDimension, unsigned int, TOutputImage::ImageDimension);
+
+#ifdef ITK_USE_CONCEPT_CHECKING
+  // make sure TInputImage and TOutputImage have the same dimension
+#endif
+};
+
 /**  \class MeshFastMarchingTraits
   \brief traits to be used when dealing with Mesh for FastMarchingBase
 */
 template< unsigned int VDimension,
           typename TInputPixel,
-          class TInputMeshTraits,
-          typename TOutputPixel,
-          class TOutputMeshTraits >
+          class TInputMeshTraits, //= QuadEdgeMeshTraits< TInputPixel, VDimension, bool, bool >,
+          typename TOutputPixel, //= TInputPixel,
+          class TOutputMeshTraits //= QuadEdgeMeshTraits< TOutputPixel, VDimension, bool, bool >
+         >
 class MeshFastMarchingTraits :
     public FastMarchingTraits<
       QuadEdgeMesh< TInputPixel, VDimension, TInputMeshTraits >,
@@ -163,6 +179,21 @@ class MeshFastMarchingTraits :
     >
   {
   itkStaticConstMacro(PointDimension, unsigned int, VDimension);
+  };
+
+template< class TInputMesh, class TOutputMesh >
+class MeshFastMarchingTraits2 :
+    public FastMarchingTraits<
+      TInputMesh,
+      typename TOutputMesh::MeshTraits::PointIdentifier,
+      TOutputMesh,
+      QuadEdgeMeshToQuadEdgeMeshFilter< TInputMesh, TOutputMesh > >
+  {
+  itkStaticConstMacro(PointDimension, unsigned int, TOutputMesh::PointDimension );
+
+#ifdef ITK_USE_CONCEPT_CHECKING
+  // make sure TInputMesh and TOutputMesh have the same dimension
+#endif
   };
 }
 #endif // __itkFastMarchingTraits_h
