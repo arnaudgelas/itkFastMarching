@@ -160,48 +160,28 @@ protected:
 
     OutputQEType* qe = p.GetEdge();
 
-    OutputVectorRealType outputPixel =
-        static_cast< OutputVectorRealType >( this->m_LargeValue );
-
     if( qe )
       {
       OutputQEType *qe_it = qe;
-      OutputQEType *qe_it2;
+      qe_it = qe_it->GetOnext();
 
-      do
+      while( qe_it != qe )
         {
-        qe_it2 = qe_it->GetOnext();
-
-        if( qe_it2 )
+        if( qe_it )
           {
-          OutputPointIdentifierType id0 = qe_it->GetDestination();
-          OutputPointIdentifierType id1 = qe_it2->GetDestination();
+          OutputPointIdentifierType neigh_id = qe_it->GetDestination();
 
-          OutputPointType q0 = oMesh->GetPoint( id0 );
-          OutputPointType q1 = oMesh->GetPoint( id1 );
+          char label = this->GetLabelValueForGivenNode( neigh_id );
 
-          OutputPixelType val0 = this->GetOutputValue( oMesh, id0 );
-          OutputPixelType val1 = this->GetOutputValue( oMesh, id1 );
-
-          if( val0 > val1 )
+          if ( ( label != Superclass::Alive ) &&
+               ( label != Superclass::InitialTrial ) &&
+               ( label != Superclass::Forbidden ) )
             {
-            OutputPointType temp_pt = q0;
-            q0 = q1;
-            q0 = temp_pt;
+            this->UpdateValue( oMesh, neigh_id );
             }
-
-          outputPixel = vnl_math_min(
-                outputPixel,
-                this->ComputeVertexDistance( oMesh, iNode, p, id0, q0, id1, q1 ) );
-
-          qe_it = qe_it2;
           }
-        else
-          {
-          // throw one exception here
-          }
+        qe_it = qe_it->GetOnext();
         }
-      while ( qe_it != qe );
       }
     else
       {
@@ -209,13 +189,83 @@ protected:
       }
     }
 
-  double ComputeVertexDistance( OutputMeshType* oDomain,
-                               const NodeType& iId,
-                               OutputPointType iCurrentPoint,
-                               const NodeType& iId1,
-                               OutputPointType iP1,
-                               const NodeType& iId2,
-                               OutputPointType iP2 )
+
+
+  void UpdateValue( OutputMeshType* oMesh,
+                    const NodeType& iNode )
+    {
+    OutputPointType p;
+    oMesh->GetPoint( iNode, &p );
+
+    OutputQEType* qe = p.GetEdge();
+
+    OutputPixelType outputPixel = this->m_LargeValue;
+
+    if( qe )
+      {
+      OutputQEType *qe_it = qe;
+      qe_it = qe_it->GetOnext();
+
+      do
+        {
+        OutputPointIdentifierType id1 = qe_it->GetDestination();
+
+        OutputQEType *qe_it2 = qe_it->GetOnext();
+
+        if( qe_it2 )
+          {
+          OutputPointIdentifierType id2 = qe_it2->GetDestination();
+
+          char label1 = this->GetLabelValueForGivenNode( id1 );
+          char label2 = this->GetLabelValueForGivenNode( id2 );
+
+          if( ( label1 != Superclass::Far ) &&
+              ( label2 != Superclass::Far ) )
+            {
+            OutputPointType q1 = oMesh->GetPoint( id1 );
+            OutputPointType q2 = oMesh->GetPoint( id2 );
+
+            OutputPixelType val1 = this->GetOutputValue( oMesh, id1 );
+            OutputPixelType val2 = this->GetOutputValue( oMesh, id2 );
+
+            if( val1 > val2 )
+              {
+              OutputPointType temp_pt = q1;
+              q1 = q2;
+              q2 = temp_pt;
+              }
+
+            OutputPixelType temp =
+                static_cast< OutputPixelType >(
+                  this->Solve( oMesh, iNode, p, id1, q1, id2, q2 ) );
+
+            outputPixel = vnl_math_min( outputPixel, temp );
+            }
+          }
+        else
+          {
+          // throw one exception here
+          }
+
+        qe_it = qe_it2;
+        }
+      while( qe_it != qe );
+      }
+    else
+      {
+      // throw one exception
+      }
+    }
+
+
+  OutputVectorRealType
+  Solve( OutputMeshType* oDomain,
+                const NodeType& iId,
+                OutputPointType iCurrentPoint,
+                const NodeType& iId1,
+                OutputPointType iP1,
+                const NodeType& iId2,
+                OutputPointType iP2 )
     {
     OutputVectorType Edge1 = iP1 - iCurrentPoint;
     OutputVectorType Edge2 = iP2 - iCurrentPoint;
@@ -356,11 +406,7 @@ protected:
       }
   }
 
-  void UpdateValue( OutputMeshType* oDomain,
-                    const NodeType& iNode )
-    {
 
-    }
 
   bool CheckTopology( OutputMeshType* oDomain,
                       const NodeType& iNode )
@@ -375,16 +421,14 @@ protected:
     {
     this->CopyInputMeshToOutputMesh();
 
-    OutputMeshPointer output = this->GetOutput();
-
       {
-      OutputPointsContainerPointer points = output->GetPoints();
+      OutputPointsContainerPointer points = oDomain->GetPoints();
       OutputPointsContainerIterator p_it = points->Begin();
       OutputPointsContainerIterator p_end = points->End();
 
       while( p_it != p_end )
         {
-        output->SetPointData( p_it->Index(), this->m_LargeValue );
+        oDomain->SetPointData( p_it->Index(), this->m_LargeValue );
         ++p_it;
         }
       }
@@ -403,7 +447,7 @@ protected:
         OutputPixelType outputPixel = pointsIter->Value().GetValue();
 
         m_Label[idx] = Superclass::Alive;
-        output->SetPointData( idx, outputPixel );
+        oDomain->SetPointData( idx, outputPixel );
 
         ++pointsIter;
         }
@@ -420,7 +464,7 @@ protected:
         NodeType idx = node_it->Value();
 
         m_Label[idx] = Superclass::Forbidden;
-        output->SetPointData( idx, zero );
+        oDomain->SetPointData( idx, zero );
 
         ++node_it;
         }
@@ -437,7 +481,7 @@ protected:
 
         m_Label[idx] = Superclass::InitialTrial;
 
-        output->SetPointData( idx, outputPixel );
+        oDomain->SetPointData( idx, outputPixel );
 
         this->m_Heap.push( pointsIter->Value() );
 
