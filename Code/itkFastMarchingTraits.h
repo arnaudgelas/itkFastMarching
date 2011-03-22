@@ -24,8 +24,8 @@
 #include "itkImage.h"
 #include "itkImageToImageFilter.h"
 
-#include "itkMesh.h"
-#include "itkMeshToMeshFilter.h"
+#include "itkQuadEdgeMesh.h"
+#include "itkQuadEdgeMeshToQuadEdgeMeshFilter.h"
 
 namespace itk
 {
@@ -154,11 +154,12 @@ template< unsigned int VDimension,
           class TOutputMeshTraits >
 class MeshFastMarchingTraits :
     public FastMarchingTraits<
-      Mesh< TInputPixel, VDimension, TInputMeshTraits >,
+      QuadEdgeMesh< TInputPixel, VDimension, TInputMeshTraits >,
       typename TInputMeshTraits::PointIdentifier,
-      Mesh< TOutputPixel, VDimension, TOutputMeshTraits >,
-      MeshToMeshFilter< Mesh< TInputPixel, VDimension, TInputMeshTraits >,
-                        Mesh< TOutputPixel, VDimension, TOutputMeshTraits > >
+      QuadEdgeMesh< TOutputPixel, VDimension, TOutputMeshTraits >,
+      QuadEdgeMeshToQuadEdgeMeshFilter<
+        QuadEdgeMesh< TInputPixel, VDimension, TInputMeshTraits >,
+        QuadEdgeMesh< TOutputPixel, VDimension, TOutputMeshTraits > >
     >
   {
   itkStaticConstMacro(PointDimension, unsigned int, VDimension);

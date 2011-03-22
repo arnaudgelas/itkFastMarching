@@ -38,6 +38,8 @@
 #include "itkFastMarchingBase.h"
 #include "itkFastMarchingTraits.h"
 
+#include "vnl/vnl_math.h"
+
 namespace itk
 {
 
@@ -50,6 +52,7 @@ class FastMarchingQuadEdgeMeshFilterBase :
     public FastMarchingBase<
       MeshFastMarchingTraits< VDimension,
         TInputPixel,
+        TInputMeshTraits,
         TOutputPixel,
         TOutputMeshTraits > >
 {
@@ -57,6 +60,7 @@ public:
 
   typedef MeshFastMarchingTraits< VDimension,
     TInputPixel,
+    TInputMeshTraits,
     TOutputPixel,
     TOutputMeshTraits > Traits;
 
@@ -71,41 +75,70 @@ public:
   /** Run-time type information (and related methods). */
   itkTypeMacro(FastMarchingQuadEdgeMeshFilterBase, FastMarchingBase);
 
-  typedef typename Superclass::InputDomainType     InputImageType;
-  typedef typename Superclass::InputDomainPointer  InputImagePointer;
+  typedef typename Superclass::InputDomainType     InputMeshType;
+  typedef typename Superclass::InputDomainPointer  InputMeshPointer;
   typedef typename Superclass::InputPixelType      InputPixelType;
+  typedef typename InputMeshType::PointType        InputPointType;
+  typedef typename InputMeshType::PointIdentifier  InputPointIdentifierType;
 
-  typedef typename Superclass::OutputDomainType     OutputImageType;
-  typedef typename Superclass::OutputDomainPointer  OutputImagePointer;
+  typedef typename Superclass::OutputDomainType     OutputMeshType;
+  typedef typename Superclass::OutputDomainPointer  OutputMeshPointer;
   typedef typename Superclass::OutputPixelType      OutputPixelType;
+  typedef typename OutputMeshType::PointType        OutputPointType;
+  typedef typename OutputPointType::VectorType      OutputVectorType;
+  typedef typename OutputVectorType::RealValueType  OutputVectorRealType;
+  typedef typename OutputMeshType::QEType           OutputQEType;
+  typedef typename OutputMeshType::PointIdentifier  OutputPointIdentifierType;
+  typedef typename OutputMeshType::PointsContainer  OutputPointsContainer;
+  typedef typename OutputPointsContainer::Pointer   OutputPointsContainerPointer;
+  typedef typename OutputPointsContainer::Iterator  OutputPointsContainerIterator;
+
+
+  typedef typename Traits::NodeType                 NodeType;
+  typedef typename Traits::NodePairType             NodePairType;
+  typedef typename Traits::NodePairContainerType    NodePairContainerType;
+  typedef typename Traits::NodePairContainerPointer NodePairContainerPointer;
+  typedef typename Traits::NodePairContainerConstIterator
+    NodePairContainerConstIterator;
+
+  typedef typename Traits::NodeContainerType        NodeContainerType;
+  typedef typename Traits::NodeContainerPointer     NodeContainerPointer;
+  typedef typename Traits::NodeContainerConstIterator
+    NodeContainerConstIterator;
+
+  typedef typename Superclass::LabelType LabelType;
 
   typedef std::map< NodeType, LabelType > NodeLabelMapType;
   typedef typename NodeLabelMapType::iterator NodeLabelMapIterator;
   typedef typename NodeLabelMapType::const_iterator NodeLabelMapConstIterator;
 
 protected:
+
   FastMarchingQuadEdgeMeshFilterBase() {}
   virtual ~FastMarchingQuadEdgeMeshFilterBase() {}
 
+  NodeLabelMapType m_Label;
 
   IdentifierType GetTotalNumberOfNodes() const
     {
-    this->GetInput()->GetNumberOfPoints();
+    return this->GetInput()->GetNumberOfPoints();
     }
 
-  OutputPixelType GetOutputValue( OutputDomainType* oDomain,
+  OutputPixelType GetOutputValue( OutputMeshType* oDomain,
                                   const NodeType& iNode ) const
     {
-    return oDomain->GetPointData( iNode );
+    OutputPixelType outputValue;
+    oDomain->GetPointData( iNode, &outputValue );
+    return outputValue;
     }
 
   char GetLabelValueForGivenNode( const NodeType& iNode ) const
     {
-    NodeLabelMapIterator it = m_Label.find( iNode );
+    NodeLabelMapConstIterator it = m_Label.find( iNode );
 
     if( it != m_Label.end() )
       {
-      return iLabel;
+      return it->second;
       }
     else
       {
@@ -119,25 +152,226 @@ protected:
     m_Label[iNode] = iLabel;
     }
 
-  void UpdateNeighbors( OutputDomainType* oDomain,
+  void UpdateNeighbors( OutputMeshType* oMesh,
                         const NodeType& iNode )
     {
+    OutputPointType p;
+    oMesh->GetPoint( iNode, &p );
 
+    OutputQEType* qe = p.GetEdge();
+
+    OutputVectorRealType outputPixel =
+        static_cast< OutputVectorRealType >( this->m_LargeValue );
+
+    if( qe )
+      {
+      OutputQEType *qe_it = qe;
+      OutputQEType *qe_it2;
+
+      do
+        {
+        qe_it2 = qe_it->GetOnext();
+
+        if( qe_it2 )
+          {
+          OutputPointIdentifierType id0 = qe_it->GetDestination();
+          OutputPointIdentifierType id1 = qe_it2->GetDestination();
+
+          OutputPointType q0 = oMesh->GetPoint( id0 );
+          OutputPointType q1 = oMesh->GetPoint( id1 );
+
+          OutputPixelType val0 = this->GetOutputValue( oMesh, id0 );
+          OutputPixelType val1 = this->GetOutputValue( oMesh, id1 );
+
+          if( val0 > val1 )
+            {
+            OutputPointType temp_pt = q0;
+            q0 = q1;
+            q0 = temp_pt;
+            }
+
+          outputPixel = vnl_math_min(
+                outputPixel,
+                this->ComputeVertexDistance( oMesh, iNode, p, id0, q0, id1, q1 ) );
+
+          qe_it = qe_it2;
+          }
+        else
+          {
+          // throw one exception here
+          }
+        }
+      while ( qe_it != qe );
+      }
+    else
+      {
+      // throw one exception here
+      }
     }
 
-  void UpdateValue( OutputDomainType* oDomain,
+  double ComputeVertexDistance( OutputMeshType* oDomain,
+                               const NodeType& iId,
+                               OutputPointType iCurrentPoint,
+                               const NodeType& iId1,
+                               OutputPointType iP1,
+                               const NodeType& iId2,
+                               OutputPointType iP2 )
+    {
+    OutputVectorType Edge1 = iP1 - iCurrentPoint;
+    OutputVectorType Edge2 = iP2 - iCurrentPoint;
+
+    OutputVectorRealType sq_norm1 = Edge1.GetSquaredNorm(); //b
+    OutputVectorRealType norm1 = vcl_sqrt( sq_norm1 );
+
+    OutputVectorRealType epsilon =
+        NumericTraits< OutputVectorRealType >::epsilon();
+
+    if( norm1 > epsilon )
+      {
+      OutputVectorRealType inv_norm1 = 1. / norm1;
+      Edge1 *= inv_norm1;
+      }
+
+    OutputVectorRealType sq_norm2 = Edge2.GetSquaredNorm(); //a
+    OutputVectorRealType norm2 = vcl_sqrt( sq_norm2 );
+
+    if( norm2 > epsilon )
+      {
+      OutputVectorRealType inv_norm2 = 1. / norm2;
+      Edge2 *= inv_norm2;
+      }
+
+    OutputVectorRealType dist1 = iP1.GetVectorFromOrigin().GetNorm();
+    OutputVectorRealType dist2 = iP2.GetVectorFromOrigin().GetNorm();
+
+    bool Usable1 = ( this->GetLabelValueForGivenNode( iId1 ) != Superclass::Far );
+    bool Usable2 = ( this->GetLabelValueForGivenNode( iId2 ) != Superclass::Far );
+
+    InputPixelType F;
+    this->GetInput()->GetPointData( iId, &F );
+
+    if( !Usable1 && Usable2 )
+      {
+      // only one point is a contributor
+      return dist2 + norm2 * F;
+      }
+    if( Usable1 && !Usable2 )
+      {
+      // only one point is a contributor
+      return dist1 + norm1 * F;
+      }
+
+    if( Usable1 && Usable2 )
+      {
+      OutputVectorRealType dot =
+          static_cast< OutputVectorRealType >( Edge1 * Edge2 );
+
+      if( dot > 0. )
+        {
+        return ComputeUpdate( dist1, dist2,
+                             norm2, sq_norm2,
+                             norm1, sq_norm1, dot, F );
+        }
+      else
+        {
+        // throw an exception here!
+        // angle is obtuse, some preprocessing must be done on the input mesh
+        }
+
+
+      }
+
+    return this->m_LargeValue;
+    }
+
+  OutputVectorRealType
+  ComputeUpdate(
+    const OutputVectorRealType& iDist1, const OutputVectorRealType& iDist2,
+    const OutputVectorRealType& iNorm1, const OutputVectorRealType& iSqNorm1,
+    const OutputVectorRealType& iNorm2, const OutputVectorRealType& iSqNorm2,
+    const OutputVectorRealType& iDot, const OutputVectorRealType& iF )
+    const
+  {
+    OutputVectorRealType large_value =
+        static_cast< OutputVectorRealType >( this->m_LargeValue );
+
+    OutputVectorRealType t = large_value;
+
+    OutputVectorRealType CosAngle = iDot;
+    OutputVectorRealType SinAngle = vcl_sqrt( 1 - iDot * iDot );
+
+    OutputVectorRealType u = iDist2 - iDist1;
+
+    OutputVectorRealType sq_u = u * u;
+    OutputVectorRealType f2 = iSqNorm1 + iSqNorm2 - 2. * iNorm1 * iNorm2 * CosAngle;
+    OutputVectorRealType f1 = iNorm2 * u * ( iNorm1 * CosAngle - iNorm2 );
+    OutputVectorRealType f0 = iSqNorm2 * ( sq_u - iF * iF * iSqNorm1 * SinAngle * SinAngle );
+
+    OutputVectorRealType delta = f1 * f1 - f0 * f2;
+
+    OutputVectorRealType epsilon =
+        NumericTraits< OutputVectorRealType >::epsilon();
+
+    if( delta >= 0. )
+      {
+      if( vnl_math_abs( f2 ) > epsilon )
+        {
+        t = ( -f1 - vcl_sqrt( delta ) ) / f2;
+
+        // test if we must must choose the other solution
+        if( ( t < u ) ||
+            ( iNorm2 * ( t - u ) / t < iNorm1 * CosAngle ) ||
+            ( iNorm1 / CosAngle < iNorm2 * ( t - u ) / t ) )
+          {
+          t = ( -f1 + vcl_sqrt( delta ) ) / f2;
+          }
+        }
+      else
+        {
+        if( vnl_math_abs( f1 ) > epsilon )
+          {
+          t = -f0 / f1;
+          }
+        else
+          {
+          t = - large_value;
+          }
+        }
+      }
+    else
+      {
+      t = - large_value;
+      }
+
+    // choose the update from the 2 vertex only if upwind criterion is met
+    if( ( u < t ) &&
+        ( iNorm1 * CosAngle < iNorm2 * ( t - u ) / t ) &&
+        ( iNorm2 * ( t - u ) / t < iNorm1 / CosAngle ) )
+      {
+      return t + iDist1;
+      }
+    else
+      {
+      return vnl_math_min( iNorm2 * iF + iDist1, iNorm1 * iF + iDist2 );
+      }
+  }
+
+  void UpdateValue( OutputMeshType* oDomain,
                     const NodeType& iNode )
     {
 
     }
 
-  bool CheckTopology( OutputDomainType* oDomain,
+  bool CheckTopology( OutputMeshType* oDomain,
                       const NodeType& iNode )
     {
-    itkWarningMacro( << "Constrained topology on Mesh is not implemented" );
+    (void) oDomain;
+    (void) iNode;
+
+    return true;
     }
 
-  void InitializeOutput( OutputDomainType* oDomain )
+  void InitializeOutput( OutputMeshType* oDomain )
     {
     this->CopyInputMeshToOutputMesh();
 
@@ -165,8 +399,8 @@ protected:
       while( pointsIter != pointsEnd )
         {
         // get node from alive points container
-        idx = pointsIter->Value().GetNode();
-        outputPixel = pointsIter->Value().GetValue();
+        NodeType idx = pointsIter->Value().GetNode();
+        OutputPixelType outputPixel = pointsIter->Value().GetValue();
 
         m_Label[idx] = Superclass::Alive;
         output->SetPointData( idx, outputPixel );
@@ -183,7 +417,7 @@ protected:
 
       while( node_it != node_end )
         {
-        idx = node_it->Value();
+        NodeType idx = node_it->Value();
 
         m_Label[idx] = Superclass::Forbidden;
         output->SetPointData( idx, zero );
@@ -198,8 +432,8 @@ protected:
 
       while( pointsIter != pointsEnd )
         {
-        idx = pointsIter->Value().GetNode();
-        outputPixel = pointsIter->Value().GetValue();
+        NodeType idx = pointsIter->Value().GetNode();
+        OutputPixelType outputPixel = pointsIter->Value().GetValue();
 
         m_Label[idx] = Superclass::InitialTrial;
 

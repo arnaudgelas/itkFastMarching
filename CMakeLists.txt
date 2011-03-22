@@ -53,6 +53,7 @@ set( BASE_SOURCE
   ${FMM_SOURCE_DIR}/Code/itkSingleImageCostFunction.txx
   ${FMM_SOURCE_DIR}/Code/itkSpeedFunctionToPathFilter.h
   ${FMM_SOURCE_DIR}/Code/itkSpeedFunctionToPathFilter.txx
+  ${FMM_SOURCE_DIR}/Code/itkFastMarchingQuadEdgeMeshFilterBase.h
 )
 
 include_directories( Code )

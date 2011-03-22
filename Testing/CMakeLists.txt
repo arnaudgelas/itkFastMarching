@@ -80,6 +80,15 @@ target_link_libraries( itkFastMarchingExtensionImageFilterTest ${ITK_LIBRARIES} 
 add_test( itkFastMarchingExtensionImageFilterTest
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingExtensionImageFilterTest )
 
+add_executable( itkFastMarchingQuadEdgeMeshFilterBaseTest
+  itkFastMarchingQuadEdgeMeshFilterBaseTest.cxx
+  ${BASE_SOURCE}
+)
+target_link_libraries( itkFastMarchingQuadEdgeMeshFilterBaseTest ${ITK_LIBRARIES} )
+
+add_test( itkFastMarchingQuadEdgeMeshFilterBaseTest
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingQuadEdgeMeshFilterBaseTest )
+
 # --------------------------------------------------------------------------
 # Topology constrained front propagation
 # --------------------------------------------------------------------------

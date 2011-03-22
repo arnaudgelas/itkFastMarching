@@ -143,9 +143,9 @@ int main( int argc, char* argv[] )
       {
       typedef itk::MeshFastMarchingTraits< Dimension,
           PixelType,
-          itk::DefaultStaticMeshTraits< PixelType, 3, 3 >,
+          itk::QuadEdgeMeshTraits< PixelType, 3, bool, bool >,
           PixelType,
-          itk::DefaultStaticMeshTraits< PixelType, 3, 3 > >
+          itk::QuadEdgeMeshTraits< PixelType, 3, bool, bool > >
         MeshTraits;
       typedef MeshTraits::NodeType MeshNodetype;
 
