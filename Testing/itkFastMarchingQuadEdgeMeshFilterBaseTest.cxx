@@ -19,6 +19,9 @@
 #include "itkFastMarchingQuadEdgeMeshFilterBase.h"
 #include "itkQuadEdgeMesh.h"
 #include "itkQuadEdgeMeshExtendedTraits.h"
+#include "itkRegularSphereMeshSource.h"
+#include "itkFastMarchingThresholdStoppingCriterion.h"
+#include "itkQuadEdgeMeshScalarDataVTKPolyDataWriter.h"
 
 int main( int argc, char* argv[] )
 {
@@ -37,11 +40,70 @@ int main( int argc, char* argv[] )
     bool        // type of data for dual edges
   > Traits;
 
-  typedef itk::QuadEdgeMesh< CoordType, Dimension, Traits > MeshType;
-
   typedef itk::FastMarchingQuadEdgeMeshFilterBase< Dimension, PixelType, Traits,
       PixelType, Traits > FastMarchingType;
-  FastMarchingType::Pointer filter = FastMarchingType::New();
+  typedef FastMarchingType::InputMeshType MeshType;
+
+  MeshType::PointType center;
+  center.Fill( 0. );
+
+  typedef itk::RegularSphereMeshSource< MeshType > SphereSourceType;
+  SphereSourceType::Pointer sphere_filter = SphereSourceType::New();
+  sphere_filter->SetCenter( center );
+  sphere_filter->SetResolution( 3 );
+  sphere_filter->Update();
+
+  MeshType::Pointer sphere_output = sphere_filter->GetOutput();
+
+  MeshType::PointsContainerConstPointer points =
+      sphere_output->GetPoints();
+
+  MeshType::PointsContainerConstIterator p_it = points->Begin();
+  MeshType::PointsContainerConstIterator p_end = points->End();
+
+  while( p_it != p_end )
+    {
+    sphere_output->SetPointData( p_it->Index(), 1. );
+    ++p_it;
+    }
+
+  typedef FastMarchingType::NodeType NodeType;
+  typedef FastMarchingType::NodePairType NodePairType;
+  typedef FastMarchingType::NodeContainerType NodeContainerType;
+  typedef FastMarchingType::NodePairContainerType NodePairContainerType;
+
+  NodePairContainerType::Pointer trial = NodePairContainerType::New();
+
+  NodePairType node_pair( 0, 0. );
+  trial->push_back( node_pair );
+
+  typedef itk::FastMarchingThresholdStoppingCriterion< NodeType, PixelType >
+      CriterionType;
+  CriterionType::Pointer criterion = CriterionType::New();
+  criterion->SetThreshold( 100. );
+
+  FastMarchingType::Pointer fmm_filter = FastMarchingType::New();
+  fmm_filter->SetInput( sphere_output );
+  fmm_filter->SetTrialPoints( trial );
+  fmm_filter->SetStoppingCriterion( criterion );
+
+  try
+    {
+    fmm_filter->Update();
+    }
+  catch( itk::ExceptionObject & excep )
+    {
+    std::cerr << "Exception caught !" << std::endl;
+    std::cerr << excep << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  typedef itk::QuadEdgeMeshScalarDataVTKPolyDataWriter< MeshType > WriterType;
+  WriterType::Pointer writer = WriterType::New();
+  writer->SetInput( fmm_filter->GetOutput() );
+  writer->SetFileName( "output.vtk" );
+  writer->Update();
+
 
   return EXIT_SUCCESS;
 }
