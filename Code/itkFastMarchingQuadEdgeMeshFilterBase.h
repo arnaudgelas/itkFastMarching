@@ -165,15 +165,14 @@ protected:
     if( qe )
       {
       OutputQEType *qe_it = qe;
-      qe_it = qe_it->GetOnext();
 
-      while( qe_it != qe )
+      do
         {
         if( qe_it )
           {
           OutputPointIdentifierType neigh_id = qe_it->GetDestination();
 
-          char label = this->GetLabelValueForGivenNode( neigh_id );
+          const char label = this->GetLabelValueForGivenNode( neigh_id );
 
           if ( ( label != Superclass::Alive ) &&
                ( label != Superclass::InitialTrial ) &&
@@ -184,6 +183,7 @@ protected:
           }
         qe_it = qe_it->GetOnext();
         }
+      while( qe_it != qe );
       }
     else
       {
@@ -258,6 +258,15 @@ protected:
         qe_it = qe_it2;
         }
       while( qe_it != qe );
+
+      if( outputPixel < this->m_LargeValue )
+        {
+        oMesh->SetPointData( iNode, outputPixel );
+
+        this->SetLabelValueForGivenNode( iNode, Superclass::Trial );
+
+        this->m_Heap.push( NodePairType( iNode, outputPixel ) );
+        }
       }
     else
       {
@@ -300,8 +309,10 @@ protected:
       Edge2 *= inv_norm2;
       }
 
-    OutputVectorRealType dist1 = iP1.GetVectorFromOrigin().GetNorm();
-    OutputVectorRealType dist2 = iP2.GetVectorFromOrigin().GetNorm();
+    OutputVectorRealType val1 = this->GetOutputValue( oDomain, iId1 );
+        //iP1.GetVectorFromOrigin().GetNorm();
+    OutputVectorRealType val2 = this->GetOutputValue( oDomain, iId2 );
+        //iP2.GetVectorFromOrigin().GetNorm();
 
     bool Usable1 = ( this->GetLabelValueForGivenNode( iId1 ) != Superclass::Far );
     bool Usable2 = ( this->GetLabelValueForGivenNode( iId2 ) != Superclass::Far );
@@ -312,12 +323,12 @@ protected:
     if( !Usable1 && Usable2 )
       {
       // only one point is a contributor
-      return dist2 + norm2 * F;
+      return val2 + norm2 * F;
       }
     if( Usable1 && !Usable2 )
       {
       // only one point is a contributor
-      return dist1 + norm1 * F;
+      return val1 + norm1 * F;
       }
 
     if( Usable1 && Usable2 )
@@ -327,7 +338,7 @@ protected:
 
       if( dot > 0. )
         {
-        return ComputeUpdate( dist1, dist2,
+        return ComputeUpdate( val1, val2,
                              norm2, sq_norm2,
                              norm1, sq_norm1, dot, F );
         }
