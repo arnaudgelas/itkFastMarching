@@ -124,7 +124,14 @@ protected:
     return this->GetInput()->GetNumberOfPoints();
     }
 
-  OutputPixelType GetOutputValue( OutputMeshType* oDomain,
+  void SetOutputValue( OutputMeshType* oDomain,
+                      const NodeType& iNode,
+                      const OutputPixelType& iValue )
+    {
+    oDomain->SetPointData( iNode, iValue );
+    }
+
+  const OutputPixelType GetOutputValue( OutputMeshType* oDomain,
                                   const NodeType& iNode ) const
     {
     OutputPixelType outputValue;
@@ -219,8 +226,8 @@ protected:
           {
           OutputPointIdentifierType id2 = qe_it2->GetDestination();
 
-          const char label1 = this->GetLabelValueForGivenNode( id1 );
-          const char label2 = this->GetLabelValueForGivenNode( id2 );
+          const unsigned char label1 = this->GetLabelValueForGivenNode( id1 );
+          const unsigned char label2 = this->GetLabelValueForGivenNode( id2 );
 
           if( ( label1 != Superclass::Far ) ||
               ( label2 != Superclass::Far ) )
@@ -240,7 +247,9 @@ protected:
 
             OutputPixelType temp =
                 static_cast< OutputPixelType >(
-                  this->Solve( oMesh, iNode, p, id1, q1, id2, q2 ) );
+                  this->Solve( oMesh, iNode, p,
+                              id1, q1, static_cast< LabelType >( label1 ),
+                              id2, q2, static_cast< LabelType >( label2 ) ) );
 
             std::cout << "temp: " << temp << " * "
                       << "outputPixel : " << outputPixel <<std::endl;
@@ -261,7 +270,7 @@ protected:
 
       if( outputPixel < this->m_LargeValue )
         {
-        oMesh->SetPointData( iNode, outputPixel );
+        this->SetOutputValue( oMesh, iNode, outputPixel );
 
         this->SetLabelValueForGivenNode( iNode, Superclass::Trial );
 
@@ -282,40 +291,44 @@ protected:
                 OutputPointType iCurrentPoint,
                 const NodeType& iId1,
                 OutputPointType iP1,
+                const LabelType& iLabel1,
                 const NodeType& iId2,
-                OutputPointType iP2 )
+                OutputPointType iP2,
+                const LabelType& iLabel2 )
     {
     OutputVectorType Edge1 = iP1 - iCurrentPoint;
     OutputVectorType Edge2 = iP2 - iCurrentPoint;
 
     OutputVectorRealType sq_norm1 = Edge1.GetSquaredNorm(); //b
-    OutputVectorRealType norm1 = vcl_sqrt( sq_norm1 );
+    OutputVectorRealType norm1 = 0.;
 
     OutputVectorRealType epsilon =
         NumericTraits< OutputVectorRealType >::epsilon();
 
-    if( norm1 > epsilon )
+    if( sq_norm1 > epsilon )
       {
+      norm1 = vcl_sqrt( sq_norm1 );
+
       OutputVectorRealType inv_norm1 = 1. / norm1;
       Edge1 *= inv_norm1;
       }
 
     OutputVectorRealType sq_norm2 = Edge2.GetSquaredNorm(); //a
-    OutputVectorRealType norm2 = vcl_sqrt( sq_norm2 );
+    OutputVectorRealType norm2 = 0.;
 
-    if( norm2 > epsilon )
+    if( sq_norm2 > epsilon )
       {
+      norm2 = vcl_sqrt( sq_norm2 );
+
       OutputVectorRealType inv_norm2 = 1. / norm2;
       Edge2 *= inv_norm2;
       }
 
-    OutputVectorRealType val1 = this->GetOutputValue( oDomain, iId1 );
-        //iP1.GetVectorFromOrigin().GetNorm();
-    OutputVectorRealType val2 = this->GetOutputValue( oDomain, iId2 );
-        //iP2.GetVectorFromOrigin().GetNorm();
+    const OutputVectorRealType val1 = this->GetOutputValue( oDomain, iId1 );
+    const OutputVectorRealType val2 = this->GetOutputValue( oDomain, iId2 );
 
-    bool Usable1 = ( this->GetLabelValueForGivenNode( iId1 ) != Superclass::Far );
-    bool Usable2 = ( this->GetLabelValueForGivenNode( iId2 ) != Superclass::Far );
+    bool Usable1 = ( iLabel1 != Superclass::Far );
+    bool Usable2 = ( iLabel2 != Superclass::Far );
 
     InputPixelType F;
     this->GetInput()->GetPointData( iId, &F );
@@ -448,7 +461,7 @@ protected:
 
       while( p_it != p_end )
         {
-        oDomain->SetPointData( p_it->Index(), this->m_LargeValue );
+        this->SetOutputValue( oDomain, p_it->Index(), this->m_LargeValue );
         ++p_it;
         }
       }
@@ -466,8 +479,8 @@ protected:
         NodeType idx = pointsIter->Value().GetNode();
         OutputPixelType outputPixel = pointsIter->Value().GetValue();
 
-        m_Label[idx] = Superclass::Alive;
-        oDomain->SetPointData( idx, outputPixel );
+        this->SetLabelValueForGivenNode( idx, Superclass::Alive );
+        this->SetOutputValue( oDomain, idx, outputPixel );
 
         ++pointsIter;
         }
@@ -483,8 +496,8 @@ protected:
         {
         NodeType idx = node_it->Value();
 
-        m_Label[idx] = Superclass::Forbidden;
-        oDomain->SetPointData( idx, zero );
+        this->SetLabelValueForGivenNode( idx, Superclass::Forbidden );
+        this->SetOutputValue( oDomain, idx, zero );
 
         ++node_it;
         }
@@ -499,9 +512,9 @@ protected:
         NodeType idx = pointsIter->Value().GetNode();
         OutputPixelType outputPixel = pointsIter->Value().GetValue();
 
-        m_Label[idx] = Superclass::InitialTrial;
+        this->SetLabelValueForGivenNode( idx, Superclass::InitialTrial );
 
-        oDomain->SetPointData( idx, outputPixel );
+        this->SetOutputValue( oDomain, idx, outputPixel );
 
         this->m_Heap.push( pointsIter->Value() );
 

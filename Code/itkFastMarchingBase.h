@@ -218,8 +218,12 @@ protected:
 
   virtual IdentifierType GetTotalNumberOfNodes() const = 0;
 
-  virtual OutputPixelType GetOutputValue( OutputDomainType* oDomain,
+  virtual const OutputPixelType GetOutputValue( OutputDomainType* oDomain,
                                          const NodeType& iNode ) const = 0;
+
+  virtual void SetOutputValue( OutputDomainType* oDomain,
+                              const NodeType& iNode,
+                              const OutputPixelType& iValue ) = 0;
 
   /** \brief Get the LabelType Value for a given node
     \param[in] iNode

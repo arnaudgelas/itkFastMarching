@@ -238,8 +238,12 @@ protected:
 
   IdentifierType GetTotalNumberOfNodes() const;
 
+  void SetOutputValue( OutputImageType* oDomain,
+                       const NodeType& iNode,
+                       const OutputPixelType& iValue );
+
   /** Returns the output value for a given node */
-  OutputPixelType GetOutputValue( OutputImageType* oImage,
+  const OutputPixelType GetOutputValue( OutputImageType* oImage,
                                   const NodeType& iNode ) const;
 
   /** Returns the label value for a given node */

@@ -137,6 +137,19 @@ GetTotalNumberOfNodes() const
 
 // -----------------------------------------------------------------------------
 template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+void
+FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
+SetOutputValue( OutputImageType* oImage,
+               const NodeType& iNode,
+               const OutputPixelType& iValue )
+  {
+  return oImage->SetPixel( iNode, iValue );
+  }
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+template< unsigned int VDimension, typename TInputPixel, typename TOutputPixel >
+const
 typename
 FastMarchingImageFilterBase< VDimension, TInputPixel, TOutputPixel >::
 OutputPixelType
@@ -225,14 +238,15 @@ UpdateValue( OutputImageType* oImage, const NodeType& iNode )
 
   if ( outputPixel < this->m_LargeValue )
     {
-    oImage->SetPixel(iNode, outputPixel);
+    this->SetOutputValue( oImage, iNode, outputPixel );
 
-    // insert point into trial heap
-    m_LabelImage->SetPixel( iNode, Superclass::Trial );
+    this->SetLabelValueForGivenNode( iNode, Superclass::Trial );
 
     //node.SetValue( outputPixel );
     //node.SetIndex( index );
     //m_TrialHeap.push(node);
+
+    // insert point into trial heap
     this->m_Heap.push( NodePairType( iNode, outputPixel ) );
     }
   }
@@ -276,10 +290,9 @@ GetInternalNodesUsed( OutputImageType* oImage,
         {
         neighbor_node[j] = temp;
 
-        if ( m_LabelImage->GetPixel( neighbor_node ) == Superclass::Alive )
+        if ( this->GetLabelValueForGivenNode( neighbor_node ) == Superclass::Alive )
           {
-          neighValue =
-            static_cast< OutputPixelType >( oImage->GetPixel( neighbor_node ) );
+          neighValue = this->GetOutputValue( oImage, neighbor_node );
 
           // let's find the minimum value given a direction j
           if ( temp_node.m_Value > neighValue )
@@ -540,15 +553,15 @@ InitializeOutput( OutputImageType* oImage )
       if ( m_BufferedRegion.IsInside( idx ) )
         {
         // make this an alive point
-        m_LabelImage->SetPixel(idx, Superclass::Alive );
+        this->SetLabelValueForGivenNode( idx, Superclass::Alive );
 
-       if( this->m_TopologyCheck == Superclass::NoHandles )
+        if( this->m_TopologyCheck == Superclass::NoHandles )
           {
           m_ConnectedComponentImage->SetPixel( idx, 1 );
           }
 
         outputPixel = pointsIter->Value().GetValue();
-        oImage->SetPixel(idx, outputPixel);
+        this->SetOutputValue( oImage, idx, outputPixel );
         }
 
       ++pointsIter;
@@ -570,8 +583,8 @@ InitializeOutput( OutputImageType* oImage )
       if ( m_BufferedRegion.IsInside( idx ) )
         {
         // make this an alive point
-        m_LabelImage->SetPixel(idx, Superclass::Forbidden );
-        oImage->SetPixel (idx, zero );
+        this->SetLabelValueForGivenNode( idx, Superclass::Forbidden );
+        this->SetOutputValue( oImage, idx, zero );
         }
 
       ++p_it;
@@ -612,10 +625,10 @@ InitializeOutput( OutputImageType* oImage )
       if ( m_BufferedRegion.IsInside( idx ) )
         {
         // make this an initial trial point
-        m_LabelImage->SetPixel( idx, Superclass::InitialTrial );
+        this->SetLabelValueForGivenNode( idx, Superclass::InitialTrial );
 
         outputPixel = pointsIter->Value().GetValue();
-        oImage->SetPixel(idx, outputPixel);
+        this->SetOutputValue( oImage, idx, outputPixel );
 
         //this->m_Heap->Push( PriorityQueueElementType( idx, pointsIter->second ) );
         this->m_Heap.push( pointsIter->Value() );

@@ -53,7 +53,13 @@ protected:
   IdentifierType GetTotalNumberOfNodes() const
     { return 1; }
 
-  OutputPixelType GetOutputValue( OutputDomainType* ,
+  void SetOutputValue( OutputDomainType*,
+                      const NodeType&,
+                      const OutputPixelType& )
+    {
+    }
+
+  const OutputPixelType GetOutputValue( OutputDomainType* ,
                                   const NodeType& ) const
     {
     return NumericTraits< OutputPixelType >::Zero;
