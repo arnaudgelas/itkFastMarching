@@ -92,6 +92,10 @@ public:
   typedef typename OutputMeshType::PointsContainer  OutputPointsContainer;
   typedef typename OutputPointsContainer::Pointer   OutputPointsContainerPointer;
   typedef typename OutputPointsContainer::Iterator  OutputPointsContainerIterator;
+  typedef typename OutputMeshType::PointDataContainer
+                                                    OutputPointDataContainer;
+  typedef typename OutputPointDataContainer::Pointer
+                                                    OutputPointDataContainerPointer;
 
 
   typedef typename Traits::NodeType                 NodeType;
@@ -452,19 +456,24 @@ protected:
 
   void InitializeOutput( OutputMeshType* oDomain )
     {
-    this->CopyInputMeshToOutputMesh();
+    this->CopyInputMeshToOutputMeshGeometry();
 
+    OutputPointsContainerPointer points = oDomain->GetPoints();
+
+    OutputPointDataContainerPointer pointdata =
+        OutputPointDataContainer::New();
+    pointdata->Reserve( points->Size() );
+
+    OutputPointsContainerIterator p_it = points->Begin();
+    OutputPointsContainerIterator p_end = points->End();
+
+    while( p_it != p_end )
       {
-      OutputPointsContainerPointer points = oDomain->GetPoints();
-      OutputPointsContainerIterator p_it = points->Begin();
-      OutputPointsContainerIterator p_end = points->End();
-
-      while( p_it != p_end )
-        {
-        this->SetOutputValue( oDomain, p_it->Index(), this->m_LargeValue );
-        ++p_it;
-        }
+      pointdata->SetElement( p_it->Index(), this->m_LargeValue );
+      ++p_it;
       }
+
+    oDomain->SetPointData( pointdata );
 
     m_Label.clear();
 
@@ -477,10 +486,14 @@ protected:
         {
         // get node from alive points container
         NodeType idx = pointsIter->Value().GetNode();
-        OutputPixelType outputPixel = pointsIter->Value().GetValue();
 
-        this->SetLabelValueForGivenNode( idx, Superclass::Alive );
-        this->SetOutputValue( oDomain, idx, outputPixel );
+        if( points->IndexExists( idx ) )
+          {
+          OutputPixelType outputPixel = pointsIter->Value().GetValue();
+
+          this->SetLabelValueForGivenNode( idx, Superclass::Alive );
+          this->SetOutputValue( oDomain, idx, outputPixel );
+          }
 
         ++pointsIter;
         }
@@ -496,8 +509,11 @@ protected:
         {
         NodeType idx = node_it->Value();
 
-        this->SetLabelValueForGivenNode( idx, Superclass::Forbidden );
-        this->SetOutputValue( oDomain, idx, zero );
+        if( points->IndexExists( idx ) )
+          {
+          this->SetLabelValueForGivenNode( idx, Superclass::Forbidden );
+          this->SetOutputValue( oDomain, idx, zero );
+          }
 
         ++node_it;
         }
@@ -510,13 +526,16 @@ protected:
       while( pointsIter != pointsEnd )
         {
         NodeType idx = pointsIter->Value().GetNode();
-        OutputPixelType outputPixel = pointsIter->Value().GetValue();
 
-        this->SetLabelValueForGivenNode( idx, Superclass::InitialTrial );
+        if( points->IndexExists( idx ) )
+          {
+          OutputPixelType outputPixel = pointsIter->Value().GetValue();
 
-        this->SetOutputValue( oDomain, idx, outputPixel );
+          this->SetLabelValueForGivenNode( idx, Superclass::InitialTrial );
+          this->SetOutputValue( oDomain, idx, outputPixel );
 
-        this->m_Heap.push( pointsIter->Value() );
+          this->m_Heap.push( pointsIter->Value() );
+          }
 
         ++pointsIter;
         }
