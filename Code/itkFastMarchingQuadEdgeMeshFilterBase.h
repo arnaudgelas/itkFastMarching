@@ -192,13 +192,17 @@ protected:
             this->UpdateValue( oMesh, neigh_id );
             }
           }
+        else
+          {
+          itkGenericExceptionMacro( <<"qe_it is NULL" );
+          }
         qe_it = qe_it->GetOnext();
         }
       while( qe_it != qe );
       }
     else
       {
-      // throw one exception here
+      itkGenericExceptionMacro( <<"qe is NULL" );
       }
     }
 
@@ -230,8 +234,10 @@ protected:
           {
           OutputPointIdentifierType id2 = qe_it2->GetDestination();
 
-          const unsigned char label1 = this->GetLabelValueForGivenNode( id1 );
-          const unsigned char label2 = this->GetLabelValueForGivenNode( id2 );
+          const LabelType label1 =
+              static_cast< LabelType >( this->GetLabelValueForGivenNode( id1 ) );
+          const LabelType label2 =
+              static_cast< LabelType >( this->GetLabelValueForGivenNode( id2 ) );
 
           if( ( label1 != Superclass::Far ) ||
               ( label2 != Superclass::Far ) )
@@ -239,8 +245,13 @@ protected:
             OutputPointType q1 = oMesh->GetPoint( id1 );
             OutputPointType q2 = oMesh->GetPoint( id2 );
 
-            OutputPixelType val1 = this->GetOutputValue( oMesh, id1 );
-            OutputPixelType val2 = this->GetOutputValue( oMesh, id2 );
+            OutputVectorRealType val1 =
+                static_cast< OutputVectorRealType >(
+                  this->GetOutputValue( oMesh, id1 ) );
+
+            OutputVectorRealType val2 =
+                static_cast< OutputVectorRealType >(
+                  this->GetOutputValue( oMesh, id2 ) );
 
             if( val1 > val2 )
               {
@@ -249,16 +260,17 @@ protected:
               q2 = temp_pt;
               }
 
-            OutputPixelType temp =
-                static_cast< OutputPixelType >(
-                  this->Solve( oMesh, iNode, p,
-                              id1, q1, static_cast< LabelType >( label1 ),
-                              id2, q2, static_cast< LabelType >( label2 ) ) );
+            const OutputVectorRealType temp =
+                this->Solve( oMesh, iNode, p,
+                            id1, q1, label1, val1,
+                            id2, q2, label2, val2 );
 
             std::cout << "temp: " << temp << " * "
                       << "outputPixel : " << outputPixel <<std::endl;
 
-            outputPixel = vnl_math_min( outputPixel, temp );
+            outputPixel =
+                vnl_math_min( outputPixel,
+                              static_cast< OutputPixelType >( temp ) );
 
             std::cout << "outputPixel : " << outputPixel <<std::endl;
             }
@@ -266,6 +278,7 @@ protected:
         else
           {
           // throw one exception here
+          itkGenericExceptionMacro( << "qe_it2 is NULL" );
           }
 
         qe_it = qe_it2;
@@ -284,26 +297,25 @@ protected:
     else
       {
       // throw one exception
+      itkGenericExceptionMacro( << "qe_it is NULL" );
       }
     std:: cout << std::endl;
     }
 
 
-  OutputVectorRealType
+  const OutputVectorRealType
   Solve( OutputMeshType* oDomain,
-                const NodeType& iId,
-                OutputPointType iCurrentPoint,
-                const NodeType& iId1,
-                OutputPointType iP1,
-                const LabelType& iLabel1,
-                const NodeType& iId2,
-                OutputPointType iP2,
-                const LabelType& iLabel2 )
+         const NodeType& iId, OutputPointType iCurrentPoint,
+         const NodeType& iId1, OutputPointType iP1,
+         const LabelType& iLabel1, const OutputVectorRealType iVal1,
+         const NodeType& iId2, OutputPointType iP2,
+         const LabelType& iLabel2, const OutputVectorRealType& iVal2 )
+  const
     {
     OutputVectorType Edge1 = iP1 - iCurrentPoint;
     OutputVectorType Edge2 = iP2 - iCurrentPoint;
 
-    OutputVectorRealType sq_norm1 = Edge1.GetSquaredNorm(); //b
+    OutputVectorRealType sq_norm1 = Edge1.GetSquaredNorm();
     OutputVectorRealType norm1 = 0.;
 
     OutputVectorRealType epsilon =
@@ -317,7 +329,7 @@ protected:
       Edge1 *= inv_norm1;
       }
 
-    OutputVectorRealType sq_norm2 = Edge2.GetSquaredNorm(); //a
+    OutputVectorRealType sq_norm2 = Edge2.GetSquaredNorm();
     OutputVectorRealType norm2 = 0.;
 
     if( sq_norm2 > epsilon )
@@ -328,9 +340,6 @@ protected:
       Edge2 *= inv_norm2;
       }
 
-    const OutputVectorRealType val1 = this->GetOutputValue( oDomain, iId1 );
-    const OutputVectorRealType val2 = this->GetOutputValue( oDomain, iId2 );
-
     bool Usable1 = ( iLabel1 != Superclass::Far );
     bool Usable2 = ( iLabel2 != Superclass::Far );
 
@@ -340,12 +349,12 @@ protected:
     if( !Usable1 && Usable2 )
       {
       // only one point is a contributor
-      return val2 + norm2 * F;
+      return iVal2 + norm2 * F;
       }
     if( Usable1 && !Usable2 )
       {
       // only one point is a contributor
-      return val1 + norm1 * F;
+      return iVal1 + norm1 * F;
       }
 
     if( Usable1 && Usable2 )
@@ -353,9 +362,9 @@ protected:
       OutputVectorRealType dot =
           static_cast< OutputVectorRealType >( Edge1 * Edge2 );
 
-      if( dot > 0. )
+      if( dot >= 0. )
         {
-        return ComputeUpdate( val1, val2,
+        return ComputeUpdate( iVal1, iVal2,
                              norm2, sq_norm2,
                              norm1, sq_norm1, dot, F );
         }
@@ -363,6 +372,7 @@ protected:
         {
         // throw an exception here!
         // angle is obtuse, some preprocessing must be done on the input mesh
+        itkWarningMacro( <<"Not yet implemented for meshes with obtuse angle" );
         }
 
 
@@ -371,7 +381,7 @@ protected:
     return this->m_LargeValue;
     }
 
-  OutputVectorRealType
+  const OutputVectorRealType
   ComputeUpdate(
     const OutputVectorRealType& iDist1, const OutputVectorRealType& iDist2,
     const OutputVectorRealType& iNorm1, const OutputVectorRealType& iSqNorm1,
@@ -385,7 +395,7 @@ protected:
     OutputVectorRealType t = large_value;
 
     OutputVectorRealType CosAngle = iDot;
-    OutputVectorRealType SinAngle = vcl_sqrt( 1 - iDot * iDot );
+    OutputVectorRealType SinAngle = vcl_sqrt( 1. - iDot * iDot );
 
     OutputVectorRealType u = iDist2 - iDist1;
 
