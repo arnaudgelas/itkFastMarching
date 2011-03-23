@@ -97,6 +97,12 @@ public:
   typedef typename OutputPointDataContainer::Pointer
                                                     OutputPointDataContainerPointer;
 
+  typedef typename OutputMeshType::CellsContainer   OutputCellsContainer;
+  typedef typename OutputCellsContainer::Pointer    OutputCellsContainerPointer;
+  typedef typename OutputCellsContainer::ConstIterator
+                                                    OutputCellsContainerConstIterator;
+  typedef typename OutputMeshType::CellType         OutputCellType;
+
 
   typedef typename Traits::NodeType                 NodeType;
   typedef typename Traits::NodePairType             NodePairType;
@@ -226,54 +232,61 @@ protected:
 
       do
         {
-        OutputPointIdentifierType id1 = qe_it->GetDestination();
-
         OutputQEType *qe_it2 = qe_it->GetOnext();
 
         if( qe_it2 )
           {
-          OutputPointIdentifierType id2 = qe_it2->GetDestination();
-
-          const LabelType label1 =
-              static_cast< LabelType >( this->GetLabelValueForGivenNode( id1 ) );
-          const LabelType label2 =
-              static_cast< LabelType >( this->GetLabelValueForGivenNode( id2 ) );
-
-          if( ( label1 != Superclass::Far ) ||
-              ( label2 != Superclass::Far ) )
+          //if( ( qe_it2->GetLeft() != OutputMeshType::m_NoFace ) &&
+          //    ( qe_it->GetLeft() != OutputMeshType::m_NoFace ) )
             {
-            OutputPointType q1 = oMesh->GetPoint( id1 );
-            OutputPointType q2 = oMesh->GetPoint( id2 );
+            OutputPointIdentifierType id1 = qe_it->GetDestination();
+            OutputPointIdentifierType id2 = qe_it2->GetDestination();
 
-            OutputVectorRealType val1 =
-                static_cast< OutputVectorRealType >(
-                  this->GetOutputValue( oMesh, id1 ) );
+            const LabelType label1 =
+                static_cast< LabelType >( this->GetLabelValueForGivenNode( id1 ) );
+            const LabelType label2 =
+                static_cast< LabelType >( this->GetLabelValueForGivenNode( id2 ) );
 
-            OutputVectorRealType val2 =
-                static_cast< OutputVectorRealType >(
-                  this->GetOutputValue( oMesh, id2 ) );
-
-            if( val1 > val2 )
+            if( ( label1 != Superclass::Far ) ||
+                ( label2 != Superclass::Far ) )
               {
-              OutputPointType temp_pt = q1;
-              q1 = q2;
-              q2 = temp_pt;
+              OutputPointType q1 = oMesh->GetPoint( id1 );
+              OutputPointType q2 = oMesh->GetPoint( id2 );
+
+              OutputVectorRealType val1 =
+                  static_cast< OutputVectorRealType >(
+                    this->GetOutputValue( oMesh, id1 ) );
+
+              OutputVectorRealType val2 =
+                  static_cast< OutputVectorRealType >(
+                    this->GetOutputValue( oMesh, id2 ) );
+
+              if( val1 > val2 )
+                {
+                OutputPointType temp_pt = q1;
+                q1 = q2;
+                q2 = temp_pt;
+                }
+
+              const OutputVectorRealType temp =
+                  this->Solve( oMesh, iNode, p,
+                              id1, q1, label1, val1,
+                              id2, q2, label2, val2 );
+
+              std::cout << "temp: " << temp << " * "
+                        << "outputPixel : " << outputPixel <<std::endl;
+
+              outputPixel =
+                  vnl_math_min( outputPixel,
+                                static_cast< OutputPixelType >( temp ) );
+
+              std::cout << "outputPixel : " << outputPixel <<std::endl;
               }
-
-            const OutputVectorRealType temp =
-                this->Solve( oMesh, iNode, p,
-                            id1, q1, label1, val1,
-                            id2, q2, label2, val2 );
-
-            std::cout << "temp: " << temp << " * "
-                      << "outputPixel : " << outputPixel <<std::endl;
-
-            outputPixel =
-                vnl_math_min( outputPixel,
-                              static_cast< OutputPixelType >( temp ) );
-
-            std::cout << "outputPixel : " << outputPixel <<std::endl;
             }
+          //else
+          //  {
+          //  std::cout << "this is a boundary" <<std::endl;
+          //  }
           }
         else
           {
@@ -372,7 +385,13 @@ protected:
         {
         // throw an exception here!
         // angle is obtuse, some preprocessing must be done on the input mesh
-        itkWarningMacro( <<"Not yet implemented for meshes with obtuse angle" );
+        itkWarningMacro(
+              <<"Not yet implemented for meshes with obtuse angle." << std::endl
+              << iId <<" iCurrentPoint: " << iCurrentPoint <<std::endl
+              << iId1 <<" iP1: " << iP1 << std::endl
+              << iId2 <<" iP2: " << iP2 << std::endl
+              <<"dot = " << dot << std::endl
+              );
         }
 
 
@@ -467,6 +486,24 @@ protected:
   void InitializeOutput( OutputMeshType* oDomain )
     {
     this->CopyInputMeshToOutputMeshGeometry();
+
+    // Check that the input mesh is made of triangles
+      {
+      OutputCellsContainerPointer cells = oDomain->GetCells();
+      OutputCellsContainerConstIterator c_it = cells->Begin();
+      OutputCellsContainerConstIterator c_end = cells->End();
+
+      while( c_it != c_end )
+        {
+        OutputCellType* cell = c_it.Value();
+
+        if( cell->GetNumberOfPoints() != 3 )
+          {
+          itkGenericExceptionMacro( << "Input mesh has non triangular faces" );
+          }
+        ++c_it;
+        }
+      }
 
     OutputPointsContainerPointer points = oDomain->GetPoints();
 

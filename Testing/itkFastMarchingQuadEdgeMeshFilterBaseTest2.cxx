@@ -44,27 +44,57 @@ int main( int argc, char* argv[] )
       PixelType, Traits > FastMarchingType;
   typedef FastMarchingType::InputMeshType MeshType;
 
-  MeshType::PointType center;
-  center.Fill( 0. );
+  typedef MeshType::PointsContainer PointsContainer;
+  typedef PointsContainer::Pointer  PointsContainerPointer;
 
-  typedef itk::RegularSphereMeshSource< MeshType > SphereSourceType;
-  SphereSourceType::Pointer sphere_filter = SphereSourceType::New();
-  sphere_filter->SetCenter( center );
-  sphere_filter->SetResolution( 5 );
-  sphere_filter->Update();
+  typedef MeshType::PointDataContainer PointDataContainer;
+  typedef PointDataContainer::Pointer  PointDataContainerPointer;
 
-  MeshType::Pointer sphere_output = sphere_filter->GetOutput();
+  typedef MeshType::CellType CellType;
+  typedef itk::QuadEdgeMeshPolygonCell< CellType > QEPolygonCellType;
 
-  MeshType::PointsContainerConstPointer points =
-      sphere_output->GetPoints();
 
-  MeshType::PointsContainerConstIterator p_it = points->Begin();
-  MeshType::PointsContainerConstIterator p_end = points->End();
+  // Let's create here a plane!
+  MeshType::Pointer plane = MeshType::New();
 
-  while( p_it != p_end )
+  PointsContainerPointer points = PointsContainer::New();
+  PointDataContainerPointer pointdata = PointDataContainer::New();
+
+  points->Reserve( 100 );
+  pointdata->Reserve( 100 );
+
+  MeshType::PointType p;
+  p[2] = 0.;
+
+  int k = 0;
+
+  for( int i = 0; i < 10; i++ )
     {
-    sphere_output->SetPointData( p_it->Index(), 1. );
-    ++p_it;
+    p[0] = static_cast< CoordType >( i );
+
+    for( int j = 0; j < 10; j++ )
+      {
+      p[1] = static_cast< CoordType >( j );
+      points->SetElement( k, p );
+      pointdata->SetElement( k, 1. );
+      k++;
+      }
+    }
+
+  plane->SetPoints( points );
+  plane->SetPointData( pointdata );
+
+  k = 0;
+
+  for( int i = 0; i < 9; i++ )
+    {
+    for( int j = 0; j < 9; j++ )
+      {
+      plane->AddFaceTriangle( k, k+1, k+11 );
+      plane->AddFaceTriangle( k, k+11, k+10 );
+      k++;
+      }
+    k++;
     }
 
   typedef FastMarchingType::NodeType NodeType;
@@ -83,7 +113,7 @@ int main( int argc, char* argv[] )
   criterion->SetThreshold( 100. );
 
   FastMarchingType::Pointer fmm_filter = FastMarchingType::New();
-  fmm_filter->SetInput( sphere_output );
+  fmm_filter->SetInput( plane );
   fmm_filter->SetTrialPoints( trial );
   fmm_filter->SetStoppingCriterion( criterion );
 
