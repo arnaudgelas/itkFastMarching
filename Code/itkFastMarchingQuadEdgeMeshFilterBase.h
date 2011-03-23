@@ -132,7 +132,7 @@ protected:
     return outputValue;
     }
 
-  char GetLabelValueForGivenNode( const NodeType& iNode ) const
+  const unsigned char GetLabelValueForGivenNode( const NodeType& iNode ) const
     {
     NodeLabelMapConstIterator it = m_Label.find( iNode );
 
@@ -155,6 +155,8 @@ protected:
   void UpdateNeighbors( OutputMeshType* oMesh,
                         const NodeType& iNode )
     {
+    std::cout << "## UpdateNeighbors( " << iNode << " ) ##" <<std::endl;
+
     OutputPointType p;
     oMesh->GetPoint( iNode, &p );
 
@@ -194,6 +196,7 @@ protected:
   void UpdateValue( OutputMeshType* oMesh,
                     const NodeType& iNode )
     {
+    std::cout << "** UpdateValue( " << iNode << " ) **" <<std::endl;
     OutputPointType p;
     oMesh->GetPoint( iNode, &p );
 
@@ -216,10 +219,10 @@ protected:
           {
           OutputPointIdentifierType id2 = qe_it2->GetDestination();
 
-          char label1 = this->GetLabelValueForGivenNode( id1 );
-          char label2 = this->GetLabelValueForGivenNode( id2 );
+          const char label1 = this->GetLabelValueForGivenNode( id1 );
+          const char label2 = this->GetLabelValueForGivenNode( id2 );
 
-          if( ( label1 != Superclass::Far ) &&
+          if( ( label1 != Superclass::Far ) ||
               ( label2 != Superclass::Far ) )
             {
             OutputPointType q1 = oMesh->GetPoint( id1 );
@@ -239,7 +242,12 @@ protected:
                 static_cast< OutputPixelType >(
                   this->Solve( oMesh, iNode, p, id1, q1, id2, q2 ) );
 
+            std::cout << "temp: " << temp << " * "
+                      << "outputPixel : " << outputPixel <<std::endl;
+
             outputPixel = vnl_math_min( outputPixel, temp );
+
+            std::cout << "outputPixel : " << outputPixel <<std::endl;
             }
           }
         else
@@ -255,6 +263,7 @@ protected:
       {
       // throw one exception
       }
+    std:: cout << std::endl;
     }
 
 

@@ -243,7 +243,7 @@ protected:
                                   const NodeType& iNode ) const;
 
   /** Returns the label value for a given node */
-  char GetLabelValueForGivenNode( const NodeType& iNode ) const;
+  const unsigned char GetLabelValueForGivenNode( const NodeType& iNode ) const;
 
   /** Set the label value for a given node */
   void SetLabelValueForGivenNode( const NodeType& iNode,

@@ -59,7 +59,7 @@ protected:
     return NumericTraits< OutputPixelType >::Zero;
     }
 
-  char GetLabelValueForGivenNode( const NodeType& ) const
+  const unsigned char GetLabelValueForGivenNode( const NodeType& ) const
     {
     return Superclass::Far;
     }
