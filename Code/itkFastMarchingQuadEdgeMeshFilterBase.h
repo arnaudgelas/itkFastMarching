@@ -246,8 +246,8 @@ protected:
             const LabelType label2 =
                 static_cast< LabelType >( this->GetLabelValueForGivenNode( id2 ) );
 
-            const bool IsFar1 = ( label1 == Superclass::Far );
-            const bool IsFar2 = ( label2 == Superclass::Far );
+            const bool IsFar1 = ( label1 != Superclass::Far );
+            const bool IsFar2 = ( label2 != Superclass::Far );
 
             if( IsFar1 || IsFar2 )
               {
