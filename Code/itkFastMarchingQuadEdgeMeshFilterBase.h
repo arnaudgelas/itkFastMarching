@@ -236,8 +236,7 @@ protected:
 
         if( qe_it2 )
           {
-          //if( ( qe_it2->GetLeft() != OutputMeshType::m_NoFace ) &&
-          //    ( qe_it->GetLeft() != OutputMeshType::m_NoFace ) )
+          if( qe_it->GetLeft() != OutputMeshType::m_NoFace )
             {
             OutputPointIdentifierType id1 = qe_it->GetDestination();
             OutputPointIdentifierType id2 = qe_it2->GetDestination();
@@ -247,8 +246,10 @@ protected:
             const LabelType label2 =
                 static_cast< LabelType >( this->GetLabelValueForGivenNode( id2 ) );
 
-            if( ( label1 != Superclass::Far ) ||
-                ( label2 != Superclass::Far ) )
+            const bool IsFar1 = ( label1 == Superclass::Far );
+            const bool IsFar2 = ( label2 == Superclass::Far );
+
+            if( IsFar1 || IsFar2 )
               {
               OutputPointType q1 = oMesh->GetPoint( id1 );
               OutputPointType q2 = oMesh->GetPoint( id2 );
@@ -270,8 +271,8 @@ protected:
 
               const OutputVectorRealType temp =
                   this->Solve( oMesh, iNode, p,
-                              id1, q1, label1, val1,
-                              id2, q2, label2, val2 );
+                              id1, q1, IsFar1, val1,
+                              id2, q2, IsFar2, val2 );
 
               std::cout << "temp: " << temp << " * "
                         << "outputPixel : " << outputPixel <<std::endl;
@@ -283,18 +284,14 @@ protected:
               std::cout << "outputPixel : " << outputPixel <<std::endl;
               }
             }
-          //else
-          //  {
-          //  std::cout << "this is a boundary" <<std::endl;
-          //  }
+
+          qe_it = qe_it2;
           }
         else
           {
           // throw one exception here
           itkGenericExceptionMacro( << "qe_it2 is NULL" );
           }
-
-        qe_it = qe_it2;
         }
       while( qe_it != qe );
 
@@ -320,9 +317,9 @@ protected:
   Solve( OutputMeshType* oDomain,
          const NodeType& iId, OutputPointType iCurrentPoint,
          const NodeType& iId1, OutputPointType iP1,
-         const LabelType& iLabel1, const OutputVectorRealType iVal1,
+         const bool& iIsFar1, const OutputVectorRealType iVal1,
          const NodeType& iId2, OutputPointType iP2,
-         const LabelType& iLabel2, const OutputVectorRealType& iVal2 )
+         const bool& iIsFar2, const OutputVectorRealType& iVal2 )
   const
     {
     OutputVectorType Edge1 = iP1 - iCurrentPoint;
@@ -353,24 +350,21 @@ protected:
       Edge2 *= inv_norm2;
       }
 
-    bool Usable1 = ( iLabel1 != Superclass::Far );
-    bool Usable2 = ( iLabel2 != Superclass::Far );
-
     InputPixelType F;
     this->GetInput()->GetPointData( iId, &F );
 
-    if( !Usable1 && Usable2 )
+    if( !iIsFar1 && iIsFar2 )
       {
       // only one point is a contributor
       return iVal2 + norm2 * F;
       }
-    if( Usable1 && !Usable2 )
+    if( iIsFar1 && !iIsFar2 )
       {
       // only one point is a contributor
       return iVal1 + norm1 * F;
       }
 
-    if( Usable1 && Usable2 )
+    if( iIsFar1 && iIsFar2 )
       {
       OutputVectorRealType dot =
           static_cast< OutputVectorRealType >( Edge1 * Edge2 );
