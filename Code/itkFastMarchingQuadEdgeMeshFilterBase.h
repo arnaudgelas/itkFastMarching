@@ -246,8 +246,8 @@ protected:
             const LabelType label2 =
                 static_cast< LabelType >( this->GetLabelValueForGivenNode( id2 ) );
 
-            const bool IsFar1 = ( label1 != Superclass::Far );
-            const bool IsFar2 = ( label2 != Superclass::Far );
+            bool IsFar1 = ( label1 != Superclass::Far );
+            bool IsFar2 = ( label2 != Superclass::Far );
 
             if( IsFar1 || IsFar2 )
               {
@@ -264,9 +264,13 @@ protected:
 
               if( val1 > val2 )
                 {
-                OutputPointType temp_pt = q1;
+                OutputPointType temp_pt( q1 );
                 q1 = q2;
                 q2 = temp_pt;
+
+                std::swap( val1, val2 );
+                std::swap( IsFar1, IsFar2 );
+                std::swap( id1, id2 );
                 }
 
               const OutputVectorRealType temp =
