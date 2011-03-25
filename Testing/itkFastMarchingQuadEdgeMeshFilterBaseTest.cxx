@@ -23,7 +23,7 @@
 #include "itkFastMarchingThresholdStoppingCriterion.h"
 #include "itkQuadEdgeMeshScalarDataVTKPolyDataWriter.h"
 
-int main( int argc, char* argv[] )
+int main( int , char** )
 {
   typedef float PixelType;
   typedef double CoordType;
@@ -101,7 +101,7 @@ int main( int argc, char* argv[] )
   typedef itk::QuadEdgeMeshScalarDataVTKPolyDataWriter< MeshType > WriterType;
   WriterType::Pointer writer = WriterType::New();
   writer->SetInput( fmm_filter->GetOutput() );
-  writer->SetFileName( "output.vtk" );
+  writer->SetFileName( "itkFastMarchingQuadEdgeMeshFilterBase.vtk" );
   writer->Update();
 
 

@@ -23,7 +23,7 @@
 #include "itkFastMarchingThresholdStoppingCriterion.h"
 #include "itkQuadEdgeMeshScalarDataVTKPolyDataWriter.h"
 
-int main( int argc, char* argv[] )
+int main( int , char** )
 {
   typedef float PixelType;
   typedef double CoordType;
@@ -135,10 +135,37 @@ int main( int argc, char* argv[] )
     return EXIT_FAILURE;
     }
 
+  MeshType::Pointer output = fmm_filter->GetOutput();
+
+  PointDataContainerPointer output_data = output->GetPointData();
+
+  PointDataContainer::ConstIterator o_data_it = output_data->Begin();
+  PointDataContainer::ConstIterator o_data_end = output_data->End();
+
+  PointsContainer::ConstIterator p_it = points->Begin();
+
+  p.Fill( 0. );
+
+  bool error = false;
+
+  while( o_data_it != o_data_end )
+    {
+    PixelType expected_value = p.EuclideanDistanceTo( p_it->Value() );
+
+    if( ( o_data_it->Value() - expected_value ) > 5. * expected_value / 100. )
+      {
+      std::cout << "** k = " << k << std::endl;
+      std::cout << o_data_it->Value() << " != " << expected_value <<std::endl;
+      error = true;
+      }
+    ++p_it;
+    ++o_data_it;
+    }
+
   typedef itk::QuadEdgeMeshScalarDataVTKPolyDataWriter< MeshType > WriterType;
   WriterType::Pointer writer = WriterType::New();
   writer->SetInput( fmm_filter->GetOutput() );
-  writer->SetFileName( "output.vtk" );
+  writer->SetFileName( "itkFastMarchingQuadEdgeMeshFilterBaseTest3.vtk" );
   writer->Update();
 
 
