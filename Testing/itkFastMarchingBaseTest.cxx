@@ -53,13 +53,19 @@ protected:
   IdentifierType GetTotalNumberOfNodes() const
     { return 1; }
 
-  OutputPixelType GetOutputValue( OutputDomainType* ,
+  void SetOutputValue( OutputDomainType*,
+                      const NodeType&,
+                      const OutputPixelType& )
+    {
+    }
+
+  const OutputPixelType GetOutputValue( OutputDomainType* ,
                                   const NodeType& ) const
     {
     return NumericTraits< OutputPixelType >::Zero;
     }
 
-  char GetLabelValueForGivenNode( const NodeType& ) const
+  const unsigned char GetLabelValueForGivenNode( const NodeType& ) const
     {
     return Superclass::Far;
     }
@@ -143,9 +149,9 @@ int main( int argc, char* argv[] )
       {
       typedef itk::MeshFastMarchingTraits< Dimension,
           PixelType,
-          itk::DefaultStaticMeshTraits< PixelType, 3, 3 >,
+          itk::QuadEdgeMeshTraits< PixelType, 3, bool, bool >,
           PixelType,
-          itk::DefaultStaticMeshTraits< PixelType, 3, 3 > >
+          itk::QuadEdgeMeshTraits< PixelType, 3, bool, bool > >
         MeshTraits;
       typedef MeshTraits::NodeType MeshNodetype;
 

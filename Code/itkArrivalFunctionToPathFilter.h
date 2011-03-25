@@ -31,13 +31,13 @@ namespace itk
 
 /** A command to listen for Optimizer Iteration events. */
 template <class TFilter>
-class ArrivalFunctionToPathCommand : public itk::Command
+class ArrivalFunctionToPathCommand : public Command
 {
 public:
   /** Standard class typedefs. */
   typedef  ArrivalFunctionToPathCommand   Self;
-  typedef  itk::Command             Superclass;
-  typedef  itk::SmartPointer<Self>  Pointer;
+  typedef  Command             Superclass;
+  typedef  SmartPointer<Self>  Pointer;
 
   /** Method for creation through the object factory. */
   itkNewMacro( Self );
@@ -51,15 +51,15 @@ public:
   itkGetConstObjectMacro( Filter, FilterType );
 
   /** Execute */
-  void Execute(itk::Object *caller, const itk::EventObject & event)
+  void Execute(Object *caller, const EventObject & event)
   {
-    Execute( (const itk::Object *)caller, event);
+    Execute( (const Object *)caller, event);
   }
 
   /** Execute */
-  void Execute(const itk::Object * object, const itk::EventObject & event)
+  void Execute(const Object * object, const EventObject & event)
   {
-    if( ! itk::IterationEvent().CheckEvent( &event ) )
+    if( ! IterationEvent().CheckEvent( &event ) )
       {
       return;
       }
@@ -71,9 +71,13 @@ public:
   }
 
 protected:
-  ArrivalFunctionToPathCommand(){};
+  ArrivalFunctionToPathCommand() {}
+  ~ArrivalFunctionToPathCommand() {}
 
 private:
+  ArrivalFunctionToPathCommand( const Self& );
+  void operator = ( const Self& );
+
   FilterPointer m_Filter;
 };
 
@@ -119,7 +123,7 @@ private:
  *     Cambridge Press, 2nd edition, 1999.
  * [2] J. Andrews and J. Sethian. Fast marching methods for the continuous
  *     traveling salesman problem. Proceedings of the National Academy of
- *     Sciences (PNAS), 104(4):1118–1123, 2007.
+ *     Sciences (PNAS), 104(4):1118ï¿½1123, 2007.
  *
  * \author Dan Mueller, Queensland University of Technology, dan.muel[at]gmail.com
  *
@@ -208,7 +212,7 @@ public:
   itkGetMacro(TerminationValue, typename OptimizerType::MeasureType);
 
   /** Handle optimizer iteration events. */
-  virtual void Execute( const itk::Object * object, const itk::EventObject & event );
+  virtual void Execute( const Object * object, const EventObject & event );
 
 protected:
   ArrivalFunctionToPathFilter();

@@ -80,6 +80,33 @@ target_link_libraries( itkFastMarchingExtensionImageFilterTest ${ITK_LIBRARIES} 
 add_test( itkFastMarchingExtensionImageFilterTest
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingExtensionImageFilterTest )
 
+add_executable( itkFastMarchingQuadEdgeMeshFilterBaseTest
+  itkFastMarchingQuadEdgeMeshFilterBaseTest.cxx
+  ${BASE_SOURCE}
+)
+target_link_libraries( itkFastMarchingQuadEdgeMeshFilterBaseTest ${ITK_LIBRARIES} )
+
+add_test( itkFastMarchingQuadEdgeMeshFilterBaseTest
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingQuadEdgeMeshFilterBaseTest )
+
+add_executable( itkFastMarchingQuadEdgeMeshFilterBaseTest2
+  itkFastMarchingQuadEdgeMeshFilterBaseTest2.cxx
+  ${BASE_SOURCE}
+)
+target_link_libraries( itkFastMarchingQuadEdgeMeshFilterBaseTest2 ${ITK_LIBRARIES} )
+
+add_test( itkFastMarchingQuadEdgeMeshFilterBaseTest2
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingQuadEdgeMeshFilterBaseTest2 )
+
+add_executable( itkFastMarchingQuadEdgeMeshFilterBaseTest3
+  itkFastMarchingQuadEdgeMeshFilterBaseTest3.cxx
+  ${BASE_SOURCE}
+)
+target_link_libraries( itkFastMarchingQuadEdgeMeshFilterBaseTest3 ${ITK_LIBRARIES} )
+
+add_test( itkFastMarchingQuadEdgeMeshFilterBaseTest3
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/itkFastMarchingQuadEdgeMeshFilterBaseTest3 )
+
 # --------------------------------------------------------------------------
 # Topology constrained front propagation
 # --------------------------------------------------------------------------
