@@ -172,8 +172,6 @@ protected:
   void UpdateNeighbors( OutputMeshType* oMesh,
                         const NodeType& iNode )
     {
-    std::cout << "## UpdateNeighbors( " << iNode << " ) ##" <<std::endl;
-
     OutputPointType p;
     oMesh->GetPoint( iNode, &p );
 
@@ -217,9 +215,16 @@ protected:
   void UpdateValue( OutputMeshType* oMesh,
                     const NodeType& iNode )
     {
-    std::cout << "** UpdateValue( " << iNode << " ) **" <<std::endl;
     OutputPointType p;
     oMesh->GetPoint( iNode, &p );
+
+    InputPixelType F;
+    this->GetInput()->GetPointData( iNode, &F );
+
+    if( F < 0. )
+      {
+      itkGenericExceptionMacro( << "F < 0." );
+      }
 
     OutputQEType* qe = p.GetEdge();
 
@@ -274,18 +279,13 @@ protected:
                 }
 
               const OutputVectorRealType temp =
-                  this->Solve( oMesh, iNode, p,
+                  this->Solve( oMesh, iNode, p, F,
                               id1, q1, IsFar1, val1,
                               id2, q2, IsFar2, val2 );
-
-              std::cout << "temp: " << temp << " * "
-                        << "outputPixel : " << outputPixel <<std::endl;
 
               outputPixel =
                   vnl_math_min( outputPixel,
                                 static_cast< OutputPixelType >( temp ) );
-
-              std::cout << "outputPixel : " << outputPixel <<std::endl;
               }
             }
 
@@ -313,16 +313,16 @@ protected:
       // throw one exception
       itkGenericExceptionMacro( << "qe_it is NULL" );
       }
-    std:: cout << std::endl;
     }
 
 
   const OutputVectorRealType
   Solve( OutputMeshType* oDomain,
-         const NodeType& iId, OutputPointType iCurrentPoint,
-         const NodeType& iId1, OutputPointType iP1,
+         const NodeType& iId, const OutputPointType& iCurrentPoint,
+         const OutputVectorRealType& iF,
+         const NodeType& iId1, const OutputPointType& iP1,
          const bool& iIsFar1, const OutputVectorRealType iVal1,
-         const NodeType& iId2, OutputPointType iP2,
+         const NodeType& iId2, const OutputPointType& iP2,
          const bool& iIsFar2, const OutputVectorRealType& iVal2 )
   const
     {
@@ -354,18 +354,15 @@ protected:
       Edge2 *= inv_norm2;
       }
 
-    InputPixelType F;
-    this->GetInput()->GetPointData( iId, &F );
-
     if( !iIsFar1 && iIsFar2 )
       {
       // only one point is a contributor
-      return iVal2 + norm2 * F;
+      return iVal2 + norm2 * iF;
       }
     if( iIsFar1 && !iIsFar2 )
       {
       // only one point is a contributor
-      return iVal1 + norm1 * F;
+      return iVal1 + norm1 * iF;
       }
 
     if( iIsFar1 && iIsFar2 )
@@ -377,7 +374,7 @@ protected:
         {
         return ComputeUpdate( iVal1, iVal2,
                              norm2, sq_norm2,
-                             norm1, sq_norm1, dot, F );
+                             norm1, sq_norm1, dot, iF );
         }
       else
         {

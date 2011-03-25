@@ -60,19 +60,19 @@ int main( int argc, char* argv[] )
   PointsContainerPointer points = PointsContainer::New();
   PointDataContainerPointer pointdata = PointDataContainer::New();
 
-  points->Reserve( 4 );//100 );
-  pointdata->Reserve( 4 );//100 );
+  points->Reserve( 100 );
+  pointdata->Reserve( 100 );
 
   MeshType::PointType p;
   p[2] = 0.;
 
   int k = 0;
 
-  for( int i = 0; i < 2; i++ )//10; i++ )
+  for( int i = 0; i < 10; i++ )
     {
     p[0] = static_cast< CoordType >( i );
 
-    for( int j = 0; j < 2; j++ )//10; j++ )
+    for( int j = 0; j < 10; j++ )
       {
       p[1] = static_cast< CoordType >( j );
       points->SetElement( k, p );
@@ -85,10 +85,7 @@ int main( int argc, char* argv[] )
   plane->SetPointData( pointdata );
 
   k = 0;
-  plane->AddFaceTriangle( 0, 1, 3 );
-  plane->AddFaceTriangle( 0, 3, 2 );
 
-  /*
   for( int i = 0; i < 9; i++ )
     {
     for( int j = 0; j < 9; j++ )
@@ -98,7 +95,7 @@ int main( int argc, char* argv[] )
       k++;
       }
     k++;
-    }*/
+    }
 
   typedef FastMarchingType::NodeType NodeType;
   typedef FastMarchingType::NodePairType NodePairType;
