@@ -378,15 +378,33 @@ protected:
         }
       else
         {
-        // throw an exception here!
-        // angle is obtuse, some preprocessing must be done on the input mesh
-        itkWarningMacro(
-              <<"Not yet implemented for meshes with obtuse angle." << std::endl
-              << iId <<" iCurrentPoint: " << iCurrentPoint <<std::endl
-              << iId1 <<" iP1: " << iP1 << std::endl
-              << iId2 <<" iP2: " << iP2 << std::endl
-              <<"dot = " << dot << std::endl
-              );
+        OutputVectorRealType sq_norm3, norm3, dot1, dot2;
+        OutputPointIdentifierType new_id;
+
+        bool unfolded =
+          UnfoldTriangle( oDomain, iId, iCurrentPoint, iId1, iP1,
+                          iId2, iP2, norm3, sq_norm3, dot1, dot2 , new_id );
+
+        if( unfolded )
+          {
+          OutputVectorRealType sq_norm3 = norm3 * norm3;
+
+          OutputVectorRealType val3 =
+              static_cast< OutputVectorRealType >(
+                this->GetOutputValue( oDomain, new_id ) );
+          OutputVectorRealType t1 = ComputeUpdate( iVal1, val3, norm3, sq_norm3,
+                                                  norm1, sq_norm1, dot1, iF );
+          OutputVectorRealType t2 = ComputeUpdate( iVal2, val3, norm3, sq_norm3,
+                                                  norm2, sq_norm2, dot2, iF );
+
+          return vnl_math_min( t1, t2 );
+          }
+        else
+          {
+          return ComputeUpdate( iVal1, iVal2,
+                               norm2, sq_norm2,
+                               norm1, sq_norm1, dot, iF );
+          }
         }
 
 
@@ -397,7 +415,7 @@ protected:
 
   const OutputVectorRealType
   ComputeUpdate(
-    const OutputVectorRealType& iDist1, const OutputVectorRealType& iDist2,
+    const OutputVectorRealType& iVal1, const OutputVectorRealType& iVal2,
     const OutputVectorRealType& iNorm1, const OutputVectorRealType& iSqNorm1,
     const OutputVectorRealType& iNorm2, const OutputVectorRealType& iSqNorm2,
     const OutputVectorRealType& iDot, const OutputVectorRealType& iF )
@@ -411,7 +429,7 @@ protected:
     OutputVectorRealType CosAngle = iDot;
     OutputVectorRealType SinAngle = vcl_sqrt( 1. - iDot * iDot );
 
-    OutputVectorRealType u = iDist2 - iDist1;
+    OutputVectorRealType u = iVal2 - iVal1;
 
     OutputVectorRealType sq_u = u * u;
     OutputVectorRealType f2 = iSqNorm1 + iSqNorm2 - 2. * iNorm1 * iNorm2 * CosAngle;
@@ -459,13 +477,159 @@ protected:
         ( iNorm1 * CosAngle < iNorm2 * ( t - u ) / t ) &&
         ( iNorm2 * ( t - u ) / t < iNorm1 / CosAngle ) )
       {
-      return t + iDist1;
+      return t + iVal1;
       }
     else
       {
-      return vnl_math_min( iNorm2 * iF + iDist1, iNorm1 * iF + iDist2 );
+      return vnl_math_min( iNorm2 * iF + iVal1, iNorm1 * iF + iVal2 );
       }
   }
+
+  bool UnfoldTriangle(
+    OutputMeshType* oDomain,
+    const OutputPointIdentifierType& iId, const OutputPointType& iP,
+    const OutputPointIdentifierType& iId1, const OutputPointType& iP1,
+    const OutputPointIdentifierType& iId2, const OutputPointType &iP2,
+    OutputVectorRealType& oNorm, OutputVectorRealType& oSqNorm,
+    OutputVectorRealType& oDot1, OutputVectorRealType& oDot2,
+    OutputPointIdentifierType& oId ) const
+    // GW_GeodesicFace& CurFace, GW_GeodesicVertex& vert, GW_GeodesicVertex& vert1, GW_GeodesicVertex& vert2,
+    // GW_Float& dist, GW_Float& dot1, GW_Float& dot2 )
+    {
+    OutputVectorType Edge1 = iP1 - iP;
+    OutputVectorRealType Norm1 = Edge1.GetNorm();
+    Edge1 /= Norm1;
+
+    OutputVectorType Edge2 = iP2 - iP;
+    OutputVectorRealType Norm2 = Edge2.GetNorm();
+    Edge2 /= Norm2;
+
+    OutputVectorRealType dot =
+        static_cast< OutputVectorRealType >( Edge1 * Edge2 );
+
+    // the equation of the lines defining the unfolding region [e.g. line 1 : {x ; <x,eq1>=0} ]
+    typedef Vector< OutputVectorRealType, 2 > Vector2DType;
+    typedef Matrix< OutputVectorRealType, 2, 2 > Matrix2DType;
+
+    Vector2DType v1;
+    v1[0] = dot;
+    v1[1] = vcl_sqrt( 1. - dot * dot );
+
+    Vector2DType v2;
+    v2[0] = 1.;
+    v2[1] = 0.;
+
+    Vector2DType x1;
+    x1[0] = Norm1;
+    x1[1] = 0.;
+
+    Vector2DType x2 = Norm2 * v1;
+
+
+    // keep track of the starting point
+    Vector2DType x_start1( x1 );
+    Vector2DType x_start2( x2 );
+
+    OutputPointIdentifierType id1 = iId1;
+    OutputPointIdentifierType id2 = iId2;
+
+    OutputQEType *qe = oDomain->FindEdge( id1, id2 );
+    qe = qe->GetSym();
+
+    OutputPointType t_pt1 = iP1;
+    OutputPointType t_pt2 = iP2;
+    OutputPointType t_pt;
+
+    unsigned int nNum = 0;
+    while( nNum<50 && qe->GetLeft() != OutputMeshType::m_NoFace )
+      {
+      OutputQEType* qe_Lnext = qe->GetLnext();
+      OutputPointIdentifierType t_id = qe_Lnext->GetDestination();
+
+      oDomain->GetPoint( t_id, &t_pt );
+
+      Edge1 = t_pt2 - t_pt1;
+      Norm1 = Edge1.GetNorm();
+      Edge1 /= Norm1;
+
+      Edge2 = t_pt - t_pt1;
+      Norm2 = Edge2.GetNorm();
+      Edge2 /= Norm2;
+
+      /* compute the position of the new point x on the unfolding plane (via a rotation of -alpha on (x2-x1)/rNorm1 )
+              | cos(alpha) sin(alpha)|
+          x = |-sin(alpha) cos(alpha)| * [x2-x1]*rNorm2/rNorm1 + x1   where cos(alpha)=dot
+      */
+      Vector2DType vv = (x2 - x1) * Norm2 / Norm1;
+
+      dot = Edge1 * Edge2;
+
+      Matrix2DType rotation;
+      rotation[0][0] = dot;
+      rotation[0][1] = vcl_sqrt( 1. - dot * dot );
+      rotation[1][0] = - rotation[0][1];
+      rotation[1][1] = dot;
+
+      Vector2DType x = rotation * vv + x1;
+
+
+      /* compute the intersection points.
+         We look for x=x1+lambda*(x-x1) or x=x2+lambda*(x-x2) with <x,eqi>=0, so */
+      OutputVectorRealType lambda11 = - ( x1 * v1 ) / ( ( x - x1 ) * v1 );	// left most
+      OutputVectorRealType lambda12 = - ( x1 * v2 ) / ( ( x - x1 ) * v2 );	// right most
+      OutputVectorRealType lambda21 = - ( x2 * v1 ) / ( ( x - x2 ) * v1 );	// left most
+      OutputVectorRealType lambda22 = - ( x2 * v2 ) / ( ( x - x2 ) * v2 );	// right most
+      bool bIntersect11 = (lambda11>=0.) && (lambda11<=1.);
+      bool bIntersect12 = (lambda12>=0.) && (lambda12<=1.);
+      bool bIntersect21 = (lambda21>=0.) && (lambda21<=1.);
+      bool bIntersect22 = (lambda22>=0.) && (lambda22<=1.);
+
+      if( bIntersect11 && bIntersect12 )
+        {
+        qe = oDomain->FindEdge( id1, t_id );
+        qe->GetSym();
+
+        t_pt2 = t_pt;
+        x2 = x;
+        }
+      else
+        {
+        if( bIntersect21 && bIntersect22 )
+          {
+          qe = oDomain->FindEdge( id2, t_id );
+          qe->GetSym();
+
+          t_pt1 = t_pt;
+          x1 = x;
+          }
+        else
+          { // bIntersect11 && !bIntersect12 && !bIntersect21 && bIntersect22
+
+          // that's it, we have found the point
+          oSqNorm = x.GetSquaredNorm();
+
+          if( oSqNorm > NumericTraits< OutputVectorRealType >::epsilon() )
+            {
+            oNorm = vcl_sqrt( oSqNorm );
+            oDot1 = x * x_start1 / ( oNorm * x_start1.GetNorm() );
+            oDot2 = x * x_start2 / ( oNorm * x_start2.GetNorm() );
+            }
+          else
+            {
+            oNorm = 0.;
+            oDot1 = 0.;
+            oDot2 = 0.;
+            }
+
+          oId = t_id;
+          return true;
+          }
+        }
+      ++nNum;
+      }
+
+      return false;
+    }
 
 
 
